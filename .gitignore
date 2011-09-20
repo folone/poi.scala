@@ -1,0 +1,5 @@
+target/
+# the following is for vi and emacs users
+*~
+*#
+.#*
