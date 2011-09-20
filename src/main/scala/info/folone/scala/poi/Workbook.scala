@@ -21,7 +21,7 @@ package info.folone.scala.poi {
           }
         }
       val file = new FileOutputStream(new File(path))
-      workbook.write(file)
+      workbook write file
       file.close()
     }
   }
