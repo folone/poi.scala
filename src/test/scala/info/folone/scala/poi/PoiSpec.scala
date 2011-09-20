@@ -3,7 +3,6 @@ package info.folone.scala.poi {
   class PoiSpec extends SpecificationWithJUnit {
     "Poi" should {
       "create workbook" in {
-        //cell must not beNull
         Workbook {
           Sheet("name") {
             Row(1) {

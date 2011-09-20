@@ -7,28 +7,19 @@ package info.folone.scala.poi {
   class Workbook(sheets: List[Sheet]) {
     def save(path: String) = {
       val workbook = new HSSFWorkbook
-      sheets foreach {sh =>
-        sh match {
-          case Sheet((name),(rows)) => {
-            val sheet = workbook createSheet name
-            rows foreach { rw =>
-              rw match {
-                case Row((index),(cells)) => {
-                  val row = sheet createRow index
-                  cells foreach { cl =>
-                    cl match {
-                      case Cell(index,data) => {
-                        val cell = row createCell index
-                        cell setCellValue data
-                      }
-                    }
-                  }
-                }
-              }
+      sheets foreach { sh =>
+        val Sheet((name),(rows)) = sh
+        val sheet = workbook createSheet name
+        rows foreach { rw =>
+          val Row((index),(cells)) = rw
+          val row = sheet createRow index
+          cells foreach { cl =>
+            val Cell(index,data) = cl
+            val cell = row createCell index
+            cell setCellValue data
             }
           }
         }
-      }
       val file = new FileOutputStream(new File(path))
       workbook.write(file)
       file.close()
