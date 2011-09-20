@@ -1,6 +1,7 @@
 For now it can only create a new xls file, using the following DSL:
 
-```Workbook {
+```scala
+Workbook {
           Sheet("name") {
             Row(1) {
               Cell(1, "data") :: Cell(2, "data2") :: Nil
@@ -14,4 +15,5 @@ For now it can only create a new xls file, using the following DSL:
               Cell(1, "data") :: Cell(2, "data2") :: Nil
             } :: Nil
           } :: Nil
-        }.save("/home/georgii/ok.xls")```
+        }.save("/home/georgii/ok.xls")
+```
