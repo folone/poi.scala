@@ -16,6 +16,7 @@ package info.folone.scala.poi {
           cells foreach { cl =>
             val Cell(index,data) = cl
             val cell = row createCell index
+            sheet autoSizeColumn index
             cell setCellValue data
             }
           }
