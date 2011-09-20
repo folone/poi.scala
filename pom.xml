@@ -3,10 +3,45 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>info.folone.scala.poi</groupId>
     <artifactId>poi-scala</artifactId>
+    <packaging>jar</packaging>
     <version>0.1-SNAPSHOT</version>
+    <url>https://github.com/thenewmotion/poi.scala</url>
     <inceptionYear>2011</inceptionYear>
+    <description>Apache poi dsl for scala</description>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>The New Motion</name>
+        <url>http://www.thenewmotion.com/</url>
+    </organization>
+
+    <scm>
+        <url>https://github.com/thenewmotion/poi.scala</url>
+        <connection>scm:git:ssh://git@github.com/thenewmotion/poi.scala.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/thenewmotion/poi.scala.git</developerConnection>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>thenewmotion-nexus</id>
+            <url>http://build.thenewmotion.com/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>thenewmotion-nexus</id>
+            <url>http://build.thenewmotion.com/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <properties>
-        <scala.version>2.9.1</scala.version>
+        <scala.version>2.9.0-1</scala.version>
+        <encoding>UTF-8</encoding>
     </properties>
 
     <repositories>
