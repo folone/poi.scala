@@ -19,7 +19,7 @@ package info.folone.scala.poi {
             cell setCellValue data
             sheet autoSizeColumn index
             val height = data.split("\n").size * row.getHeight
-            row.setHeight(height.asInstanceOf[Short])
+            row setHeight height.asInstanceOf[Short]
             }
           }
         }
