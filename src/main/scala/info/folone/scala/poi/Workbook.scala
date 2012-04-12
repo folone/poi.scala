@@ -1,11 +1,13 @@
 import org.apache.poi._
 import hssf.usermodel._
-import java.io.{File,FileOutputStream}
+import java.io.{File,FileOutputStream, OutputStream}
 
 package info.folone.scala.poi {
 
-  class Workbook(sheets: List[Sheet]) {
-    def save(path: String) = {
+
+class Workbook(sheets: List[Sheet]) {
+
+    private def book = {
       val workbook = new HSSFWorkbook
       sheets foreach { sh =>
         val Sheet((name),(rows)) = sh
@@ -20,12 +22,20 @@ package info.folone.scala.poi {
             sheet autoSizeColumn index
             val height = data.split("\n").size * row.getHeight
             row setHeight height.asInstanceOf[Short]
-            }
           }
         }
+      }
+      workbook
+    }
+
+    def toFile(path: String) {
       val file = new FileOutputStream(new File(path))
-      workbook write file
+      book write file
       file.close()
+    }
+
+    def toStream(stream: OutputStream) {
+      book write stream
     }
   }
 
