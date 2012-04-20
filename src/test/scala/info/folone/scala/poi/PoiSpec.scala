@@ -1,6 +1,10 @@
 import org.specs2.mutable._
 package info.folone.scala.poi {
-  class PoiSpec extends SpecificationWithJUnit {
+
+import org.apache.poi.hssf.usermodel.HSSFSheet
+import org.specs2.specification.Scope
+
+class PoiSpec extends SpecificationWithJUnit {
     "Poi" should {
       "create workbook" in {
         /*Workbook {
@@ -21,5 +25,23 @@ package info.folone.scala.poi {
         "ok" must not be null
       }
     }
+
+  "Workbook" can {
+    "have sheets in it" in new Workbook {
+      book.asPoi.getSheet("test") must beAnInstanceOf[HSSFSheet]
+    }
+  }
+
+  "Sheet" can {
+    "have filled cells" in new Workbook {
+      val cellText = book.asPoi.getSheet("test").getRow(0).getCell(0).getStringCellValue
+      cellText must beEqualTo("theCell")
+    }
+  }
+
+
+  trait Workbook extends Scope {
+    val book = Workbook(List(Sheet("test")(List(Row(0)(List(Cell(0, "theCell")))))))
+  }
   }
 }
