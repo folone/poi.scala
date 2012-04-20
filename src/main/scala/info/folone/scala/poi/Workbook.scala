@@ -65,6 +65,8 @@ class Workbook(sheets: List[Sheet]) {
     def toStream(stream: OutputStream) {
       book write stream
     }
+
+    def asPoi = book
   }
 
   object Workbook {
