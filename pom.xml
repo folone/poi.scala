@@ -3,7 +3,7 @@
     <groupId>info.folone.scala.poi</groupId>
     <artifactId>poi-scala</artifactId>
     <packaging>jar</packaging>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.4</version>
     <url>https://github.com/thenewmotion/poi.scala</url>
     <inceptionYear>2011</inceptionYear>
     <description>Apache poi dsl for scala</description>
