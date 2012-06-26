@@ -30,11 +30,11 @@
     <distributionManagement>
         <repository>
             <id>thenewmotion-nexus</id>
-            <url>http://build.thenewmotion.com/nexus/content/repositories/releases/</url>
+            <url>http://nexus.thenewmotion.com/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>thenewmotion-nexus</id>
-            <url>http://build.thenewmotion.com/nexus/content/repositories/snapshots/</url>
+            <url>http://nexus.thenewmotion.com/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
