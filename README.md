@@ -15,5 +15,5 @@ Workbook {
               Cell(1, "data") :: Cell(2, "data2") :: Nil
             } :: Nil
           } :: Nil
-        }.save("/home/georgii/ok.xls")
+        }.safeSave("/home/folone/ok.xls").unsafePerformIO
 ```

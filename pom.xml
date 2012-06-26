@@ -94,6 +94,11 @@
           <version>1.6.1</version>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.scalaz</groupId>
+          <artifactId>scalaz-core_${scala.version}</artifactId>
+          <version>6.0.4</version>
+        </dependency>
     </dependencies>
 
     <build>
