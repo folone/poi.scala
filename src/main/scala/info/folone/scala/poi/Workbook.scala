@@ -1,24 +1,14 @@
 import org.apache.poi._
 import hssf.usermodel._
-import java.io.{ File, FileOutputStream }
+import java.io.{ File, FileOutputStream, OutputStream }
 import scalaz._, Scalaz._
-import scalaz.effects._
+import effects._
 
 package info.folone.scala.poi {
 
   class Workbook(sheets: List[Sheet]) {
-    def saveIO(wb: HSSFWorkbook, path: String) = io {
-      val file = new FileOutputStream(new File(path))
-      wb write file
-      file close
-    }
 
-    @deprecated("Use safeCreate and unsafePerformIO here you need IO to be evaluated")
-    def save(path: String) = saveIO(createWorkbook, path).unsafePerformIO
-
-    def safeSave(path: String) = saveIO(createWorkbook, path)
-
-    def createWorkbook = {
+    private lazy val book = {
       val workbook = new HSSFWorkbook
       sheets foreach { sh ⇒
         val Sheet((name), (rows)) = sh
@@ -30,15 +20,60 @@ package info.folone.scala.poi {
             val Cell(index, data) = cl
             val cell = row createCell index
             cell setCellValue data
-            sheet autoSizeColumn index
             val height = data.split("\n").size * row.getHeight
-            row setHeight height.toShort
+            row setHeight height.asInstanceOf[Short]
           }
         }
       }
       workbook
     }
 
+    private def applyStyling(wb: HSSFWorkbook, styles: Map[CellStyle, List[CellAddr]]) = {
+      def pStyle(cs: CellStyle) = {
+        val pStyle = wb.createCellStyle()
+        pStyle setFont cs.font.appliedTo(wb.createFont)
+        pStyle
+      }
+
+      styles.keys.foreach { s ⇒
+        val cellAdrresses = styles(s)
+        cellAdrresses.foreach { addr ⇒
+          val cell = wb.getSheet(addr.sheet).getRow(addr.row).getCell(addr.col)
+          cell setCellStyle pStyle(s)
+        }
+      }
+      wb
+    }
+
+    def styled(styles: Map[CellStyle, List[CellAddr]]): Workbook = { applyStyling(book, styles); this }
+
+    /**
+     * Fits column's width to maximum width of non-empty cell at cell address.
+     * Quite expensive. Use as late as possible.
+     *
+     * @param addrs addresses of cells whose columns should be sized to fit cells content
+     */
+    def autosizeColumns(addrs: List[CellAddr]): Workbook = {
+      addrs foreach { a ⇒ book.getSheet(a.sheet).autoSizeColumn(a.col) }
+      this
+    }
+
+    @deprecated("Use safeToFile and unsafePerformIO where you need it")
+    def toFile(path: String)           = safeToFile(path).unsafePerformIO
+    @deprecated("Use safeToFile and unsafePerformIO where you need it")
+    def toStream(stream: OutputStream) = safeToStream(stream).unsafePerformIO
+
+    def safeToFile(path: String) = io {
+      val file = new FileOutputStream(new File(path))
+      book write file
+      file.close()
+    }
+
+    def safeToStream(stream: OutputStream) = io {
+      book write stream
+    }
+
+    def asPoi = book
   }
 
   object Workbook {
@@ -60,4 +95,5 @@ package info.folone.scala.poi {
     def unapply(row: Row) = Some((row.index), (row.cells))
   }
   case class Cell(index: Int, data: String)
+  case class CellAddr(sheet: String, row: Int, col: Int)
 }

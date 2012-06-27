@@ -1,3 +1,10 @@
+# Idea
+.idea/
+*.iml
+*.ipr
+*.iws
+.buildpath
+
 target/
 # the following is for vi and emacs users
 *~
