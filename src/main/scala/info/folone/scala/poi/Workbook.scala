@@ -1,8 +1,7 @@
 import org.apache.poi._
 import hssf.usermodel._
 import java.io.{ File, FileOutputStream, OutputStream }
-import scalaz._, Scalaz._
-import effects._
+import scalaz.effect.IO
 
 package info.folone.scala.poi {
 
@@ -63,13 +62,13 @@ package info.folone.scala.poi {
     @deprecated("Use safeToFile and unsafePerformIO where you need it")
     def toStream(stream: OutputStream) = safeToStream(stream).unsafePerformIO
 
-    def safeToFile(path: String) = io {
+    def safeToFile(path: String) = IO {
       val file = new FileOutputStream(new File(path))
       book write file
       file.close()
     }
 
-    def safeToStream(stream: OutputStream) = io {
+    def safeToStream(stream: OutputStream) = IO {
       book write stream
     }
 
