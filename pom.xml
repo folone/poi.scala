@@ -95,8 +95,8 @@
         </dependency>
         <dependency>
           <groupId>org.scalaz</groupId>
-          <artifactId>scalaz-core_${scala.version}</artifactId>
-          <version>6.0.4</version>
+          <artifactId>scalaz-effect_${scala.version}</artifactId>
+          <version>7.0.0-M1</version>
         </dependency>
     </dependencies>
 
