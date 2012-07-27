@@ -7,7 +7,7 @@ import org.specs2.specification.Scope
 class PoiSpec extends SpecificationWithJUnit {
     "Poi" should {
       "create workbook" in {
-        /*Workbook {
+        val io = Workbook {
           Sheet("name") {
             Row(1) {
               Cell(1, "data") :: Cell(2, "data2") :: Nil
@@ -21,7 +21,8 @@ class PoiSpec extends SpecificationWithJUnit {
               Cell(1, "data") :: Cell(2, "data2") :: Nil
             } :: Nil
           } :: Nil
-        }.save("/home/georgii/ok.xls")*/
+        }.safeToFile("/home/folone/ok.xls")
+        // io.unsafePerformIO
         "ok" must not be null
       }
     }
