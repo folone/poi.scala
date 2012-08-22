@@ -9,7 +9,7 @@
 
     <groupId>info.folone.scala.poi</groupId>
     <artifactId>poi-scala</artifactId>
-    <version>0.5</version>
+    <version>0.6-SNAPSHOT</version>
     <url>https://github.com/thenewmotion/poi.scala</url>
     <inceptionYear>2011</inceptionYear>
     <description>Apache poi dsl for scala</description>
