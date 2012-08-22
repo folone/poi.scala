@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -10,7 +9,7 @@
 
     <groupId>info.folone.scala.poi</groupId>
     <artifactId>poi-scala</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.5</version>
     <url>https://github.com/thenewmotion/poi.scala</url>
     <inceptionYear>2011</inceptionYear>
     <description>Apache poi dsl for scala</description>
