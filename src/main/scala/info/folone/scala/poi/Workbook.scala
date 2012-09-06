@@ -6,7 +6,7 @@ import scalaz.effect.IO
 package info.folone.scala.poi {
 
   class Workbook(sheets: List[Sheet]) {
-
+    val sheetList = sheets
     private lazy val book = {
       val workbook = new HSSFWorkbook
       sheets foreach { sh ⇒
@@ -57,9 +57,9 @@ package info.folone.scala.poi {
       this
     }
 
-    @deprecated("Use safeToFile and unsafePerformIO where you need it")
+    @deprecated("Use safeToFile and unsafePerformIO where you need it", "2012-09-06")
     def toFile(path: String)           = safeToFile(path).unsafePerformIO
-    @deprecated("Use safeToFile and unsafePerformIO where you need it")
+    @deprecated("Use safeToFile and unsafePerformIO where you need it", "2012-09-06")
     def toStream(stream: OutputStream) = safeToStream(stream).unsafePerformIO
 
     def safeToFile(path: String) = IO {
@@ -95,4 +95,7 @@ package info.folone.scala.poi {
   }
   case class Cell(index: Int, data: String)
   case class CellAddr(sheet: String, row: Int, col: Int)
+
 }
+
+

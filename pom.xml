@@ -58,6 +58,24 @@
             <artifactId>scalaz-effect_${scala.version}</artifactId>
             <version>7.0.0-M3</version>
         </dependency>
+        <dependency>
+            <groupId>org.scalaz</groupId>
+            <artifactId>scalaz-core_${scala.version}</artifactId>
+            <version>7.0.0-M3</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.scalacheck</groupId>
+          <artifactId>scalacheck_${scala.version}</artifactId>
+          <version>1.9</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.scalaz</groupId>
+          <artifactId>scalaz-scalacheck-binding_${scala.version}</artifactId>
+          <version>7.0.0-M3</version>
+          <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

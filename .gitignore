@@ -6,6 +6,8 @@
 .buildpath
 
 target/
+.lib/
+
 # the following is for vi and emacs users
 *~
 *#

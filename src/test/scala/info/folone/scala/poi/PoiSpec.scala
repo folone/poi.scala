@@ -1,8 +1,16 @@
-import org.specs2.mutable._
-package info.folone.scala.poi {
+package info.folone.scala.poi
+
+import scalaz._, syntax.monoid._
 
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.specs2.specification.Scope
+import org.specs2.mutable._
+import org.specs2.matcher._
+import org.scalacheck.Properties
+
+import org.scalacheck._
+import scalaz.scalacheck.ScalazProperties._
+import scalaz.scalacheck.ScalaCheckBinding._
 
 class PoiSpec extends SpecificationWithJUnit {
     "Poi" should {
@@ -39,10 +47,8 @@ class PoiSpec extends SpecificationWithJUnit {
       cellText must beEqualTo("theCell")
     }
   }
-
-
+  
   trait Workbook extends Scope {
     val book = Workbook(List(Sheet("test")(List(Row(0)(List(Cell(0, "theCell")))))))
-  }
   }
 }
