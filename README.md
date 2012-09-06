@@ -5,21 +5,57 @@ Apache poi dsl for scala
 ## Usage
 
 ```scala
-Workbook {
-  Sheet("name") {
-    Row(1) {
-      Cell(1, "data") :: Cell(2, "data2") :: Nil
-    } ::
-    Row(2) {
-      Cell(1, "data") :: Cell(2, "data2") :: Nil
-    } :: Nil
-  } ::
-  Sheet("name2") {
-    Row(2) {
-      Cell(1, "data") :: Cell(2, "data2") :: Nil
-    } :: Nil
-  } :: Nil
-}.safeToFile("/home/georgii/ok.xls")
+
+scala> import info.folone.scala.poi._
+import info.folone.scala.poi._
+
+scala> import scalaz.syntax.semigroup._
+import scalaz.syntax.semigroup._
+
+scala> val sheetOne = Workbook {
+     |   Sheet("name") {
+     |     Row(1) {
+     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
+     |     } ::
+     |     Row(2) {
+     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
+     |     } :: Nil
+     |   } ::
+     |   Sheet("name2") {
+     |     Row(2) {
+     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
+     |     } :: Nil
+     |   } :: Nil
+     | }
+sheetOne: info.folone.scala.poi.Workbook = info.folone.scala.poi.Workbook@71c65b27
+
+scala> val sheetTwo = Workbook {
+     |   Sheet("name") {
+     |     Row(1) {
+     |       Cell(1, "newdata") :: Cell(2, "data2") :: Cell(3, "data3") ::Nil
+     |     } ::
+     |     Row(2) {
+     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
+     |     } ::
+     |     Row(3) {
+     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
+     |     } :: Nil
+     |   } :: Nil
+     |   Sheet("name") {
+     |     Row(2) {
+     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
+     |     } :: Nil
+     |   } :: Nil
+     | }
+sheetTwo: info.folone.scala.poi.Workbook = info.folone.scala.poi.Workbook@15eaa372
+
+scala> sheetOne |+| sheetTwo
+res0: info.folone.scala.poi.Workbook = info.folone.scala.poi.Workbook@4b1bdd73
+
+scala> .safeToFile("/home/georgii/ok.xls")
+res1: scalaz.effect.IO[Unit] = scalaz.effect.IOFunctions$$anon$4@5c6d650f
+
+scala> .unsafePerformIO // Actually write
 ```
 
 
