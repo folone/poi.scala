@@ -14,7 +14,8 @@ package object poi {
     override def append(f1: Sheet, f2: ⇒ Sheet) =
       Sheet(f2.name)(mergeLists(f1.rows, f2.rows, (_: Row).index))
   }
-  implicit val wbInstance = new Semigroup[Workbook] {
+  implicit val wbInstance = new Monoid[Workbook] {
+    override def zero = Workbook(Nil)
     override def append(f1: Workbook, f2: ⇒ Workbook) =
       Workbook(mergeLists(f1.sheetList, f2.sheetList, (_: Sheet).name))
   }
