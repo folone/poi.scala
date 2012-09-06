@@ -24,7 +24,6 @@ object Build extends Build {
   ) ++ externalPom()
 
   lazy val repoSettings = Seq(
-    resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository",
     resolvers += "Releases"  at "http://nexus.thenewmotion.com/content/repositories/releases",
     resolvers += "Snapshots" at "http://nexus.thenewmotion.com/content/repositories/snapshots"
   )
