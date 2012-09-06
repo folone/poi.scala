@@ -8,17 +8,17 @@ package object poi {
   }
   implicit val rowInstance = new Semigroup[Row] {
     override def append(f1: Row, f2: ⇒ Row) =
-      Row(f2.index)((f1.cells.map(c => (c.index, c)).toMap ++ f2.cells.map(c => (c.index, c)).toMap)
-                    .map { case(_, y) => y } toList)
+      Row(f2.index)(mergeLists(f1.cells, f2.cells, (_: Cell).index))
   }
   implicit val sheetInstance = new Semigroup[Sheet] {
     override def append(f1: Sheet, f2: ⇒ Sheet) =
-      Sheet(f2.name)((f1.rows.map(r => (r.index, r)).toMap ++ f2.rows.map(r => (r.index, r)).toMap)
-                     .map { case(_, y) => y } toList)
+      Sheet(f2.name)(mergeLists(f1.rows, f2.rows, (_: Row).index))
   }
   implicit val wbInstance = new Semigroup[Workbook] {
     override def append(f1: Workbook, f2: ⇒ Workbook) =
-      Workbook((f1.sheetList.map(s => (s.name, s)).toMap ++ f2.sheetList.map(s => (s.name, s)).toMap)
-               .map { case(_, y) => y} toList)
+      Workbook(mergeLists(f1.sheetList, f2.sheetList, (_: Sheet).name))
   }
+
+  def mergeLists[A, B](list1: List[A], list2: List[A], on: A => B): List[A] =
+    (list1.map(l => (on(l), l)).toMap ++ list2.map(l => (on(l), l)).toMap).map { case(_, y) => y } toList
 }
