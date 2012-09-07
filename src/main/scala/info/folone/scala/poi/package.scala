@@ -19,7 +19,12 @@ package object poi {
     override def append(f1: Sheet, f2: ⇒ Sheet) =
       Sheet(f2.name)(mergeSets(f1.rows, f2.rows, (_: Row).index))
     override def equal(a1: Sheet, a2: Sheet): Boolean =
-      a1.name == a2.name && a1.rows.toStream.corresponds(a2.rows.toStream)(Equal[Row].equal)
+      a1.name == a2.name &&
+      (a1.rows.toIndexedSeq.sortBy((x: Row) => x.index) zip
+       a2.rows.toIndexedSeq.sortBy((x: Row) => x.index))
+        .foldLeft (true) { (acc, v) =>
+          acc && Equal[Row].equal(v._1, v._2)
+        }
     override def shows(as: Sheet) = "Sheet (\"" + as.name + "\")(" + as.rows + ")"
   }
   implicit val wbInstance = new Monoid[Workbook] with Equal[Workbook] with Show[Workbook] {
@@ -27,15 +32,19 @@ package object poi {
     override def append(f1: Workbook, f2: ⇒ Workbook) =
       Workbook(mergeSets(f1.sheetSet, f2.sheetSet, (_: Sheet).name))
     override def equal(a1: Workbook, a2: Workbook): Boolean =
-      a1.sheetSet.toStream.corresponds(a2.sheetSet.toStream)(Equal[Sheet].equal)
+      (a1.sheetSet.toIndexedSeq.sortBy((x: Sheet) => x.name) zip
+       a1.sheetSet.toIndexedSeq.sortBy((x: Sheet) => x.name))
+      .foldLeft (true) { (acc, v) =>
+        acc && Equal[Sheet].equal(v._1, v._2)
+      }
     override def shows(as: Workbook) = "Workbook(" + as.sheetSet + ")"
   }
 
-  def mergeSets[A: Semigroup, B](list1: Set[A], list2: Set[A], on: A ⇒ B): Set[A] =
+  private def mergeSets[A: Semigroup, B](list1: Set[A], list2: Set[A], on: A ⇒ B): Set[A] =
     combine(list1.map(l ⇒ (on(l), l)).toMap, list2.map(l ⇒ (on(l), l)).toMap)
       .map { case(_, y) ⇒ y } toSet
 
-  def combine[A, B: Semigroup](m1: Map[A, B], m2: Map[A, B]): Map[A, B] = {
+  private def combine[A, B: Semigroup](m1: Map[A, B], m2: Map[A, B]): Map[A, B] = {
     val k1 = Set(m1.keysIterator.toList: _*)
     val k2 = Set(m2.keysIterator.toList: _*)
     val intersection = k1 & k2

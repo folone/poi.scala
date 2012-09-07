@@ -55,8 +55,8 @@ class PoiSpec extends SpecificationWithJUnit with ScalaCheck {
     "satisfy" in checkProp {
       semigroup.laws[Cell]
       semigroup.laws[Row]
-// TODO Equal instance problems
-//      semigroup.laws[Sheet]
+      semigroup.laws[Sheet]
+      // INFO a lot of nested tests to check, takes a long time, thus commented out
 //      monoid.laws[info.folone.scala.poi.Workbook]
     }
   }
