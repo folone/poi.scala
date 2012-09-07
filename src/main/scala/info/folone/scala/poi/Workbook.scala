@@ -1,12 +1,13 @@
 import org.apache.poi._
 import hssf.usermodel._
 import java.io.{ File, FileOutputStream, OutputStream }
-import scalaz.effect.IO
+import scalaz._
+import effect.IO
 
 package info.folone.scala.poi {
 
-  class Workbook(sheets: List[Sheet]) {
-    val sheetList = sheets
+  class Workbook(sheets: Set[Sheet]) {
+    val sheetSet = sheets
     private lazy val book = {
       val workbook = new HSSFWorkbook
       sheets foreach { sh ⇒
@@ -73,24 +74,27 @@ package info.folone.scala.poi {
     }
 
     def asPoi = book
+    override def toString = Show[Workbook].shows(this)
   }
 
   object Workbook {
-    def apply(sheets: List[Sheet]) = new Workbook(sheets)
+    def apply(sheets: Set[Sheet]) = new Workbook(sheets)
   }
 
-  class Sheet(nm: String)(rw: List[Row]) {
+  class Sheet(nm: String)(rw: Set[Row]) {
     val (name, rows) = (nm, rw)
+    override def toString = Show[Sheet].shows(this)
   }
   object Sheet {
-    def apply(name: String)(rows: List[Row]) = new Sheet(name)(rows)
+    def apply(name: String)(rows: Set[Row]) = new Sheet(name)(rows)
     def unapply(sheet: Sheet) = Some((sheet.name), (sheet.rows))
   }
-  class Row(idx: Int)(cl: List[Cell]) {
+  class Row(idx: Int)(cl: Set[Cell]) {
     val (index, cells) = (idx, cl)
+    override def toString = Show[Row].shows(this)
   }
   object Row {
-    def apply(index: Int)(cells: List[Cell]) = new Row(index)(cells)
+    def apply(index: Int)(cells: Set[Cell]) = new Row(index)(cells)
     def unapply(row: Row) = Some((row.index), (row.cells))
   }
   case class Cell(index: Int, data: String)
