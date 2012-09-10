@@ -7,6 +7,7 @@
 
 target/
 .lib/
+.ensime*
 
 # the following is for vi and emacs users
 *~

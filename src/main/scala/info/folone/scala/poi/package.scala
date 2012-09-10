@@ -28,7 +28,7 @@ package object poi {
     override def shows(as: Sheet) = "Sheet (\"" + as.name + "\")(" + as.rows + ")"
   }
   implicit val wbInstance = new Monoid[Workbook] with Equal[Workbook] with Show[Workbook] {
-    override def zero = Workbook(Set())
+    override def zero = Workbook(Set[Sheet]())
     override def append(f1: Workbook, f2: ⇒ Workbook) =
       Workbook(mergeSets(f1.sheetSet, f2.sheetSet, (_: Sheet).name))
     override def equal(a1: Workbook, a2: Workbook): Boolean =
