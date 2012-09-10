@@ -18,7 +18,7 @@ import syntax.semigroup._
 scala> import syntax.foldable._
 import syntax.foldable._
 
-scala> 
+scala> import std.list._
 import std.list._
 
 scala> val sheetOne = Workbook {
