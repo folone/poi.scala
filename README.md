@@ -69,6 +69,9 @@ import syntax.equal._
 scala> (Workbook(path) /* load from file */ |+| sheetTwo) === (sheetOne |+| sheetTwo) // Merging
 res1: Boolean = true
 
+scala> List(Workbook(path), sheetOne, sheetTwo).suml === (sheetOne |+| sheetTwo)
+res2: Boolean = true
+
 ```
 
 
