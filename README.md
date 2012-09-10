@@ -13,7 +13,7 @@ scala> import scalaz._
 import scalaz._
 
 scala> import syntax.monoid._
-import syntax.semigroup._
+import syntax.monoid._
 
 scala> import syntax.foldable._
 import syntax.foldable._
@@ -38,7 +38,21 @@ scala> val sheetOne = Workbook {
      |       }
 sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(Cell(1,data), Cell(2,data2))), Row (2)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name2")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
 
-sscala> val sheetTwo = Workbook {
+scala> .safeTo
+safeToFile     safeToStream   
+
+scala> val path = "/home/folone/ok.xls"
+path: java.lang.String = /home/folone/ok.xls
+
+scala> sheet
+sheetInstance   sheetOne        
+
+scala> sheetOne.safeTo
+safeToFile     safeToStream   
+
+scala> sheetOne.safeToFile(path).unsafePerformIO
+
+scala> val sheetTwo = Workbook {
      |         Set(Sheet("name") {
      |           Set(Row(1) {
      |             Set(Cell(1, "newdata"), Cell(2, "data2"), Cell(3, "data3"))
@@ -56,18 +70,14 @@ sscala> val sheetTwo = Workbook {
      |           })
      |         })
      |       }
-sheetTwo: info.folone.scala.poi.import std.list._Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(Cell(1,newdata), Cell(2,data2), Cell(3,data3))), Row (2)(Set(Cell(1,data), Cell(2,data2))), Row (3)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
+sheetTwo: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(Cell(1,newdata), Cell(2,data2), Cell(3,data3))), Row (2)(Set(Cell(1,data), Cell(2,data2))), Row (3)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
 
-scala> sheetOne |+| sheetTwo
-res0: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name2")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name")(Set(Row (1)(Set(Cell(1,data), Cell(2,data2))), Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
+scala> import syntax.equal._
+import syntax.equal._
 
-scala> List(sheetOne, sheetTwo).suml
-res1: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name2")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name")(Set(Row (1)(Set(Cell(1,data), Cell(2,data2))), Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
+scala> (Workbook(path) /* load from file */ |+| sheetTwo) === (sheetOne |+| sheetTwo) // Merging
+res1: Boolean = true
 
-scala> .safeToFile("/home/georgii/ok.xls")
-res2: scalaz.effect.IO[Unit] = scalaz.effect.IOFunctions$$anon$4@5c6d650f
-
-scala> .unsafePerformIO // Actually write to file
 ```
 
 
