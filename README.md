@@ -18,51 +18,51 @@ import syntax.semigroup._
 scala> import syntax.foldable._
 import syntax.foldable._
 
-scala> import std.list._
+scala> 
 import std.list._
 
 scala> val sheetOne = Workbook {
-     |   Sheet("name") {
-     |     Row(1) {
-     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
-     |     } ::
-     |     Row(2) {
-     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
-     |     } :: Nil
-     |   } ::
-     |   Sheet("name2") {
-     |     Row(2) {
-     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
-     |     } :: Nil
-     |   } :: Nil
-     | }
-sheetOne: info.folone.scala.poi.Workbook = info.folone.scala.poi.Workbook@71c65b27
+     |         Set(Sheet("name") {
+     |           Set(Row(1) {
+     |             Set(Cell(1, "data"), Cell(2, "data2"))
+     |           },
+     |           Row(2) {
+     |             Set(Cell(1, "data"), Cell(2, "data2"))
+     |           })
+     |         },
+     |         Sheet("name2") {
+     |           Set(Row(2) {
+     |             Set(Cell(1, "data"), Cell(2, "data2"))
+     |           })
+     |         })
+     |       }
+sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(Cell(1,data), Cell(2,data2))), Row (2)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name2")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
 
-scala> val sheetTwo = Workbook {
-     |   Sheet("name") {
-     |     Row(1) {
-     |       Cell(1, "newdata") :: Cell(2, "data2") :: Cell(3, "data3") ::Nil
-     |     } ::
-     |     Row(2) {
-     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
-     |     } ::
-     |     Row(3) {
-     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
-     |     } :: Nil
-     |   } :: Nil
-     |   Sheet("name") {
-     |     Row(2) {
-     |       Cell(1, "data") :: Cell(2, "data2") :: Nil
-     |     } :: Nil
-     |   } :: Nil
-     | }
-sheetTwo: info.folone.scala.poi.Workbook = info.folone.scala.poi.Workbook@15eaa372
+sscala> val sheetTwo = Workbook {
+     |         Set(Sheet("name") {
+     |           Set(Row(1) {
+     |             Set(Cell(1, "newdata"), Cell(2, "data2"), Cell(3, "data3"))
+     |           },
+     |           Row(2) {
+     |             Set(Cell(1, "data"), Cell(2, "data2"))
+     |           },
+     |           Row(3) {
+     |             Set(Cell(1, "data"), Cell(2, "data2"))
+     |           })
+     |         },
+     |         Sheet("name") {
+     |           Set(Row(2) {
+     |             Set(Cell(1, "data"), Cell(2, "data2"))
+     |           })
+     |         })
+     |       }
+sheetTwo: info.folone.scala.poi.import std.list._Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(Cell(1,newdata), Cell(2,data2), Cell(3,data3))), Row (2)(Set(Cell(1,data), Cell(2,data2))), Row (3)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
 
 scala> sheetOne |+| sheetTwo
-res0: info.folone.scala.poi.Workbook = info.folone.scala.poi.Workbook@4b1bdd73
+res0: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name2")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name")(Set(Row (1)(Set(Cell(1,data), Cell(2,data2))), Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
 
 scala> List(sheetOne, sheetTwo).suml
-res1: info.folone.scala.poi.Workbook = info.folone.scala.poi.Workbook@155ec9f4
+res1: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name2")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name")(Set(Row (1)(Set(Cell(1,data), Cell(2,data2))), Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
 
 scala> .safeToFile("/home/georgii/ok.xls")
 res2: scalaz.effect.IO[Unit] = scalaz.effect.IOFunctions$$anon$4@5c6d650f
