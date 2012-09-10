@@ -38,17 +38,8 @@ scala> val sheetOne = Workbook {
      |       }
 sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(Cell(1,data), Cell(2,data2))), Row (2)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name2")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
 
-scala> .safeTo
-safeToFile     safeToStream   
-
 scala> val path = "/home/folone/ok.xls"
 path: java.lang.String = /home/folone/ok.xls
-
-scala> sheet
-sheetInstance   sheetOne        
-
-scala> sheetOne.safeTo
-safeToFile     safeToStream   
 
 scala> sheetOne.safeToFile(path).unsafePerformIO
 
