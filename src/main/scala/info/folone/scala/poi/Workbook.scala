@@ -78,7 +78,31 @@ package info.folone.scala.poi {
   }
 
   object Workbook {
-    def apply(sheets: Set[Sheet]) = new Workbook(sheets)
+    def apply(sheets: Set[Sheet]): Workbook = new Workbook(sheets)
+    def apply(path: String): Workbook = {
+      val file = new java.io.FileInputStream(path)
+      val wb   = new HSSFWorkbook(file)
+      val data = for {
+        i     ← 0 to (wb.getNumberOfSheets - 1)
+        sheet = wb.getSheetAt(i) if (sheet != null)
+        k     ← 1 to sheet.getLastRowNum
+        row   = sheet.getRow(k) if (row != null)
+        j     ← 1 to (row.getLastCellNum - 1)
+        cell  = row.getCell(j) if (cell != null)
+      } yield (sheet, row, cell)
+      val result = data.groupBy(_._1).mapValues(lst => lst map { case (s,r,c) => (r,c)} groupBy(_._1)
+                                      mapValues(lst => lst map { case   (r,c) => c } toList))
+      val sheets = result.map { case (sheet, rowLst) =>
+        Sheet(sheet.getSheetName) {
+          rowLst map { case (row, cellLst) =>
+            Row(row.getRowNum) {
+              cellLst map { cell => Cell(cell.getColumnIndex, cell.getStringCellValue) } toSet
+            }
+          } toSet
+        }
+      }.toSet
+    Workbook(sheets)
+    }
   }
 
   class Sheet(nm: String)(rw: Set[Row]) {
