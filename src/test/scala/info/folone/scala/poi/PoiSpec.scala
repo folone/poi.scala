@@ -52,10 +52,16 @@ class PoiSpec extends SpecificationWithJUnit with ScalaCheck {
   }
 
   "Typeclasses" should {
-    "satisfy" in checkProp {
+    "satisfy for Cell" in checkProp {
       semigroup.laws[Cell]
+   }
+    "satisfy for Row" in checkProp {
       semigroup.laws[Row]
+    }
+    "satisfy for Sheet" in checkProp {
       semigroup.laws[Sheet]
+    }
+    "satisfy for Workbook" in checkProp {
       // INFO a lot of nested tests to check, takes a long time, thus commented out
 //      monoid.laws[info.folone.scala.poi.Workbook]
     }
