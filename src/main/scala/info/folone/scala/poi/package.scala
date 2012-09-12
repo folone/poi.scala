@@ -3,6 +3,7 @@ package info.folone.scala
 import scalaz._
 
 package object poi {
+  // Typeclass instances
   implicit val cellInstance = new Semigroup[Cell] with Equal[Cell] with Show[Cell] {
     override def append(f1: Cell, f2: ⇒ Cell) = f2
     override def equal(a1: Cell, a2: Cell): Boolean = a1 == a2
@@ -20,9 +21,9 @@ package object poi {
       Sheet(f2.name)(mergeSets(f1.rows, f2.rows, (_: Row).index))
     override def equal(a1: Sheet, a2: Sheet): Boolean =
       a1.name == a2.name &&
-      (a1.rows.toIndexedSeq.sortBy((x: Row) => x.index) zip
-       a2.rows.toIndexedSeq.sortBy((x: Row) => x.index))
-        .foldLeft (true) { (acc, v) =>
+      (a1.rows.toIndexedSeq.sortBy((x: Row) ⇒ x.index) zip
+       a2.rows.toIndexedSeq.sortBy((x: Row) ⇒ x.index))
+        .foldLeft (true) { (acc, v) ⇒
           acc && Equal[Row].equal(v._1, v._2)
         }
     override def shows(as: Sheet) = "Sheet (\"" + as.name + "\")(" + as.rows + ")"
@@ -32,14 +33,24 @@ package object poi {
     override def append(f1: Workbook, f2: ⇒ Workbook) =
       Workbook(mergeSets(f1.sheetSet, f2.sheetSet, (_: Sheet).name))
     override def equal(a1: Workbook, a2: Workbook): Boolean =
-      (a1.sheetSet.toIndexedSeq.sortBy((x: Sheet) => x.name) zip
-       a1.sheetSet.toIndexedSeq.sortBy((x: Sheet) => x.name))
-      .foldLeft (true) { (acc, v) =>
+      (a1.sheetSet.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name) zip
+       a1.sheetSet.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name))
+      .foldLeft (true) { (acc, v) ⇒
         acc && Equal[Sheet].equal(v._1, v._2)
       }
     override def shows(as: Workbook) = "Workbook(" + as.sheetSet + ")"
   }
 
+  // Lenses
+  import Lens._
+  import StoreT._
+  val cellLens: Cell @> String =
+    lens(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
+  val rowLens   = setLens[Row, Cell]  (lens(r ⇒ store(r.cells)(changed ⇒ Row(r.index) (changed))))
+  val sheetLens = setLens[Sheet, Row] (lens(s ⇒ store(s.rows) (changed ⇒ Sheet(s.name)(changed))))
+  val wbLens    = setLens[Workbook, Sheet] (lens(wb ⇒ store(wb.sheetSet)(changed ⇒ Workbook(changed))))
+
+  // Utility functions
   private def mergeSets[A: Semigroup, B](list1: Set[A], list2: Set[A], on: A ⇒ B): Set[A] =
     combine(list1.map(l ⇒ (on(l), l)).toMap, list2.map(l ⇒ (on(l), l)).toMap)
       .map { case(_, y) ⇒ y } toSet
