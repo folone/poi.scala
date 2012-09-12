@@ -7,7 +7,9 @@ import effect.IO
 package info.folone.scala.poi {
 
   class Workbook(sheets: Set[Sheet]) {
+
     val sheetSet = sheets
+
     private lazy val book = {
       val workbook = new HSSFWorkbook
       sheets foreach { sh ⇒
@@ -74,7 +76,11 @@ package info.folone.scala.poi {
     }
 
     def asPoi = book
+
     override def toString = Show[Workbook].shows(this)
+    override def equals(obj: Any) =
+      obj != null && obj.isInstanceOf[Workbook] && Equal[Workbook].equal(obj.asInstanceOf[Workbook], this)
+
   }
 
   object Workbook {
@@ -83,20 +89,20 @@ package info.folone.scala.poi {
       val file = new java.io.FileInputStream(path)
       val wb   = new HSSFWorkbook(file)
       val data = for {
-        i     ← 0 to (wb.getNumberOfSheets - 1)
+        i     ← 0 until wb.getNumberOfSheets
         sheet = wb.getSheetAt(i) if (sheet != null)
         k     ← 1 to sheet.getLastRowNum
         row   = sheet.getRow(k) if (row != null)
-        j     ← 1 to (row.getLastCellNum - 1)
+        j     ← 1 until row.getLastCellNum
         cell  = row.getCell(j) if (cell != null)
       } yield (sheet, row, cell)
-      val result = data.groupBy(_._1).mapValues(lst => lst map { case (s,r,c) => (r,c)} groupBy(_._1)
-                                      mapValues(lst => lst map { case   (r,c) => c } toList))
-      val sheets = result.map { case (sheet, rowLst) =>
+      val result = data.groupBy(_._1).mapValues(lst ⇒ lst map { case (s,r,c) ⇒ (r,c)} groupBy(_._1)
+                                      mapValues(lst ⇒ lst map { case   (r,c) ⇒ c } toList))
+      val sheets = result.map { case (sheet, rowLst) ⇒
         Sheet(sheet.getSheetName) {
-          rowLst map { case (row, cellLst) =>
+          rowLst map { case (row, cellLst) ⇒
             Row(row.getRowNum) {
-              cellLst map { cell => Cell(cell.getColumnIndex, cell.getStringCellValue) } toSet
+              cellLst map { cell ⇒ Cell(cell.getColumnIndex, cell.getStringCellValue) } toSet
             }
           } toSet
         }
@@ -108,6 +114,8 @@ package info.folone.scala.poi {
   class Sheet(nm: String)(rw: Set[Row]) {
     val (name, rows) = (nm, rw)
     override def toString = Show[Sheet].shows(this)
+    override def equals(obj: Any) =
+      obj != null && obj.isInstanceOf[Sheet] && Equal[Sheet].equal(obj.asInstanceOf[Sheet], this)
   }
   object Sheet {
     def apply(name: String)(rows: Set[Row]) = new Sheet(name)(rows)
@@ -116,6 +124,8 @@ package info.folone.scala.poi {
   class Row(idx: Int)(cl: Set[Cell]) {
     val (index, cells) = (idx, cl)
     override def toString = Show[Row].shows(this)
+    override def equals(obj: Any) =
+      obj != null && obj.isInstanceOf[Row] && Equal[Row].equal(obj.asInstanceOf[Row], this)
   }
   object Row {
     def apply(index: Int)(cells: Set[Cell]) = new Row(index)(cells)
@@ -125,5 +135,3 @@ package info.folone.scala.poi {
   case class CellAddr(sheet: String, row: Int, col: Int)
 
 }
-
-
