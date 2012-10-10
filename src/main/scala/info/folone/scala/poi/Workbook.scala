@@ -6,10 +6,7 @@ import effect.IO
 
 package info.folone.scala.poi {
 
-  class Workbook(sheets: Set[Sheet]) {
-
-    val sheetSet = sheets
-
+  class Workbook(val sheets: Set[Sheet]) {
     private lazy val book = {
       val workbook = new HSSFWorkbook
       sheets foreach { sh ⇒
@@ -111,8 +108,7 @@ package info.folone.scala.poi {
     }
   }
 
-  class Sheet(nm: String)(rw: Set[Row]) {
-    val (name, rows) = (nm, rw)
+  class Sheet(val name: String)(val rows: Set[Row]) {
     override def toString = Show[Sheet].shows(this)
     override def equals(obj: Any) =
       obj != null && obj.isInstanceOf[Sheet] && Equal[Sheet].equal(obj.asInstanceOf[Sheet], this)
@@ -121,8 +117,7 @@ package info.folone.scala.poi {
     def apply(name: String)(rows: Set[Row]) = new Sheet(name)(rows)
     def unapply(sheet: Sheet) = Some((sheet.name), (sheet.rows))
   }
-  class Row(idx: Int)(cl: Set[Cell]) {
-    val (index, cells) = (idx, cl)
+  class Row(val index: Int)(val cells: Set[Cell]) {
     override def toString = Show[Row].shows(this)
     override def equals(obj: Any) =
       obj != null && obj.isInstanceOf[Row] && Equal[Row].equal(obj.asInstanceOf[Row], this)

@@ -31,14 +31,14 @@ package object poi {
   implicit val wbInstance = new Monoid[Workbook] with Equal[Workbook] with Show[Workbook] {
     override def zero = Workbook(Set[Sheet]())
     override def append(f1: Workbook, f2: ⇒ Workbook) =
-      Workbook(mergeSets(f1.sheetSet, f2.sheetSet, (_: Sheet).name))
+      Workbook(mergeSets(f1.sheets, f2.sheets, (_: Sheet).name))
     override def equal(a1: Workbook, a2: Workbook): Boolean =
-      (a1.sheetSet.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name) zip
-       a1.sheetSet.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name))
+      (a1.sheets.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name) zip
+       a1.sheets.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name))
       .foldLeft (true) { (acc, v) ⇒
         acc && Equal[Sheet].equal(v._1, v._2)
       }
-    override def shows(as: Workbook) = "Workbook(" + as.sheetSet + ")"
+    override def shows(as: Workbook) = "Workbook(" + as.sheets + ")"
   }
 
   // Lenses
@@ -48,7 +48,7 @@ package object poi {
     lens(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
   val rowLens   = setLens[Row, Cell]  (lens(r ⇒ store(r.cells)(changed ⇒ Row(r.index) (changed))))
   val sheetLens = setLens[Sheet, Row] (lens(s ⇒ store(s.rows) (changed ⇒ Sheet(s.name)(changed))))
-  val wbLens    = setLens[Workbook, Sheet] (lens(wb ⇒ store(wb.sheetSet)(changed ⇒ Workbook(changed))))
+  val wbLens    = setLens[Workbook, Sheet] (lens(wb ⇒ store(wb.sheets)(changed ⇒ Workbook(changed))))
 
   // Utility functions
   private def mergeSets[A: Semigroup, B](list1: Set[A], list2: Set[A], on: A ⇒ B): Set[A] =
