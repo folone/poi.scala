@@ -56,12 +56,12 @@
         <dependency>
             <groupId>org.scalaz</groupId>
             <artifactId>scalaz-effect_${scala.version}</artifactId>
-            <version>7.0.0-M3</version>
+            <version>7.0.0-M4</version>
         </dependency>
         <dependency>
             <groupId>org.scalaz</groupId>
             <artifactId>scalaz-core_${scala.version}</artifactId>
-            <version>7.0.0-M3</version>
+            <version>7.0.0-M4</version>
         </dependency>
 
         <dependency>
@@ -73,7 +73,7 @@
         <dependency>
           <groupId>org.scalaz</groupId>
           <artifactId>scalaz-scalacheck-binding_${scala.version}</artifactId>
-          <version>7.0.0-M3</version>
+          <version>7.0.0-M4</version>
           <scope>test</scope>
         </dependency>
     </dependencies>
