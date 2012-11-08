@@ -44,7 +44,10 @@ package info.folone.scala.poi {
       wb
     }
 
-    def styled(styles: Map[CellStyle, List[CellAddr]]): Workbook = { applyStyling(book, styles); this }
+    def styled(styles: Map[CellStyle, List[CellAddr]]): Workbook = {
+      applyStyling(book, styles)
+      this
+    }
 
     /**
      * Fits column's width to maximum width of non-empty cell at cell address.
