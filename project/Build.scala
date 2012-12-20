@@ -5,28 +5,25 @@ import Keys._
 object Build extends Build {
 
   lazy val buildSettings = Seq(
-    organization       := "thenewmotion",
+    organization       := "folone",
     version            := "0.6-SNAPSHOT",
 
     scalaVersion       := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.10.0-M7"),
+    crossScalaVersions := Seq("2.9.2", "2.10.0-RC5"),
     crossVersion       := CrossVersion.full,
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
-      "-Ydependent-method-types",
       "-deprecation",
       "-unchecked",
       "-explaintypes"
     ),
 
     parallelExecution in Compile := true
-  ) ++ externalPom()
+  )
 
   lazy val repoSettings = Seq(
-    resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository",
-    resolvers += "Releases"  at "http://nexus.thenewmotion.com/content/repositories/releases",
-    resolvers += "Snapshots" at "http://nexus.thenewmotion.com/content/repositories/snapshots"
+    resolvers += "Sonatype"  at "https://oss.sonatype.org/content/repositories/releases/"
   )
 
   lazy val baseSettings = super.settings ++ Defaults.defaultSettings ++ buildSettings ++ repoSettings
@@ -34,8 +31,17 @@ object Build extends Build {
   lazy val standardSettings = baseSettings 
 
   lazy val parentSettings = standardSettings ++ Seq(
-    fork in Test := false,
-    javaOptions in Test += "-Drun.mode=dev"
+    name := "scala.poi",
+    libraryDependencies ++= Seq(
+      "org.apache.poi" %  "poi"                       % "3.8",
+      "org.apache.poi" %  "poi-ooxml"                 % "3.8",
+      "org.scalaz"     %% "scalaz-core"               % "7.0.0-M6"          cross CrossVersion.full,
+      "org.scalaz"     %% "scalaz-effect"             % "7.0.0-M6"          cross CrossVersion.full,
+      "org.specs2"     %% "specs2"                    % "1.12.3"   % "test" cross CrossVersion.full,
+      "junit"          %  "junit"                     % "4.7"      % "test",
+      "org.scalacheck" %% "scalacheck"                % "1.10.0"   % "test" cross CrossVersion.full,
+      "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.0-M6" % "test" cross CrossVersion.full
+    )
   )
 
   override lazy val settings = super.settings ++ repoSettings  ++ Seq(

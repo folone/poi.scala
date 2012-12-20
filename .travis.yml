@@ -1,6 +1,7 @@
 language: scala
 scala:
   - "2.9.2"
+  - "2.10.0-RC5"
 
 install: /bin/true
-script: mvn clean install
+script: sbt ";clean;compile;test"
