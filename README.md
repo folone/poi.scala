@@ -115,14 +115,14 @@ res23: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(S
 
 ### SBT:
 
-`libraryDependencies += "info.folone.scala.poi" % "poi-scala" % "0.6"`
+`libraryDependencies += "info.folone" %% "poi-scala" % "0.6-SNAPSHOT"`
 
 ### Maven:
 
 ```xml
     <dependency>
         <groupId>info.folone.scala.poi</groupId>
-        <artifactId>poi-scala</artifactId>
-        <version>0.5</version>
+        <artifactId>poi-scala_${scala.version}</artifactId>
+        <version>0.6-SNAPSHOT</version>
     </dependency>
 ```
