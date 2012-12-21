@@ -113,16 +113,12 @@ res23: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(S
 
 ## Setup
 
-1. Add this repository to your pom.xml:
-```xml
-    <repository>
-        <id>thenewmotion</id>
-        <name>The New Motion Repository</name>
-        <url>http://nexus.thenewmotion.com/content/repositories/releases-public</url>
-    </repository>
-```
+### SBT:
 
-2. Add dependency to your pom.xml:
+`libraryDependencies += "info.folone.scala.poi" % "poi-scala" % "0.6"`
+
+### Maven:
+
 ```xml
     <dependency>
         <groupId>info.folone.scala.poi</groupId>
