@@ -9,8 +9,7 @@ object Build extends Build {
     version            := "0.6",
 
     scalaVersion       := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.10.0-RC5"),
-    crossVersion       := CrossVersion.full,
+    crossScalaVersions := Seq("2.9.2", "2.10.0"),
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
@@ -54,15 +53,43 @@ object Build extends Build {
       libraryDependencies ++= Seq(
         "org.apache.poi" %  "poi"                       % "3.8",
         "org.apache.poi" %  "poi-ooxml"                 % "3.8",
-        "org.scalaz"     %% "scalaz-core"               % "7.0.0-M6"          cross CrossVersion.full,
-        "org.scalaz"     %% "scalaz-effect"             % "7.0.0-M6"          cross CrossVersion.full,
-        "org.specs2"     %% "specs2"                    % "1.12.3"   % "test" cross CrossVersion.full,
+        "org.scalaz"     %% "scalaz-core"               % "7.0.0-M7",
+        "org.scalaz"     %% "scalaz-effect"             % "7.0.0-M7",
+        "org.specs2"     %% "specs2"                    % "1.12.3"   % "test",
         "junit"          %  "junit"                     % "4.7"      % "test",
         "org.scalacheck" %% "scalacheck"                % "1.10.0"   % "test" cross CrossVersion.full,
-        "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.0-M6" % "test" cross CrossVersion.full
+        "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.0-M7" % "test"
       ),
       credentialsSetting,
-      publishSetting
+      publishSetting,
+         pomExtra := (
+           <url>https://github.com/folone/poi.scala</url>
+           <licenses>
+             <license>
+               <name>Apache License</name>
+               <url>http://opensource.org/licenses/Apache-2.0</url>
+               <distribution>repo</distribution>
+             </license>
+           </licenses>
+           <scm>
+             <url>git@github.com:folone/poi.scala.git</url>
+             <connection>scm:git:git@github.com:folone/poi.scala.git</connection>
+           </scm>
+           <developers>
+           {
+             Seq(
+               ("folone", "George Leontiev")
+             ).map {
+               case (id, name) =>
+               <developer>
+                 <id>{id}</id>
+                 <name>{name}</name>
+                 <url>http://github.com/{id}</url>
+               </developer>
+             }
+           }
+           </developers>
+         )
     )
 
   override lazy val settings = super.settings ++ repoSettings  ++ Seq(
