@@ -6,7 +6,7 @@ object Build extends Build {
 
   lazy val buildSettings = Seq(
     organization       := "info.folone",
-    version            := "0.6",
+    version            := "0.7-SNAPSHOT",
 
     scalaVersion       := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.10.0"),
