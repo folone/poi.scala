@@ -90,7 +90,7 @@ res2: Boolean = true
 
 ```xml
     <dependency>
-        <groupId>info.folone.scala.poi</groupId>
+        <groupId>info.folone</groupId>
         <artifactId>poi-scala_${scala.version}</artifactId>
         <version>0.7</version>
     </dependency>
