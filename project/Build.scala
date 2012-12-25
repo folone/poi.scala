@@ -1,12 +1,13 @@
 import sbt._
 import Project._
 import Keys._
+import Defaults._
 
 object Build extends Build {
 
   lazy val buildSettings = Seq(
     organization       := "info.folone",
-    version            := "0.7-SNAPSHOT",
+    version            := "0.7",
 
     scalaVersion       := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.10.0"),
@@ -44,10 +45,10 @@ object Build extends Build {
   }
 
   lazy val standardSettings = super.settings ++
-    Defaults.defaultSettings ++
-    buildSettings ++
+    Defaults.defaultSettings                 ++
+    buildSettings                            ++
     sbtrelease.ReleasePlugin.releaseSettings ++
-    repoSettings ++
+    repoSettings                             ++
     Seq(
       name := "poi-scala",
       libraryDependencies ++= Seq(

@@ -43,7 +43,7 @@ sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (
 scala> val path = "/home/folone/ok.xls"
 path: java.lang.String = /home/folone/ok.xls
 
-// Saving the result (yes, it does control side-effects via IO)
+// Saving the result (yes, it does control side-effects via scalaz.IO)
 scala> sheetOne.safeToFile(path).unsafePerformIO
 
 // Let's create another workbook
@@ -84,7 +84,7 @@ res2: Boolean = true
 
 ### SBT:
 
-`libraryDependencies += "info.folone" %% "poi-scala" % "0.6-SNAPSHOT"`
+`libraryDependencies += "info.folone" %% "poi-scala" % "0.7"`
 
 ### Maven:
 
@@ -92,6 +92,6 @@ res2: Boolean = true
     <dependency>
         <groupId>info.folone.scala.poi</groupId>
         <artifactId>poi-scala_${scala.version}</artifactId>
-        <version>0.6-SNAPSHOT</version>
+        <version>0.7</version>
     </dependency>
 ```
