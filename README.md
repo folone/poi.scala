@@ -77,6 +77,37 @@ res1: Boolean = true
 scala> List(Workbook(path), sheetOne, sheetTwo).suml === (sheetOne |+| sheetTwo)
 res2: Boolean = true
 
+// We also have some lenses, though they are a work in progress (and only available since 0.8-SNAPSHOT). Some examples:
+scala> cellLens.get(Cell(1, "data"))
+res3: scalaz.Id.Id[String] = data
+
+scala> cellLens.set(Cell(1, "data"), "new data")
+res4: scalaz.Id.Id[info.folone.scala.poi.Cell] = Cell(1,new data)
+
+scala> rowLens.contains(Cell(2, "data1")).get(Row(1)(Set(Cell(1,"data"), Cell(2, "data1"))))
+res8: scalaz.Id.Id[Boolean] = true
+
+scala> rowLens.contains(Cell(2, "data1")).get(Row(1)(Set(Cell(1,"data"), Cell(2, "data"))))
+res9: scalaz.Id.Id[Boolean] = false
+
+scala> (rowLens += Cell(2, "data1")).run(Row(1)(Set(Cell(1, "data"), Cell(3, "data3"))))
+res14: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(1,data), Cell(3,data3), Cell(2,data1))),Set(Cell(1,data), Cell(3,data3), Cell(2,data1)))
+
+scala> (rowLens &= Set(Cell(2, "data1"))).run(Row(1)(Set(Cell(1, "data"), Cell(2, "data1"))))
+res17: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(2,data1))),Set(Cell(2,data1)))
+
+scala> (rowLens &~= Set(Cell(2, "data1"))).run(Row(1)(Set(Cell(1, "data"), Cell(2, "data1"))))
+res18: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(1,data))),Set(Cell(1,data)))
+
+scala> (rowLens |= Set(Cell(2, "data1"))).run(Row(1)(Set(Cell(1, "data"), Cell(2, "data1"))))
+res20: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(1,data), Cell(2,data1))),Set(Cell(1,data), Cell(2,data1)))
+
+scala> (rowLens |= Set(Cell(2, "data1"))).run(Row(1)(Set(Cell(1, "data"), Cell(2, "data2"))))
+res21: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(1,data), Cell(2,data2), Cell(2,data1))),Set(Cell(1,data), Cell(2,data2), Cell(2,data1)))
+
+scala> (rowLens -= Cell(2, "data1")).run(Row(1)(Set(Cell(1, "data"), Cell(2, "data1"))))
+res23: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(1,data))),Set(Cell(1,data)))
+
 ```
 
 
