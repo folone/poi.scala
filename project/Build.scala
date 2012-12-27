@@ -57,7 +57,6 @@ object Build extends Build {
         "org.scalaz"     %% "scalaz-core"               % "7.0.0-M7",
         "org.scalaz"     %% "scalaz-effect"             % "7.0.0-M7",
         "org.specs2"     %% "specs2"                    % "1.12.3"   % "test",
-        "junit"          %  "junit"                     % "4.7"      % "test",
         "org.scalacheck" %% "scalacheck"                % "1.10.0"   % "test" cross CrossVersion.full,
         "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.0-M7" % "test"
       ),

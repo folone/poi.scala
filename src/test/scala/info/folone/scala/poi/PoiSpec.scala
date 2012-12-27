@@ -15,7 +15,7 @@ import scalaz.scalacheck.ScalaCheckBinding._
 
 import Arbitrary._
 
-class PoiSpec extends SpecificationWithJUnit with ScalaCheck {
+class PoiSpec extends Specification with ScalaCheck {
     "Poi" should {
       "create workbook" in {
         val io = Workbook {
