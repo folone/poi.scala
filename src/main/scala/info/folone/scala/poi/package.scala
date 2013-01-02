@@ -1,8 +1,11 @@
 package info.folone.scala
 
+import poi._
 import scalaz._
 
-package object poi {
+package object poi extends Instances with Lenses
+
+trait Instances {
   // Typeclass instances
   implicit val cellInstance = new Semigroup[Cell] with Equal[Cell] with Show[Cell] {
     override def append(f1: Cell, f2: ⇒ Cell) = f2
@@ -41,17 +44,6 @@ package object poi {
     override def shows(as: Workbook) = "Workbook(" + as.sheets + ")"
   }
 
-  // Lenses
-  import Lens._
-  import StoreT._
-  val cellLens: Cell @> String =
-    lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
-  val rowLens   = setLensFamily[Row, Row, Cell](lens(r ⇒ store(r.cells)(changed ⇒ Row(r.index) (changed))))
-  val sheetLens =
-    setLensFamily[Sheet, Sheet, Row](lens(s ⇒ store(s.rows) (changed ⇒ Sheet(s.name)(changed))))
-  val wbLens    =
-    setLensFamily[Workbook, Workbook, Sheet](lens(wb ⇒ store(wb.sheets)(changed ⇒ Workbook(changed))))
-
   // Utility functions
   private def mergeSets[A: Semigroup, B](list1: Set[A], list2: Set[A], on: A ⇒ B): Set[A] =
     combine(list1.map(l ⇒ (on(l), l)).toMap, list2.map(l ⇒ (on(l), l)).toMap)
@@ -65,4 +57,18 @@ package object poi {
     val r2 = m1.filterKeys(!intersection.contains(_)) ++ m2.filterKeys(!intersection.contains(_)) 
     r2 ++ r1
   }
+}
+
+trait Lenses {
+    // Lenses
+  import Lens._
+  import StoreT._
+  val cellLens: Cell @> String =
+    lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
+  val rowLens   =
+    setLensFamily[Row, Row, Cell](lens(r ⇒ store(r.cells)(changed ⇒ Row(r.index) (changed))))
+  val sheetLens =
+    setLensFamily[Sheet, Sheet, Row](lens(s ⇒ store(s.rows) (changed ⇒ Sheet(s.name)(changed))))
+  val wbLens    =
+    setLensFamily[Workbook, Workbook, Sheet](lens(wb ⇒ store(wb.sheets)(changed ⇒ Workbook(changed))))
 }
