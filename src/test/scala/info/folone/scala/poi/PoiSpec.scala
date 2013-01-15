@@ -69,7 +69,7 @@ class PoiSpec extends Specification with ScalaCheck {
 
   implicit def arbCell: Arbitrary[Cell] = Arbitrary(for {
     index ← arbitrary[Int]
-    data  ← arbitrary[String]
+    data  ← Gen.alphaStr
   } yield Cell(index, data))
 
   implicit def arbRow: Arbitrary[Row] = Arbitrary(for {
