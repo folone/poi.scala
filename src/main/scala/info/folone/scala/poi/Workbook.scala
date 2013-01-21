@@ -1,7 +1,8 @@
 import org.apache.poi._
 import hssf.usermodel._
-import java.io.{ File, FileOutputStream, OutputStream }
+import java.io.{ File, FileOutputStream, OutputStream, InputStream, FileInputStream }
 import scalaz._
+import syntax.applicative._
 import effect.IO
 
 package info.folone.scala.poi {
@@ -91,31 +92,34 @@ package info.folone.scala.poi {
     def apply(sheets: Set[Sheet]): Workbook = new Workbook(sheets)
     // in future might need to change Either to \/, therefore writing it infixed
     def apply(path: String): IO[Throwable Either Workbook] = {
-      val action = IO {
-        val file = new java.io.FileInputStream(path)
-        val wb   = new HSSFWorkbook(file)
-        val data = for {
-          i     ← 0 until wb.getNumberOfSheets
-          sheet = wb.getSheetAt(i) if (sheet != null)
-          k     ← 1 to sheet.getLastRowNum
-          row   = sheet.getRow(k) if (row != null)
-          j     ← 1 until row.getLastCellNum
-          cell  = row.getCell(j) if (cell != null)
-        } yield (sheet, row, cell)
-        val result = data.groupBy(_._1).mapValues(lst ⇒ lst map { case (s,r,c) ⇒ (r,c)} groupBy(_._1)
-                                        mapValues(lst ⇒ lst map { case   (r,c) ⇒ c } toList))
-        val sheets = result.map { case (sheet, rowLst) ⇒
-            Sheet(sheet.getSheetName) {
-              rowLst map { case (row, cellLst) ⇒
-                  Row(row.getRowNum) {
-                    cellLst map { cell ⇒ Cell(cell.getColumnIndex, cell.getStringCellValue) } toSet
-                  }
-              } toSet
-            }
-        }.toSet
-        Workbook(sheets)
-      }
-      action.catchLeft
+      val action: IO[InputStream] = IO { new FileInputStream(path) }
+      (action <*> fromInputStream).catchLeft
+    }
+    def apply(is: InputStream): IO[Throwable Either Workbook] =
+      fromInputStream.map(f ⇒ f(is)).catchLeft
+
+    private def fromInputStream = IO { is: InputStream ⇒
+      val wb   = new HSSFWorkbook(is)
+      val data = for {
+        i     ← 0 until wb.getNumberOfSheets
+        sheet = wb.getSheetAt(i) if (sheet != null)
+        k     ← 1 to sheet.getLastRowNum
+        row   = sheet.getRow(k) if (row != null)
+        j     ← 1 until row.getLastCellNum
+        cell  = row.getCell(j) if (cell != null)
+          } yield (sheet, row, cell)
+      val result = data.groupBy(_._1).mapValues(lst ⇒ lst map { case (s,r,c) ⇒ (r,c)} groupBy(_._1)
+                                      mapValues(lst ⇒ lst map { case   (r,c) ⇒ c } toList))
+      val sheets = result.map { case (sheet, rowLst) ⇒
+          Sheet(sheet.getSheetName) {
+            rowLst map { case (row, cellLst) ⇒
+                Row(row.getRowNum) {
+                  cellLst map { cell ⇒ Cell(cell.getColumnIndex, cell.getStringCellValue) } toSet
+                }
+            } toSet
+          }
+      }.toSet
+      Workbook(sheets)
     }
   }
 
