@@ -62,17 +62,21 @@ package info.folone.scala.poi {
 
     @deprecated("Use safeToFile and unsafePerformIO where you need it", "2012-09-06")
     def toFile(path: String)           = safeToFile(path).unsafePerformIO
-    @deprecated("Use safeToFile and unsafePerformIO where you need it", "2012-09-06")
+    @deprecated("Use safeToStream and unsafePerformIO where you need it", "2012-09-06")
     def toStream(stream: OutputStream) = safeToStream(stream).unsafePerformIO
 
-    def safeToFile(path: String) = IO {
-      val file = new FileOutputStream(new File(path))
-      book write file
-      file.close()
+    def safeToFile(path: String) = {
+      val action = IO {
+        val file = new FileOutputStream(new File(path))
+        book write file
+        file.close()
+      }
+      action.catchLeft
     }
 
-    def safeToStream(stream: OutputStream) = IO {
-      book write stream
+    def safeToStream(stream: OutputStream) = {
+      val action = IO { book write stream }
+      action.catchLeft
     }
 
     def asPoi = book
@@ -85,29 +89,33 @@ package info.folone.scala.poi {
 
   object Workbook {
     def apply(sheets: Set[Sheet]): Workbook = new Workbook(sheets)
-    def apply(path: String): Workbook = {
-      val file = new java.io.FileInputStream(path)
-      val wb   = new HSSFWorkbook(file)
-      val data = for {
-        i     ← 0 until wb.getNumberOfSheets
-        sheet = wb.getSheetAt(i) if (sheet != null)
-        k     ← 1 to sheet.getLastRowNum
-        row   = sheet.getRow(k) if (row != null)
-        j     ← 1 until row.getLastCellNum
-        cell  = row.getCell(j) if (cell != null)
-      } yield (sheet, row, cell)
-      val result = data.groupBy(_._1).mapValues(lst ⇒ lst map { case (s,r,c) ⇒ (r,c)} groupBy(_._1)
-                                      mapValues(lst ⇒ lst map { case   (r,c) ⇒ c } toList))
-      val sheets = result.map { case (sheet, rowLst) ⇒
-        Sheet(sheet.getSheetName) {
-          rowLst map { case (row, cellLst) ⇒
-            Row(row.getRowNum) {
-              cellLst map { cell ⇒ Cell(cell.getColumnIndex, cell.getStringCellValue) } toSet
+    // in future might need to change Either to \/, therefore writing it infixed
+    def apply(path: String): IO[Throwable Either Workbook] = {
+      val action = IO {
+        val file = new java.io.FileInputStream(path)
+        val wb   = new HSSFWorkbook(file)
+        val data = for {
+          i     ← 0 until wb.getNumberOfSheets
+          sheet = wb.getSheetAt(i) if (sheet != null)
+          k     ← 1 to sheet.getLastRowNum
+          row   = sheet.getRow(k) if (row != null)
+          j     ← 1 until row.getLastCellNum
+          cell  = row.getCell(j) if (cell != null)
+        } yield (sheet, row, cell)
+        val result = data.groupBy(_._1).mapValues(lst ⇒ lst map { case (s,r,c) ⇒ (r,c)} groupBy(_._1)
+                                        mapValues(lst ⇒ lst map { case   (r,c) ⇒ c } toList))
+        val sheets = result.map { case (sheet, rowLst) ⇒
+            Sheet(sheet.getSheetName) {
+              rowLst map { case (row, cellLst) ⇒
+                  Row(row.getRowNum) {
+                    cellLst map { cell ⇒ Cell(cell.getColumnIndex, cell.getStringCellValue) } toSet
+                  }
+              } toSet
             }
-          } toSet
-        }
-      }.toSet
-    Workbook(sheets)
+        }.toSet
+        Workbook(sheets)
+      }
+      action.catchLeft
     }
   }
 
