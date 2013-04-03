@@ -97,12 +97,11 @@ package info.folone.scala.poi {
 
   object Workbook {
     def apply(sheets: Set[Sheet]): Workbook = new Workbook(sheets)
-    // in future might need to change Either to \/, therefore writing it infixed
-    def apply(path: String): IO[Throwable Either Workbook] = {
+    def apply(path: String): IO[Throwable \/ Workbook] = {
       val action: IO[InputStream] = IO { new FileInputStream(path) }
       (action <*> fromInputStream).catchLeft
     }
-    def apply(is: InputStream): IO[Throwable Either Workbook] =
+    def apply(is: InputStream): IO[Throwable \/ Workbook] =
       fromInputStream.map(f ⇒ f(is)).catchLeft
 
     private def fromInputStream = IO { is: InputStream ⇒

@@ -54,11 +54,11 @@ object Build extends Build {
       libraryDependencies ++= Seq(
         "org.apache.poi" %  "poi"                       % "3.8",
         "org.apache.poi" %  "poi-ooxml"                 % "3.8",
-        "org.scalaz"     %% "scalaz-core"               % "7.0.0-M7",
-        "org.scalaz"     %% "scalaz-effect"             % "7.0.0-M7",
+        "org.scalaz"     %% "scalaz-core"               % "7.0.0-RC1",
+        "org.scalaz"     %% "scalaz-effect"             % "7.0.0-RC1",
         "org.specs2"     %% "specs2"                    % "1.12.3"   % "test",
         "org.scalacheck" %% "scalacheck"                % "1.10.0"   % "test" cross CrossVersion.full,
-        "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.0-M7" % "test"
+        "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.0-RC1" % "test"
       ),
       credentialsSetting,
       publishSetting,
