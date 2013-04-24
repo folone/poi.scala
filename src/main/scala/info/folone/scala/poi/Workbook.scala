@@ -3,8 +3,10 @@ import hssf.usermodel._
 import java.io.{ File, FileOutputStream, OutputStream, InputStream, FileInputStream }
 import scala.util.control.Exception.allCatch
 import scalaz._
-import syntax.applicative._
 import std.option._
+import syntax.applicative._
+import syntax.std.option._
+import syntax.std.boolean._
 import effect.IO
 
 package info.folone.scala.poi {
@@ -21,11 +23,14 @@ package info.folone.scala.poi {
           cells foreach { cl ⇒
             val Cell(index, data) = cl
             val cell = row createCell index
+            def parseFormula(str: String) = str.startsWith("=") ? some(str.replaceFirst("=", "")) | none
             (allCatch.opt(data.toDouble),
-             allCatch.opt(data.toBoolean)) match {
-              case (Some(d), None) ⇒ cell.setCellValue(d)
-              case (None, Some(b)) ⇒ cell.setCellValue(b)
-              case _               ⇒ cell.setCellValue(data)
+             allCatch.opt(data.toBoolean),
+             parseFormula(data)) match {
+              case (Some(d), None, None) ⇒ cell.setCellValue(d)
+              case (None, Some(b), None) ⇒ cell.setCellValue(b)
+              case (None, None, Some(f)) ⇒ cell.setCellFormula(f)
+              case _                     ⇒ cell.setCellValue(data)
             }
             val height = data.split("\n").size * row.getHeight
             row setHeight height.asInstanceOf[Short]

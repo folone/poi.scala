@@ -21,7 +21,7 @@ class PoiSpec extends Specification with ScalaCheck {
         val io = Workbook {
           Set(Sheet("name") {
             Set(Row(1) {
-              Set(Cell(1, "data"), Cell(2, "data2"))
+              Set(Cell(1, "data"), Cell(2, "=ABS(A0)"))
             },
             Row(2) {
               Set(Cell(1, "data"), Cell(2, "data2"))
