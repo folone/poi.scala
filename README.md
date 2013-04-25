@@ -26,7 +26,7 @@ import std.list._
 scala> val sheetOne = Workbook {
      |         Set(Sheet("name") {
      |           Set(Row(1) {
-     |             Set(Cell(1, "data"), Cell(2, "data2"))
+     |             Set(Cell(1, "-2.5"), Cell(2, "=ABS(B2)"))
      |           },
      |           Row(2) {
      |             Set(Cell(1, "data"), Cell(2, "data2"))
@@ -38,13 +38,14 @@ scala> val sheetOne = Workbook {
      |           })
      |         })
      |       }
-sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(Cell(1,data), Cell(2,data2))), Row (2)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name2")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
+sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(Cell(1,-2.5), Cell(2,=ABS(B2)))), Row (2)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name2")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
 
 scala> val path = "/home/folone/ok.xls"
 path: java.lang.String = /home/folone/ok.xls
 
 // Saving the result (yes, it does control side-effects via scalaz.IO)
 scala> sheetOne.safeToFile(path).unsafePerformIO
+res3: scalaz.\/[Throwable,Unit] = \/-(())
 
 // Let's create another workbook
 scala> val sheetTwo = Workbook {
