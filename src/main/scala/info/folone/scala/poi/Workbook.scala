@@ -23,15 +23,15 @@ package info.folone.scala.poi {
           cells foreach { cl ⇒
             val index = cl.index
             val cell = row createCell index
-            def parseFormula(str: String) = str.startsWith("=") ? some(str.replaceFirst("=", "")) | none
             cl match {
-              case StringCell(index, data) ⇒ cell.setCellValue(data)
+              case StringCell(index, data)  ⇒
+                cell.setCellValue(data)
+                val height = data.split("\n").size * row.getHeight
+                row setHeight height.asInstanceOf[Short]
               case BooleanCell(index, data) ⇒ cell.setCellValue(data)
-              case DoubleCell(index, data) ⇒ cell.setCellValue(data)
+              case DoubleCell(index, data)  ⇒ cell.setCellValue(data)
               case FormulaCell(index, data) ⇒ cell.setCellFormula(data)
             }
-            //val height = data.split("\n").size * row.getHeight
-            //row setHeight height.asInstanceOf[Short]
           }
         }
       }
@@ -125,8 +125,18 @@ package info.folone.scala.poi {
             rowLst map { case (row, cellLst) ⇒
                 Row(row.getRowNum) {
                   cellLst map { cell ⇒
-                    // FIXME figure out the actual cell type
-                    StringCell(cell.getColumnIndex, cell.getStringCellValue)
+                    def parseFormula(str: String) =
+                      str.startsWith("=") ? some(str.replaceFirst("=", "")) | none
+                    val data  = cell.getStringCellValue
+                    val index = cell.getColumnIndex
+                    (allCatch.opt(data.toDouble),
+                      allCatch.opt(data.toBoolean),
+                      parseFormula(data)) match {
+                      case (Some(d), None, None) ⇒ DoubleCell(index, d)
+                      case (None, Some(b), None) ⇒ BooleanCell(index, b)
+                      case (None, None, Some(f)) ⇒ FormulaCell(index, f)
+                      case _                     ⇒ StringCell(index, data)
+                    }
                   } toSet
                 }
             } toSet
