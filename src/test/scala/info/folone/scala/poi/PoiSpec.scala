@@ -21,15 +21,15 @@ class PoiSpec extends Specification with ScalaCheck {
         val io = Workbook {
           Set(Sheet("name") {
             Set(Row(1) {
-              Set(Cell(1, "data"), Cell(2, "=ABS(A0)"))
+              Set(DoubleCell(1, 13.0/5), FormulaCell(2, "ABS(A0)"))
             },
             Row(2) {
-              Set(Cell(1, "data"), Cell(2, "data2"))
+              Set(StringCell(1, "data"), StringCell(2, "data2"))
             })
           },
           Sheet("name2") {
             Set(Row(2) {
-              Set(Cell(1, "data"), Cell(2, "data2"))
+              Set(BooleanCell(1, true), DoubleCell(2, 2.4))
             })
           })
         }.safeToFile("/home/folone/ok.xls")
@@ -68,9 +68,13 @@ class PoiSpec extends Specification with ScalaCheck {
   }
 
   implicit def arbCell: Arbitrary[Cell] = Arbitrary(for {
-    index ← arbitrary[Int]
-    data  ← Gen.alphaStr
-  } yield Cell(index, data))
+    index      ← arbitrary[Int]
+    stringData ← Gen.alphaStr
+    boolData   ← arbitrary[Boolean]
+    doubleData ← arbitrary[Double]
+    res        ← Gen.oneOf(StringCell(index, stringData),
+      BooleanCell(index, boolData), DoubleCell(index, doubleData))
+  } yield res)
 
   implicit def arbRow: Arbitrary[Row] = Arbitrary(for {
     index ← arbitrary[Int]
@@ -87,6 +91,6 @@ class PoiSpec extends Specification with ScalaCheck {
   } yield Workbook(sheets))
 
   trait Workbook extends Scope {
-    val book = Workbook(Set(Sheet("test")(Set(Row(0)(Set(Cell(0, "theCell")))))))
+    val book = Workbook(Set(Sheet("test")(Set(Row(0)(Set(StringCell(0, "theCell")))))))
   }
 }

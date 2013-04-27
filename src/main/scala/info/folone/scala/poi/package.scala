@@ -10,7 +10,13 @@ trait Instances {
   implicit val cellInstance = new Semigroup[Cell] with Equal[Cell] with Show[Cell] {
     override def append(f1: Cell, f2: ⇒ Cell) = f2
     override def equal(a1: Cell, a2: Cell): Boolean = a1 == a2
-    override def shows(as: Cell) = "Cell(" + as.index + ", \"" + as.data + "\")"
+    override def shows(as: Cell) =
+      as match {
+        case StringCell(index, data)  ⇒ "StringCell(" + index + ", \"" + data + "\")"
+        case DoubleCell(index, data)  ⇒ "DoubleCell(" + index + ", \"" + data + "\")"
+        case BooleanCell(index, data) ⇒ "BooleanCell(" + index + ", \"" + data + "\")"
+        case FormulaCell(index, data) ⇒ "FormulaCell(" + index + ", \"=" + data + "\")"
+      }
   }
   implicit val rowInstance = new Semigroup[Row] with Equal[Row] with Show[Row] {
     override def append(f1: Row, f2: ⇒ Row) =
@@ -63,7 +69,11 @@ trait Lenses {
     // Lenses
   import Lens._
   import StoreT._
-  val cellLens: Cell @> String =
+  val doubleCellLens: DoubleCell @> Double =
+    lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
+  val boolCellLens: BooleanCell @> Boolean =
+    lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
+  val stringCellLens: StringCell @> String =
     lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
   val rowLens   =
     setLensFamily[Row, Row, Cell](lens(r ⇒ store(r.cells)(changed ⇒ Row(r.index) (changed))))

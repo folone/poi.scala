@@ -24,49 +24,48 @@ import std.list._
 
 // Creating a test workbook
 scala> val sheetOne = Workbook {
-     |         Set(Sheet("name") {
-     |           Set(Row(1) {
-     |             Set(Cell(1, "-2.5"), Cell(2, "=ABS(B2)"))
-     |           },
-     |           Row(2) {
-     |             Set(Cell(1, "data"), Cell(2, "data2"))
-     |           })
-     |         },
-     |         Sheet("name2") {
-     |           Set(Row(2) {
-     |             Set(Cell(1, "data"), Cell(2, "data2"))
-     |           })
-     |         })
-     |       }
-sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(Cell(1,-2.5), Cell(2,=ABS(B2)))), Row (2)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name2")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
+     |    Set(Sheet("name") {
+     |      Set(Row(1) {
+     |        Set(DoubleCell(1, 13.0/5), FormulaCell(2, "ABS(A0)"))
+     |      },
+     |      Row(2) {
+     |        Set(StringCell(1, "data"), StringCell(2, "data2"))
+     |      })
+     |    },
+     |    Sheet("name2") {
+     |      Set(Row(2) {
+     |        Set(BooleanCell(1, true), DoubleCell(2, 2.4))
+     |      })
+     |    })
+     |  }
+sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(DoubleCell(1,2.6), FormulaCell(2,ABS(A0)))), Row (2)(Set(StringCell(1,data), StringCell(2,data2))))), Sheet ("name2")(Set(Row (2)(Set(BooleanCell(1,true), DoubleCell(2,2.4)))))))
 
 scala> val path = "/home/folone/ok.xls"
 path: java.lang.String = /home/folone/ok.xls
 
 // Saving the result (yes, it does control side-effects via scalaz.IO)
 scala> sheetOne.safeToFile(path).unsafePerformIO
-res3: scalaz.\/[Throwable,Unit] = \/-(())
 
 // Let's create another workbook
 scala> val sheetTwo = Workbook {
      |         Set(Sheet("name") {
      |           Set(Row(1) {
-     |             Set(Cell(1, "newdata"), Cell(2, "data2"), Cell(3, "data3"))
+     |             Set(StringCell(1, "newdata"), StringCell(2, "data2"), StringCell(3, "data3"))
      |           },
      |           Row(2) {
-     |             Set(Cell(1, "data"), Cell(2, "data2"))
+     |             Set(StringCell(1, "data"), StringCell(2, "data2"))
      |           },
      |           Row(3) {
-     |             Set(Cell(1, "data"), Cell(2, "data2"))
+     |             Set(StringCell(1, "data"), StringCell(2, "data2"))
      |           })
      |         },
      |         Sheet("name") {
      |           Set(Row(2) {
-     |             Set(Cell(1, "data"), Cell(2, "data2"))
+     |             Set(StringCell(1, "data"), StringCell(2, "data2"))
      |           })
      |         })
      |       }
-sheetTwo: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(Cell(1,newdata), Cell(2,data2), Cell(3,data3))), Row (2)(Set(Cell(1,data), Cell(2,data2))), Row (3)(Set(Cell(1,data), Cell(2,data2))))), Sheet ("name")(Set(Row (2)(Set(Cell(1,data), Cell(2,data2)))))))
+sheetTwo: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(StringCell(1,newdata), StringCell(2,data2), StringCell(3,data3))), Row (2)(Set(StringCell(1,data), StringCell(2,data2))), Row (3)(Set(StringCell(1,data), StringCell(2,data2))))), Sheet ("name")(Set(Row (2)(Set(StringCell(1,data), StringCell(2,data2)))))))
 
 scala> import syntax.equal._
 import syntax.equal._
@@ -77,38 +76,6 @@ res1: Boolean = true
 
 scala> List(Workbook(path), sheetOne, sheetTwo).suml === (sheetOne |+| sheetTwo)
 res2: Boolean = true
-
-// We also have some lenses, though they are a work in progress (and only available since 0.8-SNAPSHOT). Some examples:
-scala> cellLens.get(Cell(1, "data"))
-res3: scalaz.Id.Id[String] = data
-
-scala> cellLens.set(Cell(1, "data"), "new data")
-res4: scalaz.Id.Id[info.folone.scala.poi.Cell] = Cell(1,new data)
-
-scala> rowLens.contains(Cell(2, "data1")).get(Row(1)(Set(Cell(1,"data"), Cell(2, "data1"))))
-res8: scalaz.Id.Id[Boolean] = true
-
-scala> rowLens.contains(Cell(2, "data1")).get(Row(1)(Set(Cell(1,"data"), Cell(2, "data"))))
-res9: scalaz.Id.Id[Boolean] = false
-
-scala> (rowLens += Cell(2, "data1")).run(Row(1)(Set(Cell(1, "data"), Cell(3, "data3"))))
-res14: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(1,data), Cell(3,data3), Cell(2,data1))),Set(Cell(1,data), Cell(3,data3), Cell(2,data1)))
-
-scala> (rowLens &= Set(Cell(2, "data1"))).run(Row(1)(Set(Cell(1, "data"), Cell(2, "data1"))))
-res17: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(2,data1))),Set(Cell(2,data1)))
-
-scala> (rowLens &~= Set(Cell(2, "data1"))).run(Row(1)(Set(Cell(1, "data"), Cell(2, "data1"))))
-res18: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(1,data))),Set(Cell(1,data)))
-
-scala> (rowLens |= Set(Cell(2, "data1"))).run(Row(1)(Set(Cell(1, "data"), Cell(2, "data1"))))
-res20: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(1,data), Cell(2,data1))),Set(Cell(1,data), Cell(2,data1)))
-
-scala> (rowLens |= Set(Cell(2, "data1"))).run(Row(1)(Set(Cell(1, "data"), Cell(2, "data2"))))
-res21: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(1,data), Cell(2,data2), Cell(2,data1))),Set(Cell(1,data), Cell(2,data2), Cell(2,data1)))
-
-scala> (rowLens -= Cell(2, "data1")).run(Row(1)(Set(Cell(1, "data"), Cell(2, "data1"))))
-res23: (info.folone.scala.poi.Row, Set[info.folone.scala.poi.Cell]) = (Row (1)(Set(Cell(1,data))),Set(Cell(1,data)))
-
 ```
 
 

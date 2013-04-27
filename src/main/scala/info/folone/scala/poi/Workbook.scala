@@ -21,19 +21,17 @@ package info.folone.scala.poi {
           val Row((index), (cells)) = rw
           val row = sheet createRow index
           cells foreach { cl ⇒
-            val Cell(index, data) = cl
+            val index = cl.index
             val cell = row createCell index
             def parseFormula(str: String) = str.startsWith("=") ? some(str.replaceFirst("=", "")) | none
-            (allCatch.opt(data.toDouble),
-             allCatch.opt(data.toBoolean),
-             parseFormula(data)) match {
-              case (Some(d), None, None) ⇒ cell.setCellValue(d)
-              case (None, Some(b), None) ⇒ cell.setCellValue(b)
-              case (None, None, Some(f)) ⇒ cell.setCellFormula(f)
-              case _                     ⇒ cell.setCellValue(data)
+            cl match {
+              case StringCell(index, data) ⇒ cell.setCellValue(data)
+              case BooleanCell(index, data) ⇒ cell.setCellValue(data)
+              case DoubleCell(index, data) ⇒ cell.setCellValue(data)
+              case FormulaCell(index, data) ⇒ cell.setCellFormula(data)
             }
-            val height = data.split("\n").size * row.getHeight
-            row setHeight height.asInstanceOf[Short]
+            //val height = data.split("\n").size * row.getHeight
+            //row setHeight height.asInstanceOf[Short]
           }
         }
       }
@@ -119,13 +117,17 @@ package info.folone.scala.poi {
         j     ← 1 until row.getLastCellNum
         cell  = row.getCell(j) if (cell != null)
           } yield (sheet, row, cell)
-      val result = data.groupBy(_._1).mapValues(lst ⇒ lst map { case (s,r,c) ⇒ (r,c)} groupBy(_._1)
-                                      mapValues(lst ⇒ lst map { case   (r,c) ⇒ c } toList))
+      val result = data.groupBy(_._1).mapValues(lst ⇒
+        lst map { case (s,r,c) ⇒ (r,c)} groupBy(_._1)
+          mapValues(lst ⇒ lst map { case   (r,c) ⇒ c } toList))
       val sheets = result.map { case (sheet, rowLst) ⇒
           Sheet(sheet.getSheetName) {
             rowLst map { case (row, cellLst) ⇒
                 Row(row.getRowNum) {
-                  cellLst map { cell ⇒ Cell(cell.getColumnIndex, cell.getStringCellValue) } toSet
+                  cellLst map { cell ⇒
+                    // FIXME figure out the actual cell type
+                    StringCell(cell.getColumnIndex, cell.getStringCellValue)
+                  } toSet
                 }
             } toSet
           }
@@ -152,7 +154,11 @@ package info.folone.scala.poi {
     def apply(index: Int)(cells: Set[Cell]) = new Row(index)(cells)
     def unapply(row: Row) = Some((row.index), (row.cells))
   }
-  case class Cell(index: Int, data: String)
+  sealed abstract class Cell(val index: Int)
+  case class StringCell(override  val index: Int, data: String)  extends Cell(index)
+  case class DoubleCell(override  val index: Int, data: Double)  extends Cell(index)
+  case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index)
+  case class FormulaCell(override val index: Int, data: String)  extends Cell(index)
   case class CellAddr(sheet: String, row: Int, col: Int)
 
 }
