@@ -78,7 +78,8 @@ object Build extends Build {
            <developers>
            {
              Seq(
-               ("folone", "George Leontiev")
+               ("folone", "George Leontiev"),
+               ("anvie", "Robin Syihab")
              ).map {
                case (id, name) =>
                <developer>
