@@ -9,8 +9,8 @@ object Build extends Build {
     organization       := "info.folone",
     version            := "0.9-SNAPSHOT",
 
-    scalaVersion       := "2.9.2",
-    crossScalaVersions := Seq("2.9.2", "2.10.0"),
+    scalaVersion       := "2.10.1",
+    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1"),
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
@@ -27,7 +27,7 @@ object Build extends Build {
   )
 
   lazy val publishSetting = publishTo <<= (version).apply{
-    v =>
+    v ⇒
       val nexus = "https://oss.sonatype.org/"
       if (v.trim.endsWith("SNAPSHOT"))
         Some("snapshots" at nexus + "content/repositories/snapshots")
@@ -36,10 +36,10 @@ object Build extends Build {
   }
 
   lazy val credentialsSetting = credentials += {
-    Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
-      case Seq(Some(user), Some(pass)) =>
+    Seq("build.publish.user", "build.publish.password").map(k ⇒ Option(System.getProperty(k))) match {
+      case Seq(Some(user), Some(pass)) ⇒
         Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
-      case _                           =>
+      case _                           ⇒
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
   }
@@ -51,15 +51,18 @@ object Build extends Build {
     repoSettings                             ++
     Seq(
       name := "poi-scala",
-      libraryDependencies ++= Seq(
-        "org.apache.poi" %  "poi"                       % "3.8",
-        "org.apache.poi" %  "poi-ooxml"                 % "3.8",
-        "org.scalaz"     %% "scalaz-core"               % "7.0.0",
-        "org.scalaz"     %% "scalaz-effect"             % "7.0.0",
-        "org.specs2"     %% "specs2"                    % "1.12.3" % "test",
-        "org.scalacheck" %% "scalacheck"                % "1.10.0" % "test" cross CrossVersion.full,
-        "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.0"  % "test"
-      ),
+      resolvers += Resolver.sonatypeRepo("releases"),
+      libraryDependencies <++= (scalaVersion) { sv ⇒
+        Seq(
+          "org.apache.poi" %  "poi"                       % "3.8",
+          "org.apache.poi" %  "poi-ooxml"                 % "3.8",
+          "org.scalaz"     %% "scalaz-core"               % "7.0.0",
+          "org.scalaz"     %% "scalaz-effect"             % "7.0.0",
+          "org.specs2"     %% "specs2"                    % Dependencies.specs2(sv) % "test",
+          "org.scalacheck" %% "scalacheck"                % "1.10.0" % "test",
+          "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.0"  % "test"
+        )
+      },
       credentialsSetting,
       publishSetting,
          pomExtra := (
@@ -78,9 +81,10 @@ object Build extends Build {
            <developers>
            {
              Seq(
-               ("folone", "George Leontiev")
+               ("folone",   "George Leontiev"),
+               ("fedgehog", "Maxim Fedorov")
              ).map {
-               case (id, name) =>
+               case (id, name) ⇒
                <developer>
                  <id>{id}</id>
                  <name>{name}</name>
@@ -93,7 +97,7 @@ object Build extends Build {
     )
 
   override lazy val settings = super.settings ++ repoSettings  ++ Seq(
-    shellPrompt := { s => Project.extract(s).currentProject.id + " > " }
+    shellPrompt := { s ⇒ Project.extract(s).currentProject.id + " > " }
   )
 
   lazy val excludedTestNames = SettingKey[Seq[String]]("excluded-tests", "temporary excluded tests")
@@ -103,5 +107,14 @@ object Build extends Build {
     base = file("."),
     settings = standardSettings
   )
+
+  object Dependencies {
+    def specs2(scalaVersion: String) =
+      if (scalaVersion startsWith "2.9")
+        "1.12.4.1"
+      else
+        "1.12.3"
+  }
+
 
 }
