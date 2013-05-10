@@ -14,23 +14,29 @@ package info.folone.scala.poi {
   class Workbook(val sheets: Set[Sheet]) {
     private lazy val book = {
       val workbook = new HSSFWorkbook
-      sheets foreach { sh ⇒
+      sheets foreach { sh =>
         val Sheet((name), (rows)) = sh
         val sheet = workbook createSheet name
-        rows foreach { rw ⇒
+        rows foreach { rw =>
           val Row((index), (cells)) = rw
           val row = sheet createRow index
-          cells foreach { cl ⇒
+          cells foreach { cl =>
             val index = cl.index
             val cell = row createCell index
             cl match {
-              case StringCell(index, data)  ⇒
+              case StringCell(index, data)  =>
                 cell.setCellValue(data)
                 val height = data.split("\n").size * row.getHeight
                 row setHeight height.asInstanceOf[Short]
-              case BooleanCell(index, data) ⇒ cell.setCellValue(data)
-              case DoubleCell(index, data)  ⇒ cell.setCellValue(data)
-              case FormulaCell(index, data) ⇒ cell.setCellFormula(data)
+              case BooleanCell(index, data) => cell.setCellValue(data)
+
+              case NumericCell(index, data:Int)  => cell.setCellValue(data)
+              case NumericCell(index, data:Double)  => cell.setCellValue(data)
+              case NumericCell(index, data:Long)  => cell.setCellValue(data)
+              case NumericCell(index, x)  =>
+                throw new Exception("Numeric type not supported: " + x + " (" + x.getClass.getName + ")")
+
+              case FormulaCell(index, data) => cell.setCellFormula(data)
             }
           }
         }
@@ -45,9 +51,9 @@ package info.folone.scala.poi {
         pStyle
       }
 
-      styles.keys.foreach { s ⇒
+      styles.keys.foreach { s =>
         val cellAdrresses = styles(s)
-        cellAdrresses.foreach { addr ⇒
+        cellAdrresses.foreach { addr =>
           val cell = wb.getSheet(addr.sheet).getRow(addr.row).getCell(addr.col)
           cell setCellStyle pStyle(s)
         }
@@ -67,7 +73,7 @@ package info.folone.scala.poi {
      * @param addrs addresses of cells whose columns should be sized to fit cells content
      */
     def autosizeColumns(addrs: List[CellAddr]): Workbook = {
-      addrs foreach { a ⇒ book.getSheet(a.sheet).autoSizeColumn(a.col) }
+      addrs foreach { a => book.getSheet(a.sheet).autoSizeColumn(a.col) }
       this
     }
 
@@ -105,9 +111,9 @@ package info.folone.scala.poi {
       (action <*> fromInputStream).catchLeft
     }
     def apply(is: InputStream): IO[Throwable \/ Workbook] =
-      fromInputStream.map(f ⇒ f(is)).catchLeft
+      fromInputStream.map(f => f(is)).catchLeft
 
-    private def fromInputStream = IO { is: InputStream ⇒
+    private def fromInputStream = IO { is: InputStream =>
       val wb   = new HSSFWorkbook(is)
       val data = for {
         i     ← 0 until wb.getNumberOfSheets
@@ -117,14 +123,14 @@ package info.folone.scala.poi {
         j     ← 1 until row.getLastCellNum
         cell  = row.getCell(j) if (cell != null)
           } yield (sheet, row, cell)
-      val result = data.groupBy(_._1).mapValues(lst ⇒
-        lst map { case (s,r,c) ⇒ (r,c)} groupBy(_._1)
-          mapValues(lst ⇒ lst map { case   (r,c) ⇒ c } toList))
-      val sheets = result.map { case (sheet, rowLst) ⇒
+      val result = data.groupBy(_._1).mapValues(lst =>
+        lst map { case (s,r,c) => (r,c)} groupBy(_._1)
+          mapValues(lst => lst map { case   (r,c) => c } toList))
+      val sheets = result.map { case (sheet, rowLst) =>
           Sheet(sheet.getSheetName) {
-            rowLst map { case (row, cellLst) ⇒
+            rowLst map { case (row, cellLst) =>
                 Row(row.getRowNum) {
-                  cellLst map { cell ⇒
+                  cellLst map { cell =>
                     def parseFormula(str: String) =
                       str.startsWith("=") ? some(str.replaceFirst("=", "")) | none
                     val data  = cell.getStringCellValue
@@ -132,10 +138,10 @@ package info.folone.scala.poi {
                     (allCatch.opt(data.toDouble),
                       allCatch.opt(data.toBoolean),
                       parseFormula(data)) match {
-                      case (Some(d), None, None) ⇒ DoubleCell(index, d)
-                      case (None, Some(b), None) ⇒ BooleanCell(index, b)
-                      case (None, None, Some(f)) ⇒ FormulaCell(index, f)
-                      case _                     ⇒ StringCell(index, data)
+                      case (Some(d), None, None) => NumericCell(index, d)
+                      case (None, Some(b), None) => BooleanCell(index, b)
+                      case (None, None, Some(f)) => FormulaCell(index, f)
+                      case _                     => StringCell(index, data)
                     }
                   } toSet
                 }
@@ -164,9 +170,10 @@ package info.folone.scala.poi {
     def apply(index: Int)(cells: Set[Cell]) = new Row(index)(cells)
     def unapply(row: Row) = Some((row.index), (row.cells))
   }
+  
   sealed abstract class Cell(val index: Int)
   case class StringCell(override  val index: Int, data: String)  extends Cell(index)
-  case class DoubleCell(override  val index: Int, data: Double)  extends Cell(index)
+  case class NumericCell(override  val index: Int, data: AnyVal)  extends Cell(index)
   case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index)
   case class FormulaCell(override val index: Int, data: String)  extends Cell(index)
   case class CellAddr(sheet: String, row: Int, col: Int)
