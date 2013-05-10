@@ -18,10 +18,10 @@ import Arbitrary._
 class PoiSpec extends Specification with ScalaCheck {
     "Poi" should {
       "create workbook" in {
-        val io = Workbook {
+        val wb = Workbook {
           Set(Sheet("name") {
             Set(Row(1) {
-              Set(NumericCell(1, 13.0/5), FormulaCell(2, "ABS(A0)"))
+              Set(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
             },
             Row(2) {
               Set(StringCell(1, "data"), StringCell(2, "data2"))
@@ -32,8 +32,9 @@ class PoiSpec extends Specification with ScalaCheck {
               Set(BooleanCell(1, true), NumericCell(2, 2.4))
             })
           })
-        }.safeToFile("/home/folone/ok.xls")
-        // io.unsafePerformIO
+        }
+        val io = wb.safeToFile("/home/folone/ok.xls")
+        //io.unsafePerformIO
         "ok" must not be null
       }
     }

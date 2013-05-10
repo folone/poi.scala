@@ -77,10 +77,9 @@ package info.folone.scala.poi {
     def toStream(stream: OutputStream) = safeToStream(stream).unsafePerformIO
 
     def safeToFile(path: String) = {
-      val action = IO {
-        val file = new FileOutputStream(new File(path))
-        book write file
-        file.close()
+      def close(resource: {def close(): Unit}) = IO { resource.close() }
+      val action = IO { new FileOutputStream(new File(path)) }.bracket(close) { file ⇒
+        IO { book write file }
       }
       action.catchLeft
     }
@@ -170,5 +169,4 @@ package info.folone.scala.poi {
   case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index)
   case class FormulaCell(override val index: Int, data: String)  extends Cell(index)
   case class CellAddr(sheet: String, row: Int, col: Int)
-
 }
