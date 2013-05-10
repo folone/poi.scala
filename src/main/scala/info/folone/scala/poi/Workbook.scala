@@ -29,7 +29,7 @@ package info.folone.scala.poi {
                 val height = data.split("\n").size * row.getHeight
                 row setHeight height.asInstanceOf[Short]
               case BooleanCell(index, data) ⇒ cell.setCellValue(data)
-              case DoubleCell(index, data)  ⇒ cell.setCellValue(data)
+              case NumericCell(index, data) ⇒ cell.setCellValue(data)
               case FormulaCell(index, data) ⇒ cell.setCellFormula(data)
             }
           }
@@ -132,7 +132,7 @@ package info.folone.scala.poi {
                     (allCatch.opt(data.toDouble),
                       allCatch.opt(data.toBoolean),
                       parseFormula(data)) match {
-                      case (Some(d), None, None) ⇒ DoubleCell(index, d)
+                      case (Some(d), None, None) ⇒ NumericCell(index, d)
                       case (None, Some(b), None) ⇒ BooleanCell(index, b)
                       case (None, None, Some(f)) ⇒ FormulaCell(index, f)
                       case _                     ⇒ StringCell(index, data)
@@ -166,7 +166,7 @@ package info.folone.scala.poi {
   }
   sealed abstract class Cell(val index: Int)
   case class StringCell(override  val index: Int, data: String)  extends Cell(index)
-  case class DoubleCell(override  val index: Int, data: Double)  extends Cell(index)
+  case class NumericCell(override  val index: Int, data: Double) extends Cell(index)
   case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index)
   case class FormulaCell(override val index: Int, data: String)  extends Cell(index)
   case class CellAddr(sheet: String, row: Int, col: Int)

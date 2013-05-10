@@ -13,7 +13,7 @@ trait Instances {
     override def shows(as: Cell) =
       as match {
         case StringCell(index, data)  ⇒ "StringCell(" + index + ", \"" + data + "\")"
-        case DoubleCell(index, data)  ⇒ "DoubleCell(" + index + ", \"" + data + "\")"
+        case NumericCell(index, data) ⇒ "NumericCell(" + index + ", \"" + data + "\")"
         case BooleanCell(index, data) ⇒ "BooleanCell(" + index + ", \"" + data + "\")"
         case FormulaCell(index, data) ⇒ "FormulaCell(" + index + ", \"=" + data + "\")"
       }
@@ -69,8 +69,8 @@ trait Lenses {
     // Lenses
   import Lens._
   import StoreT._
-  val doubleCellLens: DoubleCell @> Double =
-    lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
+  val doubleCellLens: NumericCell @> Double =
+    lensFamily(c ⇒ store(c.data)(chaned ⇒ c.copy(data = changed)))
   val boolCellLens: BooleanCell @> Boolean =
     lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
   val stringCellLens: StringCell @> String =
