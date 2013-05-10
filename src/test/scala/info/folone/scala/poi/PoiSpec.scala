@@ -21,7 +21,7 @@ class PoiSpec extends Specification with ScalaCheck {
         val io = Workbook {
           Set(Sheet("name") {
             Set(Row(1) {
-              Set(DoubleCell(1, 13.0/5), FormulaCell(2, "ABS(A0)"))
+              Set(NumericCell(1, 13.0/5), FormulaCell(2, "ABS(A0)"))
             },
             Row(2) {
               Set(StringCell(1, "data"), StringCell(2, "data2"))
@@ -29,7 +29,7 @@ class PoiSpec extends Specification with ScalaCheck {
           },
           Sheet("name2") {
             Set(Row(2) {
-              Set(BooleanCell(1, true), DoubleCell(2, 2.4))
+              Set(BooleanCell(1, true), NumericCell(2, 2.4))
             })
           })
         }.safeToFile("/home/folone/ok.xls")
@@ -73,7 +73,7 @@ class PoiSpec extends Specification with ScalaCheck {
     boolData   ← arbitrary[Boolean]
     doubleData ← arbitrary[Double]
     res        ← Gen.oneOf(StringCell(index, stringData),
-      BooleanCell(index, boolData), DoubleCell(index, doubleData))
+      BooleanCell(index, boolData), NumericCell(index, doubleData))
   } yield res)
 
   implicit def arbRow: Arbitrary[Row] = Arbitrary(for {

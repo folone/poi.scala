@@ -70,7 +70,7 @@ trait Lenses {
   import Lens._
   import StoreT._
   val doubleCellLens: NumericCell @> Double =
-    lensFamily(c ⇒ store(c.data)(chaned ⇒ c.copy(data = changed)))
+    lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
   val boolCellLens: BooleanCell @> Boolean =
     lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
   val stringCellLens: StringCell @> String =
