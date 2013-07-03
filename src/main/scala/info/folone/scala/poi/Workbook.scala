@@ -64,9 +64,9 @@ package info.folone.scala.poi {
      * Fits column's width to maximum width of non-empty cell at cell address.
      * Quite expensive. Use as late as possible.
      *
-     * @param addrs addresses of cells whose columns should be sized to fit cells content
+     * @param addrs addresses of cells, which columns size should fit cells content
      */
-    def autosizeColumns(addrs: List[CellAddr]): Workbook = {
+    def autosizeColumns(addrs: Set[CellAddr]): Workbook = {
       addrs foreach { a ⇒ book.getSheet(a.sheet).autoSizeColumn(a.col) }
       this
     }
