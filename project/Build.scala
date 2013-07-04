@@ -9,8 +9,8 @@ object Build extends Build {
     organization       := "info.folone",
     version            := "0.9-SNAPSHOT",
 
-    scalaVersion       := "2.10.1",
-    crossScalaVersions := Seq("2.9.2", "2.9.3", "2.10.1"),
+    scalaVersion       := "2.10.2",
+    crossScalaVersions := Seq("2.9.3", "2.10.2"),
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
@@ -56,11 +56,11 @@ object Build extends Build {
         Seq(
           "org.apache.poi" %  "poi"                       % "3.8",
           "org.apache.poi" %  "poi-ooxml"                 % "3.8",
-          "org.scalaz"     %% "scalaz-core"               % "7.0.0",
-          "org.scalaz"     %% "scalaz-effect"             % "7.0.0",
+          "org.scalaz"     %% "scalaz-core"               % "7.0.1",
+          "org.scalaz"     %% "scalaz-effect"             % "7.0.1",
           "org.specs2"     %% "specs2"                    % Dependencies.specs2(sv) % "test",
-          "org.scalacheck" %% "scalacheck"                % "1.10.0" % "test",
-          "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.0"  % "test"
+          "org.scalacheck" %% "scalacheck"                % "1.10.1" % "test",
+          "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.1"  % "test"
         )
       },
       credentialsSetting,
@@ -113,7 +113,7 @@ object Build extends Build {
       if (scalaVersion startsWith "2.9")
         "1.12.4.1"
       else
-        "1.12.3"
+        "2.0"
   }
 
 
