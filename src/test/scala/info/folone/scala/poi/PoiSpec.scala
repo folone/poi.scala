@@ -63,13 +63,15 @@ class PoiSpec extends Specification with ScalaCheck {
       semigroup.laws[Sheet]
     }
     "satisfy for Workbook" in checkProp {
-      // INFO a lot of nested tests to check, takes a long time, thus commented out
-//      monoid.laws[info.folone.scala.poi.Workbook]
+      lazy val result = monoid.laws[info.folone.scala.poi.Workbook]
+      skipped("a lot of nested tests to check, takes a long time")
     }
   }
 
+  def positiveInt = Gen.choose(0, Integer.MAX_VALUE)
+
   implicit def arbCell: Arbitrary[Cell] = Arbitrary(for {
-    index      ← arbitrary[Int]
+    index      ← positiveInt
     stringData ← Gen.alphaStr
     boolData   ← arbitrary[Boolean]
     doubleData ← arbitrary[Double]
@@ -78,7 +80,7 @@ class PoiSpec extends Specification with ScalaCheck {
   } yield res)
 
   implicit def arbRow: Arbitrary[Row] = Arbitrary(for {
-    index ← arbitrary[Int]
+    index ← positiveInt
     cells ← arbitrary[Set[Cell]]
   } yield Row(index)(cells))
 

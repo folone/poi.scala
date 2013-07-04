@@ -9,7 +9,7 @@ trait Instances {
   // Typeclass instances
   implicit val cellInstance = new Semigroup[Cell] with Equal[Cell] with Show[Cell] {
     override def append(f1: Cell, f2: ⇒ Cell) = f2
-    override def equal(a1: Cell, a2: Cell): Boolean = a1 == a2
+    override def equal(a1: Cell, a2: Cell): Boolean = a1.index == a2.index
     override def shows(as: Cell) =
       as match {
         case StringCell(index, data)  ⇒ "StringCell(" + index + ", \"" + data + "\")"
