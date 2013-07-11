@@ -124,19 +124,18 @@ package info.folone.scala.poi {
           Sheet(sheet.getSheetName) {
             rowLst map { case (row, cellLst) ⇒
                 Row(row.getRowNum) {
-                  cellLst map { cell ⇒
+                  cellLst flatMap { cell ⇒
                     val index = cell.getColumnIndex
                     cell.getCellType match {
                       case Cell.CELL_TYPE_NUMERIC ⇒
-                        NumericCell(index, cell.getNumericCellValue)
+                        Some(NumericCell(index, cell.getNumericCellValue))
                       case Cell.CELL_TYPE_BOOLEAN ⇒
-                        BooleanCell(index, cell.getBooleanCellValue)
+                        Some(BooleanCell(index, cell.getBooleanCellValue))
                       case Cell.CELL_TYPE_FORMULA ⇒
-                        FormulaCell(index, cell.getCellFormula)
+                        Some(FormulaCell(index, cell.getCellFormula))
                       case Cell.CELL_TYPE_STRING  ⇒
-                        StringCell(index, cell.getStringCellValue)
-                      case _                      ⇒
-                        StringCell(index, cell.getStringCellValue)
+                        Some(StringCell(index, cell.getStringCellValue))
+                      case _                      ⇒ None
                     }
                   } toSet
                 }
