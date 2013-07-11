@@ -26,7 +26,7 @@ import std.list._
 scala> val sheetOne = Workbook {
      |    Set(Sheet("name") {
      |      Set(Row(1) {
-     |        Set(NumericCell(1, 13.0/5), FormulaCell(2, "ABS(A0)"))
+     |        Set(NumericCell(1, 13.0/5), FormulaCell(2, "ABS(A1)"))
      |      },
      |      Row(2) {
      |        Set(StringCell(1, "data"), StringCell(2, "data2"))
@@ -71,11 +71,14 @@ scala> import syntax.equal._
 import syntax.equal._
 
 // And let's merge the saved workbook from before with the new one using the Monoid instance
-scala> (Workbook(path) /* load from file */ |+| sheetTwo) === (sheetOne |+| sheetTwo)
-res1: Boolean = true
+scala> Workbook(path).map {
+     |   case \/-(workbook) => (workbook |+| sheetTwo) === (sheetOne |+| sheetTwo)
+     |   case -\/(_)        => false
+     | }
+res5: scalaz.effect.IO[Boolean] = scalaz.effect.IOFunctions$$anon$5@2e48f14
 
-scala> List(Workbook(path), sheetOne, sheetTwo).suml === (sheetOne |+| sheetTwo)
-res2: Boolean = true
+scala> .unsafePerformIO
+res6: Boolean = true
 ```
 
 

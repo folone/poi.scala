@@ -1,5 +1,6 @@
 import org.apache.poi._
 import hssf.usermodel._
+import ss.usermodel.Cell
 import java.io.{ File, FileOutputStream, OutputStream, InputStream, FileInputStream }
 import scala.util.control.Exception.allCatch
 import scalaz._
@@ -124,17 +125,18 @@ package info.folone.scala.poi {
             rowLst map { case (row, cellLst) ⇒
                 Row(row.getRowNum) {
                   cellLst map { cell ⇒
-                    def parseFormula(str: String) =
-                      str.startsWith("=") ? some(str.replaceFirst("=", "")) | none
-                    val data  = cell.getStringCellValue
                     val index = cell.getColumnIndex
-                    (allCatch.opt(data.toDouble),
-                      allCatch.opt(data.toBoolean),
-                      parseFormula(data)) match {
-                      case (Some(d), None, None) ⇒ NumericCell(index, d)
-                      case (None, Some(b), None) ⇒ BooleanCell(index, b)
-                      case (None, None, Some(f)) ⇒ FormulaCell(index, f)
-                      case _                     ⇒ StringCell(index, data)
+                    cell.getCellType match {
+                      case Cell.CELL_TYPE_NUMERIC ⇒
+                        NumericCell(index, cell.getNumericCellValue)
+                      case Cell.CELL_TYPE_BOOLEAN ⇒
+                        BooleanCell(index, cell.getBooleanCellValue)
+                      case Cell.CELL_TYPE_FORMULA ⇒
+                        FormulaCell(index, cell.getCellFormula)
+                      case Cell.CELL_TYPE_STRING  ⇒
+                        StringCell(index, cell.getStringCellValue)
+                      case _                      ⇒
+                        StringCell(index, cell.getStringCellValue)
                     }
                   } toSet
                 }
