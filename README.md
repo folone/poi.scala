@@ -91,9 +91,9 @@ res6: Boolean = true
 ### Maven:
 
 ```xml
-    <dependency>
-        <groupId>info.folone</groupId>
-        <artifactId>poi-scala_${scala.version}</artifactId>
-        <version>0.9</version>
-    </dependency>
+<dependency>
+    <groupId>info.folone</groupId>
+    <artifactId>poi-scala_${scala.version}</artifactId>
+    <version>0.9</version>
+</dependency>
 ```
