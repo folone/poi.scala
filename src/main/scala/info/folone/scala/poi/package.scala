@@ -53,7 +53,7 @@ trait Instances {
   // Utility functions
   private def mergeSets[A: Semigroup, B](list1: Set[A], list2: Set[A], on: A ⇒ B): Set[A] =
     combine(list1.map(l ⇒ (on(l), l)).toMap, list2.map(l ⇒ (on(l), l)).toMap)
-      .map { case(_, y) ⇒ y } toSet
+      .map { case(_, y) ⇒ y }.toSet
 
   private def combine[A, B: Semigroup](m1: Map[A, B], m2: Map[A, B]): Map[A, B] = {
     val k1 = Set(m1.keysIterator.toList: _*)

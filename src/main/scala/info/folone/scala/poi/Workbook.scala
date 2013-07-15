@@ -119,12 +119,12 @@ package info.folone.scala.poi {
           } yield (sheet, row, cell)
       val result = data.groupBy(_._1).mapValues(lst ⇒
         lst map { case (s,r,c) ⇒ (r,c)} groupBy(_._1)
-          mapValues(lst ⇒ lst map { case   (r,c) ⇒ c } toList))
+          mapValues(lst ⇒ lst.map { case (r, c) ⇒ c }.toList))
       val sheets = result.map { case (sheet, rowLst) ⇒
           Sheet(sheet.getSheetName) {
-            rowLst map { case (row, cellLst) ⇒
+            rowLst.map { case (row, cellLst) ⇒
                 Row(row.getRowNum) {
-                  cellLst flatMap { cell ⇒
+                  cellLst.flatMap { cell ⇒
                     val index = cell.getColumnIndex
                     cell.getCellType match {
                       case Cell.CELL_TYPE_NUMERIC ⇒
@@ -137,9 +137,9 @@ package info.folone.scala.poi {
                         Some(StringCell(index, cell.getStringCellValue))
                       case _                      ⇒ None
                     }
-                  } toSet
+                  }.toSet
                 }
-            } toSet
+            }.toSet
           }
       }.toSet
       Workbook(sheets)
