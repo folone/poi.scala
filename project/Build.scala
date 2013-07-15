@@ -56,11 +56,11 @@ object Build extends Build {
         Seq(
           "org.apache.poi" %  "poi"                       % "3.8",
           "org.apache.poi" %  "poi-ooxml"                 % "3.8",
-          "org.scalaz"     %% "scalaz-core"               % "7.0.1",
-          "org.scalaz"     %% "scalaz-effect"             % "7.0.1",
+          "org.scalaz"     %% "scalaz-core"               % "7.1.0-M1",
+          "org.scalaz"     %% "scalaz-effect"             % "7.1.0-M1",
           "org.specs2"     %% "specs2"                    % Dependencies.specs2(sv) % "test",
-          "org.scalacheck" %% "scalacheck"                % "1.10.1" % "test",
-          "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.1"  % "test"
+          "org.scalacheck" %% "scalacheck"                % "1.10.1"                % "test",
+          "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.1.0-M1"              % "test"
         )
       },
       credentialsSetting,
@@ -115,6 +115,4 @@ object Build extends Build {
       else
         "2.0"
   }
-
-
 }
