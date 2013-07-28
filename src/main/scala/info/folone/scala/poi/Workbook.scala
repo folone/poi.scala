@@ -2,7 +2,6 @@ package info.folone.scala.poi
 
 import org.apache.poi._
 import ss.usermodel.{Workbook ⇒ POIWorkbook, WorkbookFactory}
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import ss.usermodel.{ Cell ⇒ POICell }
 import java.io.{ File, FileOutputStream, OutputStream, InputStream, FileInputStream }
 
@@ -14,9 +13,12 @@ import syntax.std.boolean._
 import effect.IO
 
 
-class Workbook(val sheets: Set[Sheet]) {
+class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
   private lazy val book = {
-    val workbook = new HSSFWorkbook
+    val workbook = format match {
+      case HSSF ⇒ new org.apache.poi.hssf.usermodel.HSSFWorkbook
+      case XSSF ⇒ new org.apache.poi.xssf.usermodel.XSSFWorkbook
+    }
     sheets foreach { sh ⇒
       val Sheet((name), (rows)) = sh
       val sheet = workbook createSheet name
@@ -195,3 +197,7 @@ case class NumericCell(override  val index: Int, data: Double) extends Cell(inde
 case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index)
 case class FormulaCell(override val index: Int, data: String)  extends Cell(index)
 case class CellAddr(sheet: String, row: Int, col: Int)
+
+sealed abstract class WorkbookVersion
+case object HSSF extends WorkbookVersion
+case object XSSF extends WorkbookVersion
