@@ -8,9 +8,9 @@ package object poi extends Instances with Lenses
 trait Instances {
   // Typeclass instances
   implicit val cellInstance = new Semigroup[Cell] with Equal[Cell] with Show[Cell] {
-    override def append(f1: Cell, f2: ⇒ Cell) = f2
+    override def append(f1: Cell, f2: ⇒ Cell): Cell = f2
     override def equal(a1: Cell, a2: Cell): Boolean = a1.index == a2.index
-    override def shows(as: Cell) =
+    override def shows(as: Cell): String =
       as match {
         case StringCell(index, data)  ⇒ "StringCell(" + index + ", \"" + data + "\")"
         case NumericCell(index, data) ⇒ "NumericCell(" + index + ", \"" + data + "\")"
@@ -19,14 +19,14 @@ trait Instances {
       }
   }
   implicit val rowInstance = new Semigroup[Row] with Equal[Row] with Show[Row] {
-    override def append(f1: Row, f2: ⇒ Row) =
+    override def append(f1: Row, f2: ⇒ Row): Row =
       Row(f2.index)(mergeSets(f1.cells, f2.cells, (_: Cell).index))
     override def equal(a1: Row, a2: Row): Boolean =
       a1.index == a2.index && a1.cells.toStream.corresponds(a2.cells.toStream)(Equal[Cell].equal)
-    override def shows(as: Row) = "Row (" + as.index + ")(" + as.cells + ")"
+    override def shows(as: Row): String = "Row (" + as.index + ")(" + as.cells + ")"
   }
   implicit val sheetInstance = new Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] {
-    override def append(f1: Sheet, f2: ⇒ Sheet) =
+    override def append(f1: Sheet, f2: ⇒ Sheet): Sheet =
       Sheet(f2.name)(mergeSets(f1.rows, f2.rows, (_: Row).index))
     override def equal(a1: Sheet, a2: Sheet): Boolean =
       a1.name == a2.name &&
@@ -35,11 +35,11 @@ trait Instances {
         .foldLeft (true) { (acc, v) ⇒
           acc && Equal[Row].equal(v._1, v._2)
         }
-    override def shows(as: Sheet) = "Sheet (\"" + as.name + "\")(" + as.rows + ")"
+    override def shows(as: Sheet): String = "Sheet (\"" + as.name + "\")(" + as.rows + ")"
   }
   implicit val wbInstance = new Monoid[Workbook] with Equal[Workbook] with Show[Workbook] {
-    override def zero = Workbook(Set[Sheet]())
-    override def append(f1: Workbook, f2: ⇒ Workbook) =
+    override def zero: Workbook = Workbook(Set[Sheet]())
+    override def append(f1: Workbook, f2: ⇒ Workbook): Workbook =
       Workbook(mergeSets(f1.sheets, f2.sheets, (_: Sheet).name))
     override def equal(a1: Workbook, a2: Workbook): Boolean =
       (a1.sheets.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name) zip
@@ -47,7 +47,7 @@ trait Instances {
       .foldLeft (true) { (acc, v) ⇒
         acc && Equal[Sheet].equal(v._1, v._2)
       }
-    override def shows(as: Workbook) = "Workbook(" + as.sheets + ")"
+    override def shows(as: Workbook): String = "Workbook(" + as.sheets + ")"
   }
 
   // Utility functions
@@ -60,7 +60,7 @@ trait Instances {
     val k2 = Set(m2.keysIterator.toList: _*)
     val intersection = k1 & k2
     val r1 = for(key ← intersection) yield (key → Semigroup[B].append(m1(key), m2(key)))
-    val r2 = m1.filterKeys(!intersection.contains(_)) ++ m2.filterKeys(!intersection.contains(_)) 
+    val r2 = m1.filterKeys(!intersection.contains(_)) ++ m2.filterKeys(!intersection.contains(_))
     r2 ++ r1
   }
 }

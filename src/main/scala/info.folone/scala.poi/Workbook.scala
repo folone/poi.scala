@@ -2,7 +2,7 @@ package info.folone.scala.poi
 
 import org.apache.poi._
 import ss.usermodel.{Workbook ⇒ POIWorkbook, WorkbookFactory}
-import ss.usermodel.{ Cell ⇒ POICell }
+import ss.usermodel.{ Cell ⇒ POICell, CellStyle ⇒ POICellStyle }
 import java.io.{ File, FileOutputStream, OutputStream, InputStream, FileInputStream }
 
 import scalaz._
@@ -44,7 +44,7 @@ class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
   }
 
   private def applyStyling(wb: POIWorkbook, styles: Map[CellStyle, List[CellAddr]]) = {
-    def pStyle(cs: CellStyle) = {
+    def pStyle(cs: CellStyle): POICellStyle = {
       val pStyle = wb.createCellStyle()
       pStyle setFont cs.font.appliedTo(wb.createFont)
       pStyle
@@ -77,28 +77,29 @@ class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
   }
 
   @deprecated("Use safeToFile and unsafePerformIO where you need it", "2012-09-06")
-  def toFile(path: String)           = safeToFile(path).unsafePerformIO
+  def toFile(path: String): Unit           = safeToFile(path).unsafePerformIO
   @deprecated("Use safeToStream and unsafePerformIO where you need it", "2012-09-06")
-  def toStream(stream: OutputStream) = safeToStream(stream).unsafePerformIO
+  def toStream(stream: OutputStream): Unit = safeToStream(stream).unsafePerformIO
 
-  def safeToFile(path: String) = {
-    def close(resource: {def close(): Unit}) = IO { resource.close() }
+  def safeToFile(path: String): IO[Throwable \/ Unit] = {
+    def close(resource: {def close(): Unit}): IO[Unit] = IO { resource.close() }
     val action = IO { new FileOutputStream(new File(path)) }.bracket(close) { file ⇒
       IO { book write file }
     }
     action.catchLeft
   }
 
-  def safeToStream(stream: OutputStream) = {
+  def safeToStream(stream: OutputStream): IO[Throwable \/ Unit] = {
     val action = IO { book write stream }
     action.catchLeft
   }
 
-  def asPoi = book
+  def asPoi: POIWorkbook = book
 
-  override def toString = Show[Workbook].shows(this)
-  override def equals(obj: Any) =
+  override def toString: String = Show[Workbook].shows(this)
+  override def equals(obj: Any): Boolean =
     obj != null && obj.isInstanceOf[Workbook] && Equal[Workbook].equal(obj.asInstanceOf[Workbook], this)
+  override def hashCode: Int = this.sheets.hashCode
 
 }
 
@@ -129,9 +130,10 @@ object Workbook {
       j     ← 1 until row.getLastCellNum
       cell  = row.getCell(j) if (cell != null)
         } yield (sheet, row, cell)
-    val result = data.groupBy(_._1).mapValues(lst ⇒
-      lst map { case (s,r,c) ⇒ (r,c)} groupBy(_._1)
-        mapValues(lst ⇒ lst.map { case (r, c) ⇒ c }.toList))
+    val result = data.groupBy(_._1).mapValues { lst ⇒
+      lst.map { case (s, r, c) ⇒ (r, c)}.groupBy(_._1)
+        .mapValues(l ⇒ l.map { case (r, c) ⇒ c }.toList)
+    }
     val sheets = result.map { case (sheet, rowLst) ⇒
       Sheet(sheet.getSheetName) {
         rowLst.map { case (row, cellLst) ⇒
@@ -159,22 +161,24 @@ object Workbook {
 }
 
 class Sheet(val name: String)(val rows: Set[Row]) {
-  override def toString = Show[Sheet].shows(this)
-  override def equals(obj: Any) =
+  override def toString: String = Show[Sheet].shows(this)
+  override def equals(obj: Any): Boolean =
     obj != null && obj.isInstanceOf[Sheet] && Equal[Sheet].equal(obj.asInstanceOf[Sheet], this)
+  override def hashCode: Int = name.hashCode + rows.hashCode
 }
 object Sheet {
-  def apply(name: String)(rows: Set[Row]) = new Sheet(name)(rows)
-  def unapply(sheet: Sheet) = Some((sheet.name), (sheet.rows))
+  def apply(name: String)(rows: Set[Row]): Sheet = new Sheet(name)(rows)
+  def unapply(sheet: Sheet): Option[(String, Set[Row])] = Some((sheet.name, sheet.rows))
 }
 class Row(val index: Int)(val cells: Set[Cell]) {
-  override def toString = Show[Row].shows(this)
-  override def equals(obj: Any) =
+  override def toString: String = Show[Row].shows(this)
+  override def equals(obj: Any): Boolean =
     obj != null && obj.isInstanceOf[Row] && Equal[Row].equal(obj.asInstanceOf[Row], this)
+  override def hashCode: Int = index.hashCode + cells.hashCode
 }
 object Row {
-  def apply(index: Int)(cells: Set[Cell]) = new Row(index)(cells)
-  def unapply(row: Row) = Some((row.index), (row.cells))
+  def apply(index: Int)(cells: Set[Cell]): Row = new Row(index)(cells)
+  def unapply(row: Row): Option[(Int, Set[Cell])] = Some((row.index, row.cells))
 }
 sealed abstract class Cell(val index: Int)
 case class StringCell(override  val index: Int, data: String)  extends Cell(index)

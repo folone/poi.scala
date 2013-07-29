@@ -5,3 +5,5 @@
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.5")
 
 addSbtPlugin("org.ensime" % "ensime-sbt-cmd" % "0.1.0")
+
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.3.2")

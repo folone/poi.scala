@@ -44,11 +44,12 @@ object Build extends Build {
     }
   }
 
-  lazy val standardSettings = super.settings ++
-    Defaults.defaultSettings                 ++
-    buildSettings                            ++
-    sbtrelease.ReleasePlugin.releaseSettings ++
-    repoSettings                             ++
+  lazy val standardSettings = super.settings     ++
+    Defaults.defaultSettings                     ++
+    buildSettings                                ++
+    sbtrelease.ReleasePlugin.releaseSettings     ++
+    org.scalastyle.sbt.ScalastylePlugin.Settings ++
+    repoSettings                                 ++
     Seq(
       name := "poi-scala",
       resolvers += Resolver.sonatypeRepo("releases"),
