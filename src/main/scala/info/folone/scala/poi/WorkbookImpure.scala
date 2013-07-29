@@ -1,29 +1,30 @@
 package info.folone.scala.poi
 
-import java.io.File
-import scalaz._
+package object impure {
 
-import scala.language.implicitConversions
+  import java.io.File
+  import scalaz._
 
-class WorkbookImpure(wb: Workbook) {
-  def save(path: String) =
-    wb.safeToFile(path).unsafePerformIO
+  import scala.language.implicitConversions
 
-  def overwrite(path: String) = {
-    new File(path).delete()
-    save(path)
+  class WorkbookImpure(wb: Workbook) {
+    def save(path: String) =
+      wb.safeToFile(path).unsafePerformIO
+
+    def overwrite(path: String) = {
+      new File(path).delete()
+      save(path)
+    }
   }
-}
 
-object WorkbookImpure {
   implicit def workbook2WorkbookImpure(wb: Workbook) =
     new WorkbookImpure(wb)
-}
 
-object load {
-  def apply(path: String) =
-    Workbook(path).unsafePerformIO match {
-      case -\/(ex)  ⇒ throw ex
-      case \/-(res) ⇒ res
-    }
+  object load {
+    def apply(path: String) =
+      Workbook(path).unsafePerformIO match {
+        case -\/(ex)  ⇒ throw ex
+        case \/-(res) ⇒ res
+      }
+  }
 }

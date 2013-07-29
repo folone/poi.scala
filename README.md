@@ -79,6 +79,28 @@ res5: scalaz.effect.IO[Boolean] = scalaz.effect.IOFunctions$$anon$5@2e48f14
 
 scala> .unsafePerformIO
 res6: Boolean = true
+
+// The impure syntax:
+scala> import impure._
+import impure._
+
+scala> sheetOne.overwrite(path)
+res4: scalaz.\/[Throwable,Unit] = \/-(())
+
+scala> sheetOne
+res5: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(NumericCell(1,2.6), FormulaCell(2,ABS(A1)))), Row (2)(Set(StringCell(1,data), StringCell(2,data2))))), Sheet ("name2")(Set(Row (2)(Set(BooleanCell(1,true), NumericCell(2,2.4)))))))
+
+scala> val mergeSheets = sheetOne |+| sheetTwo
+mergeSheets: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name2")(Set(Row (2)(Set(BooleanCell(1,true), NumericCell(2,2.4))))), Sheet ("name")(Set(Row (1)(Set(NumericCell(1,2.6), FormulaCell(2,ABS(A1)))), Row (2)(Set(StringCell(1,data), StringCell(2,data2)))))))
+
+scala> val sheetOneReloaded = load(path)
+sheetOneReloaded: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (2)(Set(StringCell(1,data), StringCell(2,data2))), Row (1)(Set(NumericCell(1,2.6), FormulaCell(2,ABS(A1)))))), Sheet ("name2")(Set(Row (2)(Set(BooleanCell(1,true), NumericCell(2,2.4)))))))
+
+scala> val mergeSheets2 = sheetOneReloaded |+| sheetTwo
+mergeSheets2: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name2")(Set(Row (2)(Set(BooleanCell(1,true), NumericCell(2,2.4))))), Sheet ("name")(Set(Row (1)(Set(NumericCell(1,2.6), FormulaCell(2,ABS(A1)))), Row (2)(Set(StringCell(1,data), StringCell(2,data2)))))))
+
+scala> mergeSheets == mergeSheets2
+res7: Boolean = true
 ```
 
 
