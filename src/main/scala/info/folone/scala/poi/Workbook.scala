@@ -81,6 +81,7 @@ class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
   @deprecated("Use safeToStream and unsafePerformIO where you need it", "2012-09-06")
   def toStream(stream: OutputStream) = safeToStream(stream).unsafePerformIO
 
+  import scala.language.reflectiveCalls
   def safeToFile(path: String) = {
     def close(resource: {def close(): Unit}) = IO { resource.close() }
     val action = IO { new FileOutputStream(new File(path)) }.bracket(close) { file ⇒
@@ -148,29 +149,6 @@ object Workbook {
     }.toSet
     Workbook(sheets)
   }
-}
-
-class WorkbookImpure(wb: Workbook) {
-  def save(path: String) =
-    wb.safeToFile(path).unsafePerformIO
-
-  def overwrite(path: String) = {
-    new File(path).delete()
-    save(path)
-  }
-}
-
-object WorkbookImpure {
-  implicit def workbook2WorkbookImpure(wb: Workbook) =
-    new WorkbookImpure(wb)
-}
-
-object load {
-  def apply(path: String) =
-    Workbook(path).unsafePerformIO match {
-      case -\/(ex)  ⇒ throw ex
-      case \/-(res) ⇒ res
-    }
 }
 
 class Sheet(val name: String)(val rows: Set[Row]) {
