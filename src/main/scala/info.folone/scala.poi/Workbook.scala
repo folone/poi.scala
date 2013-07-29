@@ -81,7 +81,6 @@ class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
   @deprecated("Use safeToStream and unsafePerformIO where you need it", "2012-09-06")
   def toStream(stream: OutputStream) = safeToStream(stream).unsafePerformIO
 
-  import scala.language.reflectiveCalls
   def safeToFile(path: String) = {
     def close(resource: {def close(): Unit}) = IO { resource.close() }
     val action = IO { new FileOutputStream(new File(path)) }.bracket(close) { file ⇒
