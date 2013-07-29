@@ -103,15 +103,23 @@ class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
 }
 
 object Workbook {
-  def apply(sheets: Set[Sheet]): Workbook = new Workbook(sheets)
+  def apply(sheets: Set[Sheet], format: WorkbookVersion = HSSF): Workbook = new Workbook(sheets, format)
+
   def apply(path: String): IO[Throwable \/ Workbook] = {
     val action: IO[InputStream] = IO { new FileInputStream(path) }
-      (action <*> fromInputStream).catchLeft
+      (action <*> fromInputStream(HSSF)).catchLeft
   }
-  def apply(is: InputStream): IO[Throwable \/ Workbook] =
-    fromInputStream.map(f ⇒ f(is)).catchLeft
+  def apply(path: String, format: WorkbookVersion): IO[Throwable \/ Workbook] = {
+    val action: IO[InputStream] = IO { new FileInputStream(path) }
+      (action <*> fromInputStream(format)).catchLeft
+  }
 
-  private def fromInputStream = IO { is: InputStream ⇒
+  def apply(is: InputStream): IO[Throwable \/ Workbook] =
+    fromInputStream(HSSF).map(f ⇒ f(is)).catchLeft
+  def apply(is: InputStream, format: WorkbookVersion): IO[Throwable \/ Workbook] =
+    fromInputStream(format).map(f ⇒ f(is)).catchLeft
+
+  private def fromInputStream(format: WorkbookVersion) = IO { is: InputStream ⇒
     val wb   = WorkbookFactory.create(is)
     val data = for {
       i     ← 0 until wb.getNumberOfSheets
