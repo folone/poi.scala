@@ -180,11 +180,19 @@ object Row {
   def apply(index: Int)(cells: Set[Cell]): Row = new Row(index)(cells)
   def unapply(row: Row): Option[(Int, Set[Cell])] = Some((row.index, row.cells))
 }
-sealed abstract class Cell(val index: Int)
+sealed abstract class Cell(val index: Int) {
+  override def toString: String = Show[Cell].shows(this)
+}
 case class StringCell(override  val index: Int, data: String)  extends Cell(index)
 case class NumericCell(override  val index: Int, data: Double) extends Cell(index)
 case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index)
-case class FormulaCell(override val index: Int, data: String)  extends Cell(index)
+class FormulaCell(override val index: Int, val data: String)   extends Cell(index)
+object FormulaCell {
+  def apply(index: Int, data: String): FormulaCell =
+    new FormulaCell(index, data.dropWhile(_ == '='))
+  def unapply(cell: FormulaCell): Option[(Int, String)] = Some((cell.index, cell.data))
+}
+
 case class CellAddr(sheet: String, row: Int, col: Int)
 
 sealed abstract class WorkbookVersion

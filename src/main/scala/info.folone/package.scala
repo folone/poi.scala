@@ -12,9 +12,9 @@ trait Instances {
     override def equal(a1: Cell, a2: Cell): Boolean = a1.index == a2.index
     override def shows(as: Cell): String =
       as match {
-        case StringCell(index, data)  ⇒ "StringCell(" + index + ", \"" + data + "\")"
-        case NumericCell(index, data) ⇒ "NumericCell(" + index + ", \"" + data + "\")"
-        case BooleanCell(index, data) ⇒ "BooleanCell(" + index + ", \"" + data + "\")"
+        case StringCell(index, data)  ⇒ "StringCell("  + index + ", \""  + data + "\")"
+        case NumericCell(index, data) ⇒ "NumericCell(" + index + ", "    + data + ")"
+        case BooleanCell(index, data) ⇒ "BooleanCell(" + index + ", "    + data + ")"
         case FormulaCell(index, data) ⇒ "FormulaCell(" + index + ", \"=" + data + "\")"
       }
   }
@@ -60,7 +60,8 @@ trait Instances {
     val k2 = Set(m2.keysIterator.toList: _*)
     val intersection = k1 & k2
     val r1 = for(key ← intersection) yield (key → Semigroup[B].append(m1(key), m2(key)))
-    val r2 = m1.filterKeys(!intersection.contains(_)) ++ m2.filterKeys(!intersection.contains(_))
+    val r2 = m1.filterKeys(!intersection.contains(_)) ++
+             m2.filterKeys(!intersection.contains(_))
     r2 ++ r1
   }
 }
@@ -76,9 +77,12 @@ trait Lenses {
   val stringCellLens: StringCell @> String =
     lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
   val rowLens   =
-    setLensFamily[Row, Row, Cell](lens(r ⇒ store(r.cells)(changed ⇒ Row(r.index) (changed))))
+    setLensFamily[Row, Row, Cell](lens(r ⇒
+      store(r.cells)(changed ⇒ Row(r.index) (changed))))
   val sheetLens =
-    setLensFamily[Sheet, Sheet, Row](lens(s ⇒ store(s.rows) (changed ⇒ Sheet(s.name)(changed))))
+    setLensFamily[Sheet, Sheet, Row](lens(s ⇒
+      store(s.rows) (changed ⇒ Sheet(s.name)(changed))))
   val wbLens    =
-    setLensFamily[Workbook, Workbook, Sheet](lens(wb ⇒ store(wb.sheets)(changed ⇒ Workbook(changed))))
+    setLensFamily[Workbook, Workbook, Sheet](lens(wb ⇒
+      store(wb.sheets)(changed ⇒ Workbook(changed))))
 }
