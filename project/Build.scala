@@ -114,6 +114,6 @@ object Build extends Build {
       if (scalaVersion startsWith "2.9")
         "1.12.4.1"
       else
-        "2.0"
+        "2.1.1"
   }
 }
