@@ -3,23 +3,23 @@ package info.folone.scala.poi
 import org.specs2._
 import specification._
 
-class PoiLoadFileSpec extends script.Specification with Grouped { def is=s2"""
+class PoiLoadFileSpec extends Specification { def is=
 
-# LoadWorkbook
-
-| | A | B | C |
-|:-----------:|:-----------:|:------------:|:------------:|
+  "LoadWorkbook" ^
+"""
+|   | A  | B  | C  |
+|:-:|:--:|:--:|:--:|
 | 1 | A1 | B1 | C1 |
 | 2 | A2 | B2 | C2 |
 | 3 | A3 | B3 | C3 |
 | 4 | A4 | B4 | C4 |
+""" ^
+  "is load" ^ loadWorkbookTest ^ end
 
-  is load
-  + rows have size 4
-    cell
-    + count 12
-    + and contains [A1...C4]
-  """
+  def loadWorkbookTest =
+   "rows have size 4"       ! loadWorkbook().e1 ^
+   "cell have size 12"      ! loadWorkbook().e2 ^
+   "and contains [A1...C4]" ! loadWorkbook().e3 ^ endp
 
   val testBook = Workbook(Set(Sheet("test")(
     Set(
@@ -49,10 +49,10 @@ class PoiLoadFileSpec extends script.Specification with Grouped { def is=s2"""
     impure.load(testBookPath).sheets.head
   }
 
-  "loadworkbook" - new group {
-    eg := targetWorksheet.rows must have size(4)
-    eg := targetWorksheet.rows.toList.map{_.cells.size}.sum === 12
-    eg := {
+  case class loadWorkbook() {
+    def e1 = targetWorksheet.rows must have size(4)
+    def e2 = targetWorksheet.rows.toList.map{_.cells.size}.sum === 12
+    def e3 = {
       val expect = Set(
         "A1", "A2", "A3", "A4",
         "B1", "B2", "B3", "B4",
