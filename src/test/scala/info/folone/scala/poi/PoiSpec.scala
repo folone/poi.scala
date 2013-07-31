@@ -33,9 +33,10 @@ class PoiSpec extends Specification with ScalaCheck {
             })
           })
         }
-        val io = wb.safeToFile("/home/folone/ok.xls")
-        //io.unsafePerformIO
-        "ok" must not be null
+        val path = "/tmp/book.xls"
+        val io = wb.safeToFile(path)
+        io.unsafePerformIO
+        impure.load(path) === wb
       }
     }
 
