@@ -125,9 +125,9 @@ object Workbook {
     val data = for {
       i     ← 0 until wb.getNumberOfSheets
       sheet = wb.getSheetAt(i) if (sheet != null)
-      k     ← 1 to sheet.getLastRowNum
+      k     ← 0 to sheet.getLastRowNum
       row   = sheet.getRow(k) if (row != null)
-      j     ← 1 until row.getLastCellNum
+      j     ← 0 until row.getLastCellNum
       cell  = row.getCell(j) if (cell != null)
         } yield (sheet, row, cell)
     val result = data.groupBy(_._1).mapValues { lst ⇒
