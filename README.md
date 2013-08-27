@@ -39,8 +39,8 @@ scala> val sheetOne = Workbook {
  }
 sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (1)(Set(NumericCell(1, 2.6), FormulaCell(2, "=ABS(A1)"))), Row (2)(Set(StringCell(1, "data"), StringCell(2, "data2"))))), Sheet ("name2")(Set(Row (2)(Set(BooleanCell(1, true), NumericCell(2, 2.4)))))))
 
-scala> val path = "/home/folone/ok.xls"
-path: String = /home/folone/ok.xls
+scala> val path = "/tmp/workbook.xls"
+path: String = /tmp/workbook.xls
 
 // Saving the result (yes, it does control side-effects via scalaz.IO)
 scala> sheetOne.safeToFile(path).unsafePerformIO
