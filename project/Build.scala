@@ -23,7 +23,9 @@ object Build extends Build {
   )
 
   lazy val repoSettings = Seq(
-    resolvers += "Sonatype"  at "https://oss.sonatype.org/content/repositories/releases/"
+    resolvers ++= Seq(
+      "releases"  at "https://oss.sonatype.org/content/repositories/releases",
+      "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots")
   )
 
   lazy val publishSetting = publishTo <<= (version).apply{
@@ -55,13 +57,13 @@ object Build extends Build {
       resolvers += Resolver.sonatypeRepo("releases"),
       libraryDependencies <++= (scalaVersion) { sv ⇒
         Seq(
-          "org.apache.poi" %  "poi"                       % "3.8",
-          "org.apache.poi" %  "poi-ooxml"                 % "3.8",
-          "org.scalaz"     %% "scalaz-core"               % "7.1.0-M1",
-          "org.scalaz"     %% "scalaz-effect"             % "7.1.0-M1",
+          "org.apache.poi" %  "poi"                       % "3.9",
+          "org.apache.poi" %  "poi-ooxml"                 % "3.9",
+          "org.scalaz"     %% "scalaz-core"               % "7.1.0-M2",
+          "org.scalaz"     %% "scalaz-effect"             % "7.1.0-M2",
           "org.specs2"     %% "specs2"                    % Dependencies.specs2(sv) % "test",
           "org.scalacheck" %% "scalacheck"                % "1.10.1"                % "test",
-          "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.1.0-M1"              % "test"
+          "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.1.0-M2"              % "test"
         )
       },
       credentialsSetting,
@@ -115,6 +117,6 @@ object Build extends Build {
       if (scalaVersion startsWith "2.9")
         "1.12.4.1"
       else
-        "2.1.1"
+        "2.2-scalaz-7.1.0-M2-SNAPSHOT"
   }
 }
