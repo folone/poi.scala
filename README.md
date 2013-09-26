@@ -118,3 +118,7 @@ res4: Boolean = true
     <version>0.10</version>
 </dependency>
 ```
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/folone/poi.scala/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
