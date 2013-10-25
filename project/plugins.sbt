@@ -1,6 +1,4 @@
-// Add the following to z_local.sbt (which is .gitignored), to perform a release.
-//
-// addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.7")
+addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8.1")
 
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.7.1")
 
