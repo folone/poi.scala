@@ -7,7 +7,7 @@ object Build extends Build {
 
   lazy val buildSettings = Seq(
     organization       := "info.folone",
-    version            := "0.11-SNAPSHOT",
+    version            := "0.11",
 
     scalaVersion       := "2.10.3",
     crossScalaVersions := Seq("2.9.3", "2.10.3"),
@@ -33,7 +33,7 @@ object Build extends Build {
       if (v.trim.endsWith("SNAPSHOT"))
         Some("snapshots" at nexus + "content/repositories/snapshots")
       else
-        Some("releases" at nexus + "service/local/staging/deploy/maven2")
+        Some("staging" at nexus + "service/local/staging/deploy/maven2")
   }
 
   lazy val credentialsSetting = credentials += {
@@ -65,6 +65,8 @@ object Build extends Build {
           "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.1.0-M3"              % "test"
         )
       },
+      publishMavenStyle := true,
+      publishArtifact in Test := false,
       credentialsSetting,
       publishSetting,
          pomExtra := (
