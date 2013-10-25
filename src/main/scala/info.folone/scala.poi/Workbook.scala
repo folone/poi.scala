@@ -76,11 +76,6 @@ class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
     this
   }
 
-  @deprecated("Use safeToFile and unsafePerformIO where you need it", "2012-09-06")
-  def toFile(path: String): Unit           = safeToFile(path).fold(ex ⇒ throw ex, identity).unsafePerformIO
-  @deprecated("Use safeToStream and unsafePerformIO where you need it", "2012-09-06")
-  def toStream(stream: OutputStream): Unit = safeToStream(stream).fold(ex ⇒ throw ex, identity).unsafePerformIO
-
   def safeToFile(path: String): Result[Unit] = {
     def close(resource: {def close(): Unit}): IO[Unit] = IO { resource.close() }
     val action = IO { new FileOutputStream(new File(path)) }.bracket(close) { file ⇒
