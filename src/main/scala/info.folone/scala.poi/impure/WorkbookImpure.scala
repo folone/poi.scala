@@ -7,7 +7,7 @@ import scalaz._
 
 class WorkbookImpure(wb: Workbook) {
   def save(path: String): Unit =
-    wb.safeToFile(path).unsafePerformIO
+    wb.safeToFile(path).fold(ex ⇒ throw ex, identity).unsafePerformIO
 
   def overwrite(path: String): Unit = {
     new File(path).delete()
@@ -17,8 +17,5 @@ class WorkbookImpure(wb: Workbook) {
 
 object load {
   def apply(path: String): Workbook =
-    Workbook(path).unsafePerformIO match {
-      case -\/(ex)  ⇒ throw ex
-      case \/-(res) ⇒ res
-    }
+    Workbook(path).fold(ex  ⇒ throw ex, identity).unsafePerformIO
 }

@@ -35,7 +35,7 @@ class PoiSpec extends Specification with ScalaCheck {
         }
         val path = "/tmp/book.xls"
         val io = wb.safeToFile(path)
-        io.unsafePerformIO
+        io.fold(ex ⇒ throw ex, identity).unsafePerformIO
         impure.load(path) === wb
       }
     }

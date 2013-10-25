@@ -2,10 +2,14 @@ package info.folone.scala
 
 import poi._
 import scalaz._
+import effect.IO
 
 package object poi extends Instances with Lenses
 
 trait Instances {
+
+  type Result[A] = EitherT[IO, Throwable, A]
+
   // Typeclass instances
   implicit val cellInstance = new Semigroup[Cell] with Equal[Cell] with Show[Cell] {
     override def append(f1: Cell, f2: ⇒ Cell): Cell = f2
