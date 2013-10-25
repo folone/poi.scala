@@ -9,8 +9,8 @@ class WorkbookImpure(wb: Workbook) {
   def save(path: String): Unit =
     wb.safeToFile(path).fold(ex ⇒ throw ex, identity).unsafePerformIO
 
-  def saveToStream(stream: OutputStream): Unit =
-    safeToStream(stream).fold(ex ⇒ throw ex, identity).unsafePerformIO
+  def saveToStream(stream: java.io.OutputStream): Unit =
+    wb.safeToStream(stream).fold(ex ⇒ throw ex, identity).unsafePerformIO
 
   def overwrite(path: String): Unit = {
     new File(path).delete()
