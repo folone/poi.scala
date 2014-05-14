@@ -9,8 +9,8 @@ object Build extends Build {
     organization       := "info.folone",
     version            := "0.12-SNAPSHOT",
 
-    scalaVersion       := "2.10.3",
-    crossScalaVersions := Seq("2.9.3", "2.10.3"),
+    scalaVersion       := "2.11.0",
+    crossScalaVersions := Seq("2.10.4", "2.11.0"),
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
@@ -58,11 +58,11 @@ object Build extends Build {
         Seq(
           "org.apache.poi" %  "poi"                       % "3.9",
           "org.apache.poi" %  "poi-ooxml"                 % "3.9",
-          "org.scalaz"     %% "scalaz-core"               % "7.1.0-M3",
-          "org.scalaz"     %% "scalaz-effect"             % "7.1.0-M3",
-          "org.specs2"     %% "specs2"                    % Dependencies.specs2(sv) % "test",
-          "org.scalacheck" %% "scalacheck"                % "1.10.1"                % "test",
-          "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.1.0-M3"              % "test"
+          "org.scalaz"     %% "scalaz-core"               % "7.0.6",
+          "org.scalaz"     %% "scalaz-effect"             % "7.0.6",
+          "org.specs2"     %% "specs2"                    % "2.3.12" % "test",
+          "org.scalacheck" %% "scalacheck"                % "1.11.3" % "test",
+          "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.6"  % "test"
         )
       },
       publishMavenStyle := true,
@@ -112,12 +112,4 @@ object Build extends Build {
     base = file("."),
     settings = standardSettings
   )
-
-  object Dependencies {
-    def specs2(scalaVersion: String) =
-      if (scalaVersion startsWith "2.9")
-        "1.12.4.1"
-      else
-        "2.2.2-scalaz-7.1.0-M3"
-  }
 }
