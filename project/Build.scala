@@ -7,7 +7,7 @@ object Build extends Build {
 
   lazy val buildSettings = Seq(
     organization       := "info.folone",
-    version            := "0.12-SNAPSHOT",
+    version            := "0.13-SNAPSHOT",
 
     scalaVersion       := "2.11.0",
     crossScalaVersions := Seq("2.10.4", "2.11.0"),
@@ -45,6 +45,8 @@ object Build extends Build {
     }
   }
 
+  val scalazVersion = "7.1.0"
+
   lazy val standardSettings = super.settings     ++
     Defaults.defaultSettings                     ++
     buildSettings                                ++
@@ -56,13 +58,13 @@ object Build extends Build {
       resolvers += Resolver.sonatypeRepo("releases"),
       libraryDependencies <++= (scalaVersion) { sv ⇒
         Seq(
-          "org.apache.poi" %  "poi"                       % "3.9",
-          "org.apache.poi" %  "poi-ooxml"                 % "3.9",
-          "org.scalaz"     %% "scalaz-core"               % "7.0.6",
-          "org.scalaz"     %% "scalaz-effect"             % "7.0.6",
-          "org.specs2"     %% "specs2"                    % "2.3.12" % "test",
-          "org.scalacheck" %% "scalacheck"                % "1.11.3" % "test",
-          "org.scalaz"     %% "scalaz-scalacheck-binding" % "7.0.6"  % "test"
+          "org.apache.poi" %  "poi"                       % "3.10.1",
+          "org.apache.poi" %  "poi-ooxml"                 % "3.10.1",
+          "org.scalaz"     %% "scalaz-core"               % scalazVersion,
+          "org.scalaz"     %% "scalaz-effect"             % scalazVersion,
+          "org.specs2"     %% "specs2"                    % "2.4.1" % "test",
+          "org.scalacheck" %% "scalacheck"                % "1.11.5" % "test",
+          "org.scalaz"     %% "scalaz-scalacheck-binding" % scalazVersion  % "test"
         )
       },
       publishMavenStyle := true,
@@ -88,7 +90,8 @@ object Build extends Build {
                ("folone",       "George Leontiev"),
                ("fedgehog",     "Maxim Fedorov"),
                ("Michael Rans", "Michael Rans"),
-               ("daneko",       "Kouichi Akatsuka")
+               ("daneko",       "Kouichi Akatsuka"),
+               ("rintcius",     "Rintcius Blok")
              ).map { case (id, name) ⇒
                <developer>
                  <id>{id}</id>
