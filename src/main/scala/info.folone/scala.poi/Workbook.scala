@@ -2,18 +2,37 @@ package info.folone.scala.poi
 
 import org.apache.poi._
 import ss.usermodel.{Workbook ⇒ POIWorkbook, WorkbookFactory}
-import ss.usermodel.{ Cell ⇒ POICell, CellStyle ⇒ POICellStyle }
+import ss.usermodel.{ Row ⇒ POIRow, Cell ⇒ POICell, CellStyle ⇒ POICellStyle }
 import java.io.{ File, FileOutputStream, OutputStream, InputStream, FileInputStream }
 
 import scalaz._
 import std.option._
+import std.map._
+import std.list._
 import syntax.applicative._
+import syntax.monoid._
 import syntax.std.option._
-import syntax.std.boolean._
+import syntax.std.all._
 import effect.IO
 
 
 class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
+
+  private def setPoiCell(row: POIRow, cell: Cell, poiCell: POICell): Unit = {
+    cell match {
+      case StringCell(index, data)  ⇒
+        poiCell.setCellValue(data)
+        val height = data.split("\n").size * row.getHeight
+        row setHeight height.asInstanceOf[Short]
+      case BooleanCell(index, data) ⇒ poiCell.setCellValue(data)
+      case NumericCell(index, data) ⇒ poiCell.setCellValue(data)
+      case FormulaCell(index, data) ⇒ poiCell.setCellFormula(data)
+      case styledCell@StyledCell(_, _) ⇒ {
+        setPoiCell(row, styledCell.nestedCell, poiCell)
+      }
+    }
+  }
+
   private lazy val book = {
     val workbook = format match {
       case HSSF ⇒ new org.apache.poi.hssf.usermodel.HSSFWorkbook
@@ -26,17 +45,8 @@ class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
         val Row((index), (cells)) = rw
         val row = sheet createRow index
         cells foreach { cl ⇒
-          val index = cl.index
-          val cell = row createCell index
-          cl match {
-            case StringCell(index, data)  ⇒
-              cell.setCellValue(data)
-              val height = data.split("\n").size * row.getHeight
-              row setHeight height.asInstanceOf[Short]
-            case BooleanCell(index, data) ⇒ cell.setCellValue(data)
-            case NumericCell(index, data) ⇒ cell.setCellValue(data)
-            case FormulaCell(index, data) ⇒ cell.setCellFormula(data)
-          }
+          val poiCell = row createCell cl.index
+          setPoiCell(row, cl, poiCell)
         }
       }
     }
@@ -47,12 +57,13 @@ class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
     def pStyle(cs: CellStyle): POICellStyle = {
       val pStyle = wb.createCellStyle()
       pStyle setFont cs.font.appliedTo(wb.createFont)
+      pStyle setDataFormat cs.dataFormat.appliedTo(wb.createDataFormat)
       pStyle
     }
 
     styles.keys.foreach { s ⇒
-      val cellAdrresses = styles(s)
-      cellAdrresses.foreach { addr ⇒
+      val cellAddresses = styles(s)
+      cellAddresses.foreach { addr ⇒
         val cell = wb.getSheet(addr.sheet).getRow(addr.row).getCell(addr.col)
         cell setCellStyle pStyle(s)
       }
@@ -63,6 +74,13 @@ class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
   def styled(styles: Map[CellStyle, List[CellAddr]]): Workbook = {
     applyStyling(book, styles)
     this
+  }
+
+  def styled: Workbook = {
+    val styles: Map[CellStyle, List[CellAddr]] = sheets.foldRight(Map[CellStyle, List[CellAddr]]()) {
+      case (sheet, map) => map |+| sheet.styles
+    }
+    styled(styles)
   }
 
   /**
@@ -157,6 +175,9 @@ object Workbook {
 }
 
 class Sheet(val name: String)(val rows: Set[Row]) {
+  def styles: Map[CellStyle, List[CellAddr]] = rows.foldRight(Map[CellStyle, List[CellAddr]]()) {
+    case (row, map) => map |+| row.styles(name)
+  }
   override def toString: String = Show[Sheet].shows(this)
   override def equals(obj: Any): Boolean =
     obj != null && obj.isInstanceOf[Sheet] && Equal[Sheet].equal(obj.asInstanceOf[Sheet], this)
@@ -167,6 +188,9 @@ object Sheet {
   def unapply(sheet: Sheet): Option[(String, Set[Row])] = Some((sheet.name, sheet.rows))
 }
 class Row(val index: Int)(val cells: Set[Cell]) {
+  def styles(sheet: String): Map[CellStyle, List[CellAddr]] = cells.foldRight(Map[CellStyle, List[CellAddr]]()) {
+    case (cell, map) => map |+| cell.styles(sheet, index)
+  }
   override def toString: String = Show[Row].shows(this)
   override def equals(obj: Any): Boolean =
     obj != null && obj.isInstanceOf[Row] && Equal[Row].equal(obj.asInstanceOf[Row], this)
@@ -176,17 +200,28 @@ object Row {
   def apply(index: Int)(cells: Set[Cell]): Row = new Row(index)(cells)
   def unapply(row: Row): Option[(Int, Set[Cell])] = Some((row.index, row.cells))
 }
-sealed abstract class Cell(val index: Int) {
+sealed abstract class Cell(val index: Int, val style: Option[CellStyle]) {
+  def styles(sheet: String, row: Int): Map[CellStyle, List[CellAddr]] = style match {
+    case None => Map()
+    case Some(s) => Map(s -> List(CellAddr(sheet, row, index)))
+  }
   override def toString: String = Show[Cell].shows(this)
 }
-case class StringCell(override  val index: Int, data: String)  extends Cell(index)
-case class NumericCell(override  val index: Int, data: Double) extends Cell(index)
-case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index)
-class FormulaCell(override val index: Int, val data: String)   extends Cell(index)
+case class StringCell(override val index: Int, data: String) extends Cell(index, None)
+case class NumericCell(override val index: Int, data: Double) extends Cell(index, None)
+case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index, None)
+class FormulaCell(override val index: Int, val data: String) extends Cell(index, None)
 object FormulaCell {
   def apply(index: Int, data: String): FormulaCell =
     new FormulaCell(index, data.dropWhile(_ == '='))
   def unapply(cell: FormulaCell): Option[(Int, String)] = Some((cell.index, cell.data))
+}
+class StyledCell private (override val index: Int, override val style: Option[CellStyle], val nestedCell: Cell) extends Cell(index, style) {
+  def unstyledCell: Cell = if (nestedCell.isInstanceOf[StyledCell]) nestedCell.asInstanceOf[StyledCell].nestedCell else nestedCell
+}
+object StyledCell {
+  def apply(cell: Cell, style: CellStyle): StyledCell = new StyledCell(cell.index, Some(style), cell)
+  def unapply(cell: StyledCell): Option[(Cell, CellStyle)] = cell.style map { case style => (cell.nestedCell, style) }
 }
 
 case class CellAddr(sheet: String, row: Int, col: Int)
