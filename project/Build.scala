@@ -9,8 +9,8 @@ object Build extends Build {
     organization       := "info.folone",
     version            := "0.13-SNAPSHOT",
 
-    scalaVersion       := "2.11.0",
-    crossScalaVersions := Seq("2.10.4", "2.11.0"),
+    scalaVersion       := "2.11.3",
+    crossScalaVersions := Seq("2.10.4", "2.11.3"),
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
@@ -20,12 +20,6 @@ object Build extends Build {
     ),
 
     parallelExecution in Compile := true
-  )
-
-  lazy val repoSettings = Seq(
-    resolvers ++= Seq(
-      "releases"  at "https://oss.sonatype.org/content/repositories/releases",
-      "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots")
   )
 
   lazy val publishSetting = publishTo <<= (version).apply { v ⇒
@@ -52,18 +46,17 @@ object Build extends Build {
     buildSettings                                ++
     sbtrelease.ReleasePlugin.releaseSettings     ++
     org.scalastyle.sbt.ScalastylePlugin.Settings ++
-    repoSettings                                 ++
     Seq(
       name := "poi-scala",
-      resolvers += Resolver.sonatypeRepo("releases"),
+      resolvers ++= Seq(Resolver.sonatypeRepo("releases"), Resolver.sonatypeRepo("snapshots")),
       libraryDependencies <++= (scalaVersion) { sv ⇒
         Seq(
           "org.apache.poi" %  "poi"                       % "3.10.1",
           "org.apache.poi" %  "poi-ooxml"                 % "3.10.1",
           "org.scalaz"     %% "scalaz-core"               % scalazVersion,
           "org.scalaz"     %% "scalaz-effect"             % scalazVersion,
-          "org.specs2"     %% "specs2"                    % "2.4.1" % "test",
-          "org.scalacheck" %% "scalacheck"                % "1.11.5" % "test",
+          "org.specs2"     %% "specs2"                    % "2.4.1"        % "test",
+          "org.scalacheck" %% "scalacheck"                % "1.11.5"       % "test",
           "org.scalaz"     %% "scalaz-scalacheck-binding" % scalazVersion  % "test"
         )
       },
@@ -104,7 +97,7 @@ object Build extends Build {
          )
     )
 
-  override lazy val settings = super.settings ++ repoSettings  ++ Seq(
+  override lazy val settings = super.settings ++ Seq(
     shellPrompt := { s ⇒ Project.extract(s).currentProject.id + " > " }
   )
 
