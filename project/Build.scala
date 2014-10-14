@@ -9,8 +9,8 @@ object Build extends Build {
     organization       := "info.folone",
     version            := "0.13-SNAPSHOT",
 
-    scalaVersion       := "2.11.3",
-    crossScalaVersions := Seq("2.10.4", "2.11.3"),
+    scalaVersion       := "2.11.2",
+    crossScalaVersions := Seq("2.10.4", "2.11.2"),
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
