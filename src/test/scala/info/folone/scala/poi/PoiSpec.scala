@@ -64,8 +64,8 @@ class PoiSpec extends Specification with ScalaCheck {
       semigroup.laws[Sheet]
     }
     "satisfy for Workbook" in checkProp {
-      lazy val result = monoid.laws[info.folone.scala.poi.Workbook]
-      skipped("a lot of nested tests to check, takes a long time")
+      monoid.laws[info.folone.scala.poi.Workbook]
+      //skipped("a lot of nested tests to check, takes a long time")
     }
   }
 
