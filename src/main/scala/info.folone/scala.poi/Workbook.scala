@@ -16,7 +16,8 @@ import syntax.std.all._
 import effect.IO
 
 
-class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
+class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF) {
+  val sheets: Set[Sheet] = sheetMap.values.toSet
 
   private def setPoiCell(row: POIRow, cell: Cell, poiCell: POICell): Unit = {
     cell match {
@@ -112,13 +113,14 @@ class Workbook(val sheets: Set[Sheet], format: WorkbookVersion = HSSF) {
   override def toString: String = Show[Workbook].shows(this)
   override def equals(obj: Any): Boolean =
     obj != null && obj.isInstanceOf[Workbook] && Equal[Workbook].equal(obj.asInstanceOf[Workbook], this)
-  override def hashCode: Int = this.sheets.hashCode
+  override def hashCode: Int = this.sheetMap.hashCode
 
 }
 
 object Workbook {
 
-  def apply(sheets: Set[Sheet], format: WorkbookVersion = HSSF): Workbook = new Workbook(sheets, format)
+  def apply(sheets: Set[Sheet], format: WorkbookVersion = HSSF): Workbook =
+    new Workbook(sheets.map( s => (s.name, s)).toMap, format)
 
   def apply(path: String): Result[Workbook] = {
     val action: IO[InputStream] = IO { new FileInputStream(path) }
