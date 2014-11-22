@@ -44,6 +44,64 @@ class PoiSpec extends Specification with ScalaCheck {
     "have sheets in it" in new Workbook {
       book.asPoi.getSheet("test") must beAnInstanceOf[HSSFSheet]
     }
+
+      val wb1 = Workbook {
+        Set(Sheet("name") {
+          Set(Row(1) {
+            Set(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
+          },
+            Row(2) {
+              Set(StringCell(1, "data"), StringCell(2, "data2"))
+            })
+        },
+          Sheet("name") {
+            Set(Row(2) {
+              Set(BooleanCell(1, true), NumericCell(2, 2.4))
+            })
+          })
+      }
+      val wb2 = Workbook {
+        Set(Sheet("name") {
+          Set(Row(1) {
+            Set(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
+          },
+            Row(2) {
+              Set(StringCell(1, "data"), StringCell(2, "data2"))
+            })
+        },
+          Sheet("name22") {
+            Set(Row(2) {
+              Set(BooleanCell(1, true), NumericCell(2, 2.4))
+            })
+          })
+      }
+      val wb3 = Workbook {
+        Set(Sheet("name3") {
+          Set(Row(1) {
+            Set(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
+          },
+            Row(2) {
+              Set(StringCell(1, "data"), StringCell(2, "data2"))
+            })
+        },
+          Sheet("name32") {
+            Set(Row(2) {
+              Set(BooleanCell(1, true), NumericCell(2, 2.4))
+            })
+          })
+      }
+
+    "be associative" in {
+      ((wb1 |+| wb2) |+| wb3) must_== (wb1 |+| (wb2 |+| wb3))
+    }
+
+    "satisfy right identity" in {
+      (wb1 |+| wbInstance.zero) must_== wb1
+    }
+
+    "satisfy left identity" in {
+      (wbInstance.zero |+| wb1) must_== wb1
+    }
   }
 
   "Sheet" can {

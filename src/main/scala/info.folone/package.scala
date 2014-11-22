@@ -71,7 +71,7 @@ trait Instances {
       Workbook(mergeSets(f1.sheets, f2.sheets, (_: Sheet).name))
     override def equal(a1: Workbook, a2: Workbook): Boolean =
       (a1.sheets.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name) zip
-       a1.sheets.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name))
+       a2.sheets.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name))
       .foldLeft (true) { (acc, v) ⇒
         acc && Equal[Sheet].equal(v._1, v._2)
       }
