@@ -123,12 +123,13 @@ object Workbook {
     new Workbook(sheets.map( s => (s.name, s)).toMap, format)
 
   def apply(path: String): Result[Workbook] = {
-    val action: IO[InputStream] = IO { new FileInputStream(path) }
-    EitherT((action <*> fromInputStream(HSSF)).catchLeft)
+    val action: IO[File] = IO { new File(path) }
+    EitherT((action <*> fromFile(HSSF)).catchLeft)
   }
+
   def apply(path: String, format: WorkbookVersion): Result[Workbook] = {
-    val action: IO[InputStream] = IO { new FileInputStream(path) }
-    EitherT((action <*> fromInputStream(format)).catchLeft)
+    val action: IO[File] = IO { new File(path) }
+    EitherT((action <*> fromFile(format)).catchLeft)
   }
 
   def apply(is: InputStream): Result[Workbook] =
@@ -136,8 +137,14 @@ object Workbook {
   def apply(is: InputStream, format: WorkbookVersion): Result[Workbook] =
     EitherT(fromInputStream(format).map(f ⇒ f(is)).catchLeft)
 
-  private def fromInputStream(format: WorkbookVersion) = IO { is: InputStream ⇒
-    val wb   = WorkbookFactory.create(is)
+  private def fromFile(format: WorkbookVersion) =
+    readWorkbook[File](format, f => WorkbookFactory.create(f))
+
+  private def fromInputStream(format: WorkbookVersion) =
+    readWorkbook[InputStream](format, t => WorkbookFactory.create(t))
+
+  private def readWorkbook[T](format: WorkbookVersion, workbookF: T => POIWorkbook) = IO { is: T ⇒
+    val wb   = workbookF(is)
     val data = for {
       i     ← 0 until wb.getNumberOfSheets
       sheet = wb.getSheetAt(i) if (sheet != null)
