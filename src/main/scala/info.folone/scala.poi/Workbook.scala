@@ -64,9 +64,10 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
 
     styles.keys.foreach { s ⇒
       val cellAddresses = styles(s)
+      val cellStyle = pStyle(s)
       cellAddresses.foreach { addr ⇒
         val cell = wb.getSheet(addr.sheet).getRow(addr.row).getCell(addr.col)
-        cell setCellStyle pStyle(s)
+        cell setCellStyle cellStyle
       }
     }
     wb
