@@ -4,7 +4,9 @@ import poi._
 import scalaz._
 import effect.IO
 
-package object poi extends Instances with Lenses
+package object poi extends Instances with Lenses {
+  type Seq[+A] = scala.collection.immutable.Seq[A]
+}
 
 trait Instances {
 
@@ -48,9 +50,11 @@ trait Instances {
   }
   implicit val rowInstance = new Semigroup[Row] with Equal[Row] with Show[Row] {
     override def append(f1: Row, f2: ⇒ Row): Row =
-      Row(f2.index)(mergeSets(f1.cells, f2.cells, (_: Cell).index))
+      Row(f2.index)(mergeSeqs(f1.cells, f2.cells, (_: Cell).index))
     override def equal(a1: Row, a2: Row): Boolean =
-      a1.index == a2.index && a1.cells.toStream.corresponds(a2.cells.toStream)(Equal[Cell].equal)
+      a1.index == a2.index &&
+    a1.cells.toIndexedSeq.sortBy(_.index).toStream.corresponds(
+      a2.cells.toIndexedSeq.sortBy(_.index).toStream)(Equal[Cell].equal)
     override def shows(as: Row): String = "Row (" + as.index + ")(" + as.cells.toIndexedSeq.sortBy(_.index) + ")"
   }
   implicit val sheetInstance = new Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] {
@@ -66,32 +70,49 @@ trait Instances {
     override def shows(as: Sheet): String = "Sheet (\"" + as.name + "\")(" + as.rows.toIndexedSeq.sortBy(_.index) + ")"
   }
   implicit val wbInstance = new Monoid[Workbook] with Equal[Workbook] with Show[Workbook] {
-    override def zero: Workbook = Workbook(Set[Sheet]())
+    override def zero: Workbook = Workbook(List[Sheet]())
     override def append(f1: Workbook, f2: ⇒ Workbook): Workbook =
-      Workbook(mergeSets(f1.sheets, f2.sheets, (_: Sheet).name))
+      Workbook(mergeSeqs(f1.sheets, f2.sheets, (_: Sheet).name))
     override def equal(a1: Workbook, a2: Workbook): Boolean =
-      (a1.sheets.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name) zip
-       a2.sheets.toIndexedSeq.sortBy((x: Sheet) ⇒ x.name))
+      (a1.sheets.sortBy((x: Sheet) ⇒ x.name) zip
+       a2.sheets.sortBy((x: Sheet) ⇒ x.name))
       .foldLeft (true) { (acc, v) ⇒
         acc && Equal[Sheet].equal(v._1, v._2)
       }
-    override def shows(as: Workbook): String = "Workbook(" + as.sheets.toIndexedSeq.sortBy(_.name) + ")"
+    override def shows(as: Workbook): String = "Workbook(" + as.sheets.sortBy(_.name) + ")"
   }
 
   // Utility functions
   private def mergeSets[A: Semigroup, B](list1: Set[A], list2: Set[A], on: A ⇒ B): Set[A] =
-    combine(list1.map(l ⇒ (on(l), l)).toMap, list2.map(l ⇒ (on(l), l)).toMap)
-      .map { case(_, y) ⇒ y }.toSet
+    combine(
+      list1.groupBy(on(_)).toMap[B, Set[A]].map{ case (k, xs) =>
+        k -> xs.reduceLeft[A]{case (a, b) => Semigroup[A].append(a, b)}
+      },
+      list2.groupBy(on(_)).toMap[B, Set[A]].map{ case (k, xs) =>
+        k -> xs.reduceLeft[A]{case (a, b) => Semigroup[A].append(a, b)}
+      }
+    ).map{ case (_, y) ⇒ y }.toSet
+
+  private def mergeSeqs[A: Semigroup, B](list1: Seq[A], list2: Seq[A], on: A ⇒ B): Seq[A] =
+    combine(
+      list1.groupBy(on(_)).toMap[B, Seq[A]].map{ case (k, xs) =>
+        k -> xs.reduceLeft[A]{case (a, b) => Semigroup[A].append(a, b)}
+      },
+      list2.groupBy(on(_)).toMap[B, Seq[A]].map{ case (k, xs) =>
+        k -> xs.reduceLeft[A]{case (a, b) => Semigroup[A].append(a, b)}
+      }
+    ).map{ case (_, y) ⇒ y }.toList
 
   private def combine[A, B: Semigroup](m1: Map[A, B], m2: Map[A, B]): Map[A, B] = {
-    val k1 = Set(m1.keysIterator.toList: _*)
-    val k2 = Set(m2.keysIterator.toList: _*)
+    val k1 = m1.keySet
+    val k2 = m2.keySet
     val intersection = k1 & k2
     val r1 = for(key ← intersection) yield (key → Semigroup[B].append(m1(key), m2(key)))
     val r2 = m1.filterKeys(!intersection.contains(_)) ++
              m2.filterKeys(!intersection.contains(_))
     r2 ++ r1
   }
+
 }
 
 trait Lenses {
@@ -105,12 +126,12 @@ trait Lenses {
   val stringCellLens: StringCell @> String =
     lensFamily(c ⇒ store(c.data)(changed ⇒ c.copy(data = changed)))
   val rowLens   =
-    setLensFamily[Row, Row, Cell](lens(r ⇒
+    seqLensFamily[Row, Row, Cell](lens(r ⇒
       store(r.cells)(changed ⇒ Row(r.index) (changed))))
   val sheetLens =
     setLensFamily[Sheet, Sheet, Row](lens(s ⇒
       store(s.rows) (changed ⇒ Sheet(s.name)(changed))))
   val wbLens    =
-    setLensFamily[Workbook, Workbook, Sheet](lens(wb ⇒
+    seqLensFamily[Workbook, Workbook, Sheet](lens(wb ⇒
       store(wb.sheets)(changed ⇒ Workbook(changed))))
 }
