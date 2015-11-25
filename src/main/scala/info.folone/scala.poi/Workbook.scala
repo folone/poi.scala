@@ -19,17 +19,18 @@ import effect.IO
 class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF) {
   val sheets: Set[Sheet] = sheetMap.values.toSet
 
-  private def setPoiCell(row: POIRow, cell: Cell, poiCell: POICell): Unit = {
+  private def setPoiCell(defaultRowHeight: Short, row: POIRow, cell: Cell, poiCell: POICell): Unit = {
     cell match {
       case StringCell(index, data)  ⇒
         poiCell.setCellValue(data)
-        val height = (data.split("\n").size + 1) * row.getHeight
-        row setHeight height.asInstanceOf[Short]
+        val cellHeight = (data.split("\n").size + 1) * defaultRowHeight
+        if(cellHeight > row.getHeight)
+          row setHeight cellHeight.asInstanceOf[Short]
       case BooleanCell(index, data) ⇒ poiCell.setCellValue(data)
       case NumericCell(index, data) ⇒ poiCell.setCellValue(data)
       case FormulaCell(index, data) ⇒ poiCell.setCellFormula(data)
       case styledCell@StyledCell(_, _) ⇒ {
-        setPoiCell(row, styledCell.nestedCell, poiCell)
+        setPoiCell(defaultRowHeight, row, styledCell.nestedCell, poiCell)
       }
     }
   }
@@ -47,7 +48,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
         val row = sheet createRow index
         cells foreach { cl ⇒
           val poiCell = row createCell cl.index
-          setPoiCell(row, cl, poiCell)
+          setPoiCell(sheet.getDefaultRowHeight,row, cl, poiCell)
         }
       }
     }
