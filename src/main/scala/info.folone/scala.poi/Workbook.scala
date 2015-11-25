@@ -23,7 +23,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     cell match {
       case StringCell(index, data)  ⇒
         poiCell.setCellValue(data)
-        val height = data.split("\n").size * row.getHeight
+        val height = (data.split("\n").size + 1) * row.getHeight
         row setHeight height.asInstanceOf[Short]
       case BooleanCell(index, data) ⇒ poiCell.setCellValue(data)
       case NumericCell(index, data) ⇒ poiCell.setCellValue(data)
