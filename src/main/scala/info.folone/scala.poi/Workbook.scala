@@ -23,7 +23,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     cell match {
       case StringCell(index, data)  ⇒
         poiCell.setCellValue(data)
-        val cellHeight = (data.split("\n").size + 1) * defaultRowHeight
+        val cellHeight = (data.split("\n").size) * defaultRowHeight
         if(cellHeight > row.getHeight)
           row setHeight cellHeight.asInstanceOf[Short]
       case BooleanCell(index, data) ⇒ poiCell.setCellValue(data)
