@@ -218,6 +218,16 @@ sealed abstract class Cell(val index: Int, val style: Option[CellStyle]) {
   }
   override def toString: String = Show[Cell].shows(this)
 }
+object Cell {
+  def unapply(cell: Cell): Option[(Int, Any)] =
+    cell match {
+      case StringCell(index, data)  => Some((index, data))
+      case NumericCell(index, data) => Some((index, data))
+      case BooleanCell(index, data) => Some((index, data))
+      case FormulaCell(index, data) => Some((index, data))
+      case _ => None
+    }
+}
 case class StringCell(override val index: Int, data: String) extends Cell(index, None)
 case class NumericCell(override val index: Int, data: Double) extends Cell(index, None)
 case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index, None)
