@@ -16,8 +16,7 @@ import syntax.std.all._
 import effect.IO
 
 
-class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF) {
-  val sheets: Set[Sheet] = sheetMap.values.toSet
+class Workbook(val sheets: Seq[Sheet], format: WorkbookVersion = HSSF) {
 
   private def setPoiCell(defaultRowHeight: Short, row: POIRow, cell: Cell, poiCell: POICell): Unit = {
     cell match {
@@ -97,6 +96,9 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     this
   }
 
+  def setSheetOrder(ordering: Map[String, Int]) =
+    ordering.foreach{ case (s, i) => book.setSheetOrder(s, i)}
+
   def safeToFile(path: String): Result[Unit] = {
     def close(resource: {def close(): Unit}): IO[Unit] = IO { resource.close() }
     val action = IO { new FileOutputStream(new File(path)) }.bracket(close) { file ⇒
@@ -115,14 +117,14 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
   override def toString: String = Show[Workbook].shows(this)
   override def equals(obj: Any): Boolean =
     obj != null && obj.isInstanceOf[Workbook] && Equal[Workbook].equal(obj.asInstanceOf[Workbook], this)
-  override def hashCode: Int = this.sheetMap.hashCode
+  override def hashCode: Int = this.sheets.hashCode
 
 }
 
 object Workbook {
 
-  def apply(sheets: Set[Sheet], format: WorkbookVersion = HSSF): Workbook =
-    new Workbook(sheets.map( s => (s.name, s)).toMap, format)
+  def apply(sheets: Seq[Sheet], format: WorkbookVersion = HSSF): Workbook =
+    new Workbook(sheets, format)
 
   def apply(path: String): Result[Workbook] = {
     val action: IO[File] = IO { new File(path) }
@@ -176,11 +178,11 @@ object Workbook {
                   Some(StringCell(index, cell.getStringCellValue))
                 case _                      ⇒ None
               }
-            }.toSet
+            }.toList
           }
         }.toSet
       }
-    }.toSet
+    }.toList
     Workbook(sheets)
   }
 }
@@ -198,7 +200,7 @@ object Sheet {
   def apply(name: String)(rows: Set[Row]): Sheet = new Sheet(name)(rows)
   def unapply(sheet: Sheet): Option[(String, Set[Row])] = Some((sheet.name, sheet.rows))
 }
-class Row(val index: Int)(val cells: Set[Cell]) {
+class Row(val index: Int)(val cells: Seq[Cell]) {
   def styles(sheet: String): Map[CellStyle, List[CellAddr]] = cells.foldRight(Map[CellStyle, List[CellAddr]]()) {
     case (cell, map) => map |+| cell.styles(sheet, index)
   }
@@ -208,8 +210,8 @@ class Row(val index: Int)(val cells: Set[Cell]) {
   override def hashCode: Int = index.hashCode + cells.hashCode
 }
 object Row {
-  def apply(index: Int)(cells: Set[Cell]): Row = new Row(index)(cells)
-  def unapply(row: Row): Option[(Int, Set[Cell])] = Some((row.index, row.cells))
+  def apply(index: Int)(cells: Seq[Cell]): Row = new Row(index)(cells)
+  def unapply(row: Row): Option[(Int, Seq[Cell])] = Some((row.index, row.cells))
 }
 sealed abstract class Cell(val index: Int, val style: Option[CellStyle]) {
   def styles(sheet: String, row: Int): Map[CellStyle, List[CellAddr]] = style match {

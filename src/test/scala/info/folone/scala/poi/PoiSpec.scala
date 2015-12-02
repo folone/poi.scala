@@ -16,80 +16,81 @@ import scalaz.scalacheck.ScalaCheckBinding._
 import Arbitrary._
 
 class PoiSpec extends Specification with ScalaCheck {
-    "Poi" should {
-      "create workbook" in {
-        val wb = Workbook {
-          Set(Sheet("name") {
+  "Poi" should {
+    "create workbook" in {
+      val wb = Workbook {
+        List(
+          Sheet("name") {
             Set(Row(1) {
-              Set(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
+              List(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
             },
-            Row(2) {
-              Set(StringCell(1, "data"), StringCell(2, "data2"))
-            })
+              Row(2) {
+                List(StringCell(1, "data"), StringCell(2, "data2"))
+              })
           },
           Sheet("name2") {
             Set(Row(2) {
-              Set(BooleanCell(1, true), NumericCell(2, 2.4))
+              List(BooleanCell(1, true), NumericCell(2, 2.4))
             })
           })
-        }
-        val path = "/tmp/book.xls"
-        val io = wb.safeToFile(path)
-        io.fold(ex ⇒ throw ex, identity).unsafePerformIO
-        impure.load(path) === wb
       }
+      val path = "/tmp/book.xls"
+      val io = wb.safeToFile(path)
+      io.fold(ex ⇒ throw ex, identity).unsafePerformIO
+      impure.load(path) === wb
     }
+  }
 
   "Workbook" should {
     "have sheets in it" in new Workbook {
       book.asPoi.getSheet("test") must beAnInstanceOf[HSSFSheet]
     }
 
-      val wb1 = Workbook {
-        Set(Sheet("name") {
-          Set(Row(1) {
-            Set(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
-          },
-            Row(2) {
-              Set(StringCell(1, "data"), StringCell(2, "data2"))
-            })
+    val wb1 = Workbook {
+      List(Sheet("name") {
+        Set(Row(1) {
+          List(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
         },
-          Sheet("name") {
-            Set(Row(2) {
-              Set(BooleanCell(1, true), NumericCell(2, 2.4))
-            })
+          Row(2) {
+            List(StringCell(1, "data"), StringCell(2, "data2"))
           })
-      }
-      val wb2 = Workbook {
-        Set(Sheet("name") {
-          Set(Row(1) {
-            Set(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
-          },
-            Row(2) {
-              Set(StringCell(1, "data"), StringCell(2, "data2"))
-            })
+      },
+        Sheet("name") {
+          Set(Row(2) {
+            List(BooleanCell(1, true), NumericCell(2, 2.4))
+          })
+        })
+    }
+    val wb2 = Workbook {
+      List(Sheet("name") {
+        Set(Row(1) {
+          List(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
         },
-          Sheet("name22") {
-            Set(Row(2) {
-              Set(BooleanCell(1, true), NumericCell(2, 2.4))
-            })
+          Row(2) {
+            List(StringCell(1, "data"), StringCell(2, "data2"))
           })
-      }
-      val wb3 = Workbook {
-        Set(Sheet("name3") {
-          Set(Row(1) {
-            Set(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
-          },
-            Row(2) {
-              Set(StringCell(1, "data"), StringCell(2, "data2"))
-            })
+      },
+        Sheet("name22") {
+          Set(Row(2) {
+            List(BooleanCell(1, true), NumericCell(2, 2.4))
+          })
+        })
+    }
+    val wb3 = Workbook {
+      List(Sheet("name3") {
+        Set(Row(1) {
+          List(NumericCell(1, -13.0/5), FormulaCell(2, "ABS(B2)"))
         },
-          Sheet("name32") {
-            Set(Row(2) {
-              Set(BooleanCell(1, true), NumericCell(2, 2.4))
-            })
+          Row(2) {
+            List(StringCell(1, "data"), StringCell(2, "data2"))
           })
-      }
+      },
+        Sheet("name32") {
+          Set(Row(2) {
+            List(BooleanCell(1, true), NumericCell(2, 2.4))
+          })
+        })
+    }
 
     "be associative" in {
       ((wb1 |+| wb2) |+| wb3) must_== (wb1 |+| (wb2 |+| wb3))
@@ -114,7 +115,7 @@ class PoiSpec extends Specification with ScalaCheck {
   "Typeclasses" should {
     "satisfy for Cell" in checkProp {
       semigroup.laws[Cell]
-   }
+    }
     "satisfy for Row" in checkProp {
       semigroup.laws[Row]
     }
@@ -140,7 +141,7 @@ class PoiSpec extends Specification with ScalaCheck {
 
   implicit def arbRow: Arbitrary[Row] = Arbitrary(for {
     index ← positiveInt
-    cells ← arbitrary[Set[Cell]]
+    cells ← arbitrary[Seq[Cell]]
   } yield Row(index)(cells))
 
   implicit def arbSheet: Arbitrary[Sheet] = Arbitrary(for {
@@ -149,10 +150,10 @@ class PoiSpec extends Specification with ScalaCheck {
   } yield Sheet(name)(rows))
 
   implicit def arbWorkbook: Arbitrary[info.folone.scala.poi.Workbook] = Arbitrary(for {
-    sheets ← arbitrary[Set[Sheet]]
+    sheets ← arbitrary[List[Sheet]]
   } yield Workbook(sheets))
 
   trait Workbook extends Scope {
-    val book = Workbook(Set(Sheet("test")(Set(Row(0)(Set(StringCell(0, "theCell")))))))
+    val book = Workbook(List(Sheet("test")(Set(Row(0)(List(StringCell(0, "theCell")))))))
   }
 }
