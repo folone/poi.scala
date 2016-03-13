@@ -7,12 +7,9 @@ import org.specs2.specification.Scope
 import org.specs2.ScalaCheck
 import org.specs2.mutable._
 import org.specs2.matcher._
-import org.scalacheck.Properties
 
 import org.scalacheck._
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalaCheckBinding._
-
 import Arbitrary._
 
 class PoiSpec extends Specification with ScalaCheck {
@@ -112,18 +109,17 @@ class PoiSpec extends Specification with ScalaCheck {
   }
 
   "Typeclasses" should {
-    "satisfy for Cell" in checkProp {
+    "satisfy for Cell" in properties {
       semigroup.laws[Cell]
-   }
-    "satisfy for Row" in checkProp {
+    }
+    "satisfy for Row" in properties {
       semigroup.laws[Row]
     }
-    "satisfy for Sheet" in checkProp {
+    "satisfy for Sheet" in properties {
       semigroup.laws[Sheet]
     }
-    "satisfy for Workbook" in checkProp {
-      lazy val result = monoid.laws[info.folone.scala.poi.Workbook]
-      skipped("a lot of nested tests to check, takes a long time")
+    "satisfy for Workbook" in properties {
+      monoid.laws[info.folone.scala.poi.Workbook]
     }
   }
 

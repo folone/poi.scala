@@ -7,8 +7,8 @@ object Build extends Build {
 
   lazy val buildSettings = Seq(
     organization       := "info.folone",
-    scalaVersion       := "2.11.2",
-    crossScalaVersions := Seq("2.10.4", "2.11.2"),
+    scalaVersion       := "2.11.8",
+    crossScalaVersions := Seq(scalaVersion.value, "2.10.6"),
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
@@ -37,7 +37,9 @@ object Build extends Build {
     }
   }
 
-  val scalazVersion = "7.1.0"
+  val scalazVersion = "7.2.1"
+  val poiVersion = "3.14"
+  val specsVersion = "3.7.2"
 
   lazy val standardSettings = super.settings     ++
     Defaults.defaultSettings                     ++
@@ -49,12 +51,13 @@ object Build extends Build {
       resolvers ++= Seq(Resolver.sonatypeRepo("releases"), Resolver.sonatypeRepo("snapshots")),
       libraryDependencies <++= (scalaVersion) { sv ⇒
         Seq(
-          "org.apache.poi" %  "poi"                       % "3.10.1",
-          "org.apache.poi" %  "poi-ooxml"                 % "3.10.1",
+          "org.apache.poi" %  "poi"                       % poiVersion,
+          "org.apache.poi" %  "poi-ooxml"                 % poiVersion,
           "org.scalaz"     %% "scalaz-core"               % scalazVersion,
           "org.scalaz"     %% "scalaz-effect"             % scalazVersion,
-          "org.specs2"     %% "specs2"                    % "2.4.1"        % "test",
-          "org.scalacheck" %% "scalacheck"                % "1.11.5"       % "test",
+          "org.specs2"     %% "specs2-core"               % specsVersion   % "test",
+          "org.specs2"     %% "specs2-scalacheck"         % specsVersion   % "test",
+          "org.scalacheck" %% "scalacheck"                % "1.13.0"       % "test",
           "org.scalaz"     %% "scalaz-scalacheck-binding" % scalazVersion  % "test"
         )
       },
