@@ -3,16 +3,13 @@ package info.folone.scala.poi
 import org.apache.poi._
 import ss.usermodel.{Workbook ⇒ POIWorkbook, WorkbookFactory}
 import ss.usermodel.{ Row ⇒ POIRow, Cell ⇒ POICell, CellStyle ⇒ POICellStyle }
-import java.io.{ File, FileOutputStream, OutputStream, InputStream, FileInputStream }
+import java.io.{ File, FileOutputStream, OutputStream, InputStream }
 
 import scalaz._
-import std.option._
 import std.map._
 import std.list._
 import syntax.applicative._
 import syntax.monoid._
-import syntax.std.option._
-import syntax.std.all._
 import effect.IO
 
 

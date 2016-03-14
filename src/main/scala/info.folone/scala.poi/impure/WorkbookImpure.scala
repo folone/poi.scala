@@ -3,7 +3,6 @@ package info.folone.scala.poi
 package impure
 
 import java.io.File
-import scalaz._
 
 class WorkbookImpure(wb: Workbook) {
   def save(path: String): Unit =
