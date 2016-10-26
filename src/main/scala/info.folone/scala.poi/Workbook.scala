@@ -36,7 +36,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     val workbook = format match {
       case HSSF ⇒ new org.apache.poi.hssf.usermodel.HSSFWorkbook
       case XSSF ⇒ new org.apache.poi.xssf.usermodel.XSSFWorkbook
-      case SXSSF ⇒ new org.apache.poi.xssf.streaming.SXSSFWorkbook
+      case SXSSF ⇒ new org.apache.poi.xssf.streaming.SXSSFWorkbook(-1)
     }
     sheets foreach { sh ⇒
       val Sheet((name), (rows)) = sh
