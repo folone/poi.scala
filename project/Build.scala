@@ -7,8 +7,8 @@ object Build extends Build {
 
   lazy val buildSettings = Seq(
     organization       := "info.folone",
-    scalaVersion       := "2.11.8",
-    crossScalaVersions := Seq(scalaVersion.value, "2.10.6"),
+    scalaVersion       := "2.12.1",
+    crossScalaVersions := Seq(scalaVersion.value, "2.11.8", "2.10.6"),
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
@@ -37,9 +37,9 @@ object Build extends Build {
     }
   }
 
-  val scalazVersion = "7.2.1"
+  val scalazVersion = "7.2.8"
   val poiVersion = "3.14"
-  val specsVersion = "3.7.2"
+  val specsVersion = "3.8.6"
 
   lazy val standardSettings = super.settings     ++
     Defaults.defaultSettings                     ++
@@ -57,7 +57,7 @@ object Build extends Build {
           "org.scalaz"     %% "scalaz-effect"             % scalazVersion,
           "org.specs2"     %% "specs2-core"               % specsVersion   % "test",
           "org.specs2"     %% "specs2-scalacheck"         % specsVersion   % "test",
-          "org.scalacheck" %% "scalacheck"                % "1.13.0"       % "test",
+          "org.scalacheck" %% "scalacheck"                % "1.13.4"       % "test",
           "org.scalaz"     %% "scalaz-scalacheck-binding" % scalazVersion  % "test"
         )
       },
