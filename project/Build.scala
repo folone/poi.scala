@@ -2,6 +2,8 @@ import sbt._
 import Project._
 import Keys._
 import Defaults._
+import sbtrelease.ReleasePlugin.autoImport._
+import com.typesafe.sbt.pgp.PgpKeys
 
 object Build extends Build {
 
@@ -42,12 +44,11 @@ object Build extends Build {
   val specsVersion = "3.8.6"
 
   lazy val standardSettings = super.settings     ++
-    Defaults.defaultSettings                     ++
     buildSettings                                ++
-    sbtrelease.ReleasePlugin.releaseSettings     ++
     org.scalastyle.sbt.ScalastylePlugin.Settings ++
     Seq(
       name := "poi-scala",
+      releasePublishArtifactsAction := PgpKeys.publishSigned.value,
       resolvers ++= Seq(Resolver.sonatypeRepo("releases"), Resolver.sonatypeRepo("snapshots")),
       libraryDependencies <++= (scalaVersion) { sv ⇒
         Seq(
