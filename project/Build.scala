@@ -48,6 +48,7 @@ object Build extends Build {
     org.scalastyle.sbt.ScalastylePlugin.Settings ++
     Seq(
       name := "poi-scala",
+      releaseCrossBuild := true,
       releasePublishArtifactsAction := PgpKeys.publishSigned.value,
       resolvers ++= Seq(Resolver.sonatypeRepo("releases"), Resolver.sonatypeRepo("snapshots")),
       libraryDependencies <++= (scalaVersion) { sv ⇒
