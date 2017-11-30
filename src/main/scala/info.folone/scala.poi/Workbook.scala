@@ -1,9 +1,9 @@
 package info.folone.scala.poi
 
 import org.apache.poi._
-import ss.usermodel.{Workbook ⇒ POIWorkbook, WorkbookFactory}
-import ss.usermodel.{ Row ⇒ POIRow, Cell ⇒ POICell, CellStyle ⇒ POICellStyle }
+import ss.usermodel.{DateUtil, WorkbookFactory, Cell => POICell, CellStyle => POICellStyle, Row => POIRow, Workbook => POIWorkbook}
 import java.io.{ File, FileOutputStream, OutputStream, InputStream }
+import java.util.Date
 
 import scalaz._
 import std.map._
@@ -24,6 +24,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
         if(cellHeight > row.getHeight)
           row setHeight cellHeight.asInstanceOf[Short]
       case BooleanCell(index, data) ⇒ poiCell.setCellValue(data)
+      case DateCell(index, data) ⇒ poiCell.setCellValue(data)
       case NumericCell(index, data) ⇒ poiCell.setCellValue(data)
       case FormulaCell(index, data) ⇒ poiCell.setCellFormula(data)
       case styledCell@StyledCell(_, _) ⇒ {
@@ -165,7 +166,10 @@ object Workbook {
               val index = cell.getColumnIndex
               cell.getCellType match {
                 case POICell.CELL_TYPE_NUMERIC ⇒
-                  Some(NumericCell(index, cell.getNumericCellValue))
+                  if (DateUtil.isCellDateFormatted(cell))
+                    Some(DateCell(index, cell.getDateCellValue))
+                  else
+                    Some(NumericCell(index, cell.getNumericCellValue))
                 case POICell.CELL_TYPE_BOOLEAN ⇒
                   Some(BooleanCell(index, cell.getBooleanCellValue))
                 case POICell.CELL_TYPE_FORMULA ⇒
@@ -218,6 +222,7 @@ sealed abstract class Cell(val index: Int, val style: Option[CellStyle]) {
 }
 case class StringCell(override val index: Int, data: String) extends Cell(index, None)
 case class NumericCell(override val index: Int, data: Double) extends Cell(index, None)
+case class DateCell(override val index: Int, data: Date) extends Cell(index, None)
 case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index, None)
 class FormulaCell(override val index: Int, val data: String) extends Cell(index, None) {
   import equalities.formulaCellEqualInstance
