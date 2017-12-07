@@ -26,6 +26,7 @@ trait Instances {
       override def equal(s1: Cell, s2: Cell) = (s1, s2) match {
         case (s1: StringCell, s2: StringCell) => s1 == s2
         case (n1: NumericCell, n2: NumericCell) => n1 == n2
+        case (d1: DateCell, d2: DateCell) => d1 == d2
         case (b1: BooleanCell, b2: BooleanCell) => b1 == b2
         case (f1: FormulaCell, f2: FormulaCell) => Equal[FormulaCell].equal(f1, f2)
         case (s1: StyledCell, s2: StyledCell) => Equal[StyledCell].equal(s1, s2)
@@ -41,6 +42,7 @@ trait Instances {
       as match {
         case StringCell(index, data)  ⇒ "StringCell("  + index + ", \""  + data + "\")"
         case NumericCell(index, data) ⇒ "NumericCell(" + index + ", "    + data + ")"
+        case DateCell(index, data) ⇒ "DateCell(" + index + ", "    + data + ")"
         case BooleanCell(index, data) ⇒ "BooleanCell(" + index + ", "    + data + ")"
         case FormulaCell(index, data) ⇒ "FormulaCell(" + index + ", \"=" + data + "\")"
         case StyledCell(cell, style) ⇒ "StyledCell(" + shows(cell) + ", <style>)"
