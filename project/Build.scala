@@ -9,8 +9,8 @@ object Build extends Build {
 
   lazy val buildSettings = Seq(
     organization       := "info.folone",
-    scalaVersion       := "2.12.1",
-    crossScalaVersions := Seq(scalaVersion.value, "2.11.8", "2.10.6"),
+    scalaVersion       := "2.12.8",
+    crossScalaVersions := Seq(scalaVersion.value, "2.11.12", "2.10.7"),
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
@@ -22,12 +22,14 @@ object Build extends Build {
     parallelExecution in Compile := true
   )
 
-  lazy val publishSetting = publishTo <<= (version).apply { v ⇒
+  lazy val publishSetting = {
+    publishTo := {
       val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT"))
+      if (isSnapshot.value)
         Some("snapshots" at nexus + "content/repositories/snapshots")
       else
         Some("staging" at nexus + "service/local/staging/deploy/maven2")
+    }
   }
 
   lazy val credentialsSetting = credentials += {
@@ -39,9 +41,9 @@ object Build extends Build {
     }
   }
 
-  val scalazVersion = "7.2.8"
+  val scalazVersion = "7.2.27"
   val poiVersion = "3.14"
-  val specsVersion = "3.8.6"
+  val specsVersion = "3.9.5"
 
   lazy val standardSettings = super.settings     ++
     buildSettings                                ++
@@ -51,7 +53,7 @@ object Build extends Build {
       releaseCrossBuild := true,
       releasePublishArtifactsAction := PgpKeys.publishSigned.value,
       resolvers ++= Seq(Resolver.sonatypeRepo("releases"), Resolver.sonatypeRepo("snapshots")),
-      libraryDependencies <++= (scalaVersion) { sv ⇒
+      libraryDependencies ++= {
         Seq(
           "org.apache.poi" %  "poi"                       % poiVersion,
           "org.apache.poi" %  "poi-ooxml"                 % poiVersion,
@@ -59,8 +61,8 @@ object Build extends Build {
           "org.scalaz"     %% "scalaz-effect"             % scalazVersion,
           "org.specs2"     %% "specs2-core"               % specsVersion   % "test",
           "org.specs2"     %% "specs2-scalacheck"         % specsVersion   % "test",
-          "org.scalacheck" %% "scalacheck"                % "1.13.4"       % "test",
-          "org.scalaz"     %% "scalaz-scalacheck-binding" % scalazVersion  % "test"
+          "org.scalacheck" %% "scalacheck"                % "1.14.0"       % "test",
+          "org.scalaz"     %% "scalaz-scalacheck-binding" % s"${scalazVersion}-scalacheck-1.14" % "test"
         )
       },
       publishMavenStyle := true,
