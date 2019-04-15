@@ -10,7 +10,7 @@ object Build extends Build {
   lazy val buildSettings = Seq(
     organization       := "info.folone",
     scalaVersion       := "2.12.8",
-    crossScalaVersions := Seq(scalaVersion.value, "2.11.12", "2.10.7"),
+    crossScalaVersions := Seq(scalaVersion.value, "2.11.12", "2.10.7", "2.13.0-RC1"),
 
     scalacOptions      := Seq(
       "-encoding", "UTF-8",
@@ -43,7 +43,14 @@ object Build extends Build {
 
   val scalazVersion = "7.2.27"
   val poiVersion = "3.14"
-  val specsVersion = "3.9.5"
+  val specsVersion = Def.setting(
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 10)) =>
+        "3.9.5"
+      case _ =>
+        "4.5.1"
+    }
+  )
 
   lazy val standardSettings = super.settings     ++
     buildSettings                                ++
@@ -59,8 +66,8 @@ object Build extends Build {
           "org.apache.poi" %  "poi-ooxml"                 % poiVersion,
           "org.scalaz"     %% "scalaz-core"               % scalazVersion,
           "org.scalaz"     %% "scalaz-effect"             % scalazVersion,
-          "org.specs2"     %% "specs2-core"               % specsVersion   % "test",
-          "org.specs2"     %% "specs2-scalacheck"         % specsVersion   % "test",
+          "org.specs2"     %% "specs2-core"               % specsVersion.value % "test",
+          "org.specs2"     %% "specs2-scalacheck"         % specsVersion.value % "test",
           "org.scalacheck" %% "scalacheck"                % "1.14.0"       % "test",
           "org.scalaz"     %% "scalaz-scalacheck-binding" % s"${scalazVersion}-scalacheck-1.14" % "test"
         )
