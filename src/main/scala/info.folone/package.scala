@@ -92,7 +92,7 @@ trait Instances {
     val r1 = for(key ← intersection) yield (key → Semigroup[B].append(m1(key), m2(key)))
     val r2 = m1.filterKeys(!intersection.contains(_)) ++
              m2.filterKeys(!intersection.contains(_))
-    r2 ++ r1
+    r2.toMap ++ r1
   }
 }
 
