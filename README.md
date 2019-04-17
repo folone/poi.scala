@@ -40,7 +40,7 @@ sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (
 scala> val path = "/tmp/workbook.xls"
 path: String = /tmp/workbook.xls
 
-scala> sheetOne.safeToFile(path).fold(ex ⇒ throw ex, identity).unsafePerformIO
+scala> sheetOne.safeToFile(path).fold(ex => throw ex, identity).unsafePerformIO
 
 scala> val sheetTwo = Workbook {
         Set(Sheet("name") {

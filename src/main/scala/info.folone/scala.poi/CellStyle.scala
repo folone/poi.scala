@@ -1,7 +1,7 @@
 package info.folone.scala.poi
 
 import org.apache.poi.hssf.usermodel.HSSFFont.FONT_ARIAL
-import org.apache.poi.ss.usermodel.{Font => POIFont, DataFormat ⇒ POIDataFormat}
+import org.apache.poi.ss.usermodel.{Font => POIFont, DataFormat => POIDataFormat}
 
 case class CellStyle(font: Font, dataFormat: DataFormat)
 

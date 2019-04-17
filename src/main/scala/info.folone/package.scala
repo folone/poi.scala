@@ -82,7 +82,7 @@ trait Instances {
 
   // Utility functions
   private def mergeSets[A: Semigroup, B](list1: Set[A], list2: Set[A], on: A => B): Set[A] =
-    combine(list1.map(l => (on(l), l)).toMap, list2.map(l ⇒ (on(l), l)).toMap)
+    combine(list1.map(l => (on(l), l)).toMap, list2.map(l => (on(l), l)).toMap)
       .map { case(_, y) => y }.toSet
 
   private def combine[A, B: Semigroup](m1: Map[A, B], m2: Map[A, B]): Map[A, B] = {
@@ -101,11 +101,11 @@ trait Lenses {
   import Lens._
   import StoreT._
   val doubleCellLens: NumericCell @> Double =
-    lensFamily(c => store(c.data)(changed ⇒ c.copy(data = changed)))
+    lensFamily(c => store(c.data)(changed => c.copy(data = changed)))
   val boolCellLens: BooleanCell @> Boolean =
-    lensFamily(c => store(c.data)(changed ⇒ c.copy(data = changed)))
+    lensFamily(c => store(c.data)(changed => c.copy(data = changed)))
   val stringCellLens: StringCell @> String =
-    lensFamily(c => store(c.data)(changed ⇒ c.copy(data = changed)))
+    lensFamily(c => store(c.data)(changed => c.copy(data = changed)))
   val rowLens   =
     setLensFamily[Row, Row, Cell](lens(r =>
       store(r.cells)(changed => Row(r.index) (changed))))
