@@ -32,7 +32,7 @@ class PoiSpec extends Specification with ScalaCheck {
         }
         val path = "/tmp/book.xls"
         val io = wb.safeToFile(path)
-        io.fold(ex ⇒ throw ex, identity).unsafePerformIO
+        io.fold(ex => throw ex, identity).unsafePerformIO
         impure.load(path) === wb
       }
     }
@@ -126,26 +126,26 @@ class PoiSpec extends Specification with ScalaCheck {
   def positiveInt = Gen.choose(0, Integer.MAX_VALUE)
 
   implicit def arbCell: Arbitrary[Cell] = Arbitrary(for {
-    index      ← positiveInt
-    stringData ← Gen.alphaStr
-    boolData   ← arbitrary[Boolean]
-    doubleData ← arbitrary[Double]
-    res        ← Gen.oneOf(StringCell(index, stringData),
+    index      <- positiveInt
+    stringData <- Gen.alphaStr
+    boolData   <- arbitrary[Boolean]
+    doubleData <- arbitrary[Double]
+    res        <- Gen.oneOf(StringCell(index, stringData),
       BooleanCell(index, boolData), NumericCell(index, doubleData))
   } yield res)
 
   implicit def arbRow: Arbitrary[Row] = Arbitrary(for {
-    index ← positiveInt
-    cells ← arbitrary[Set[Cell]]
+    index <- positiveInt
+    cells <- arbitrary[Set[Cell]]
   } yield Row(index)(cells))
 
   implicit def arbSheet: Arbitrary[Sheet] = Arbitrary(for {
-    name ← arbitrary[String]
-    rows ← arbitrary[Set[Row]]
+    name <- arbitrary[String]
+    rows <- arbitrary[Set[Row]]
   } yield Sheet(name)(rows))
 
   implicit def arbWorkbook: Arbitrary[info.folone.scala.poi.Workbook] = Arbitrary(for {
-    sheets ← arbitrary[Set[Sheet]]
+    sheets <- arbitrary[Set[Sheet]]
   } yield Workbook(sheets))
 
   trait Workbook extends Scope {
