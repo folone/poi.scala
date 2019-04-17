@@ -6,10 +6,10 @@ import java.io.File
 
 class WorkbookImpure(wb: Workbook) {
   def save(path: String): Unit =
-    wb.safeToFile(path).fold(ex ⇒ throw ex, identity).unsafePerformIO
+    wb.safeToFile(path).fold(ex => throw ex, identity).unsafePerformIO
 
   def saveToStream(stream: java.io.OutputStream): Unit =
-    wb.safeToStream(stream).fold(ex ⇒ throw ex, identity).unsafePerformIO
+    wb.safeToStream(stream).fold(ex => throw ex, identity).unsafePerformIO
 
   def overwrite(path: String): Unit = {
     new File(path).delete()
@@ -19,5 +19,5 @@ class WorkbookImpure(wb: Workbook) {
 
 object load {
   def apply(path: String): Workbook =
-    Workbook(path).fold(ex  ⇒ throw ex, identity).unsafePerformIO
+    Workbook(path).fold(ex  => throw ex, identity).unsafePerformIO
 }
