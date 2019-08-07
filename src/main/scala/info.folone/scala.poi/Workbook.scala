@@ -96,7 +96,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
   }
 
   def safeToFile(path: String): Result[Unit] = {
-    def close(resource: {def close(): Unit}): IO[Unit] = IO { resource.close() }
+    def close(resource: FileOutputStream): IO[Unit] = IO { resource.close() }
     val action = IO { new FileOutputStream(new File(path)) }.bracket(close) { file =>
       IO { book write file }
     }
