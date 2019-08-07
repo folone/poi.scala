@@ -13,16 +13,16 @@ trait Instances {
   // Typeclass instances
 
   object equalities {
-    implicit val formulaCellEqualInstance = new Equal[FormulaCell] {
+    implicit val formulaCellEqualInstance: Equal[FormulaCell] = new Equal[FormulaCell] {
       override def equal(f1: FormulaCell, f2: FormulaCell) = f1.index == f2.index && f1.data == f2.data
     }
 
-    implicit val styleCellEqualInstance = new Equal[StyledCell] {
+    implicit val styleCellEqualInstance: Equal[StyledCell] = new Equal[StyledCell] {
       override def equal(s1: StyledCell, s2: StyledCell) =
         s1.index == s2.index && s1.style == s2.style && s1.nestedCell == s2.nestedCell
     }
 
-    implicit val cellEqualInstance = new Equal[Cell] {
+    implicit val cellEqualInstance: Equal[Cell] = new Equal[Cell] {
       override def equal(s1: Cell, s2: Cell) = (s1, s2) match {
         case (s1: StringCell, s2: StringCell) => s1 == s2
         case (n1: NumericCell, n2: NumericCell) => n1 == n2
@@ -35,7 +35,7 @@ trait Instances {
     }
   }
 
-  implicit val cellInstance = new Semigroup[Cell] with Equal[Cell] with Show[Cell] {
+  implicit val cellInstance: Semigroup[Cell] with Equal[Cell] with Show[Cell] = new Semigroup[Cell] with Equal[Cell] with Show[Cell] {
     override def append(f1: Cell, f2: => Cell): Cell = f2
     override def equal(a1: Cell, a2: Cell): Boolean = a1.index == a2.index
     override def shows(as: Cell): String =
@@ -48,14 +48,14 @@ trait Instances {
         case StyledCell(cell, style) => "StyledCell(" + shows(cell) + ", <style>)"
       }
   }
-  implicit val rowInstance = new Semigroup[Row] with Equal[Row] with Show[Row] {
+  implicit val rowInstance: Semigroup[Row] with Equal[Row] with Show[Row] = new Semigroup[Row] with Equal[Row] with Show[Row] {
     override def append(f1: Row, f2: => Row): Row =
       Row(f2.index)(mergeSets(f1.cells, f2.cells, (_: Cell).index))
     override def equal(a1: Row, a2: Row): Boolean =
       a1.index == a2.index && a1.cells.toStream.corresponds(a2.cells.toStream)(Equal[Cell].equal)
     override def shows(as: Row): String = "Row (" + as.index + ")(" + as.cells.toIndexedSeq.sortBy(_.index) + ")"
   }
-  implicit val sheetInstance = new Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] {
+  implicit val sheetInstance: Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] = new Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] {
     override def append(f1: Sheet, f2: => Sheet): Sheet =
       Sheet(f2.name)(mergeSets(f1.rows, f2.rows, (_: Row).index))
     override def equal(a1: Sheet, a2: Sheet): Boolean =
@@ -67,7 +67,7 @@ trait Instances {
         }
     override def shows(as: Sheet): String = "Sheet (\"" + as.name + "\")(" + as.rows.toIndexedSeq.sortBy(_.index) + ")"
   }
-  implicit val wbInstance = new Monoid[Workbook] with Equal[Workbook] with Show[Workbook] {
+  implicit val wbInstance: Monoid[Workbook] with Equal[Workbook] with Show[Workbook] = new Monoid[Workbook] with Equal[Workbook] with Show[Workbook] {
     override def zero: Workbook = Workbook(Set[Sheet]())
     override def append(f1: Workbook, f2: => Workbook): Workbook =
       Workbook(mergeSets(f1.sheets, f2.sheets, (_: Sheet).name))
