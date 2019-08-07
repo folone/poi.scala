@@ -3,7 +3,6 @@ package info.folone.scala.poi
 import org.apache.poi._
 import ss.usermodel.{DateUtil, WorkbookFactory, Cell => POICell, CellStyle => POICellStyle, Row => POIRow, Workbook => POIWorkbook}
 import java.io.{ File, FileOutputStream, OutputStream, InputStream }
-import java.util.Date
 
 import scalaz._
 import std.map._
@@ -186,70 +185,3 @@ object Workbook {
     Workbook(sheets)
   }
 }
-
-class Sheet(val name: String)(val rows: Set[Row]) {
-  def styles: Map[CellStyle, List[CellAddr]] = rows.foldRight(Map[CellStyle, List[CellAddr]]()) {
-    case (row, map) => map |+| row.styles(name)
-  }
-  override def toString: String = Show[Sheet].shows(this)
-  override def equals(obj: Any): Boolean =
-    obj != null && obj.isInstanceOf[Sheet] && Equal[Sheet].equal(obj.asInstanceOf[Sheet], this)
-  override def hashCode: Int = name.hashCode + rows.hashCode
-}
-object Sheet {
-  def apply(name: String)(rows: Set[Row]): Sheet = new Sheet(name)(rows)
-  def unapply(sheet: Sheet): Option[(String, Set[Row])] = Some((sheet.name, sheet.rows))
-}
-class Row(val index: Int)(val cells: Set[Cell]) {
-  def styles(sheet: String): Map[CellStyle, List[CellAddr]] = cells.foldRight(Map[CellStyle, List[CellAddr]]()) {
-    case (cell, map) => map |+| cell.styles(sheet, index)
-  }
-  override def toString: String = Show[Row].shows(this)
-  override def equals(obj: Any): Boolean =
-    obj != null && obj.isInstanceOf[Row] && Equal[Row].equal(obj.asInstanceOf[Row], this)
-  override def hashCode: Int = index.hashCode + cells.hashCode
-}
-object Row {
-  def apply(index: Int)(cells: Set[Cell]): Row = new Row(index)(cells)
-  def unapply(row: Row): Option[(Int, Set[Cell])] = Some((row.index, row.cells))
-}
-sealed abstract class Cell(val index: Int, val style: Option[CellStyle]) {
-  def styles(sheet: String, row: Int): Map[CellStyle, List[CellAddr]] = style match {
-    case None => Map()
-    case Some(s) => Map(s -> List(CellAddr(sheet, row, index)))
-  }
-  override def toString: String = Show[Cell].shows(this)
-}
-case class StringCell(override val index: Int, data: String) extends Cell(index, None)
-case class NumericCell(override val index: Int, data: Double) extends Cell(index, None)
-case class DateCell(override val index: Int, data: Date) extends Cell(index, None)
-case class BooleanCell(override val index: Int, data: Boolean) extends Cell(index, None)
-class FormulaCell(override val index: Int, val data: String) extends Cell(index, None) {
-  import equalities.formulaCellEqualInstance
-  override def equals(obj: Any) =
-    obj != null && obj.isInstanceOf[FormulaCell] && Equal[FormulaCell].equal(obj.asInstanceOf[FormulaCell], this)
-  override def hashCode: Int = index.hashCode + data.hashCode
-}
-object FormulaCell {
-  def apply(index: Int, data: String): FormulaCell =
-    new FormulaCell(index, data.dropWhile(_ == '='))
-  def unapply(cell: FormulaCell): Option[(Int, String)] = Some((cell.index, cell.data))
-}
-class StyledCell private (override val index: Int, override val style: Option[CellStyle], val nestedCell: Cell) extends Cell(index, style) {
-  import equalities.styleCellEqualInstance
-  def unstyledCell: Cell = if (nestedCell.isInstanceOf[StyledCell]) nestedCell.asInstanceOf[StyledCell].nestedCell else nestedCell
-  override def equals(obj: Any) =
-    obj != null && obj.isInstanceOf[StyledCell] && Equal[StyledCell].equal(obj.asInstanceOf[StyledCell], this)
-  override def hashCode: Int = index.hashCode + style.hashCode + nestedCell.hashCode()
-}
-object StyledCell {
-  def apply(cell: Cell, style: CellStyle): StyledCell = new StyledCell(cell.index, Some(style), cell)
-  def unapply(cell: StyledCell): Option[(Cell, CellStyle)] = cell.style map { case style => (cell.nestedCell, style) }
-}
-
-case class CellAddr(sheet: String, row: Int, col: Int)
-
-sealed abstract class WorkbookVersion
-case object HSSF extends WorkbookVersion
-case object XSSF extends WorkbookVersion
-case object SXSSF extends WorkbookVersion
