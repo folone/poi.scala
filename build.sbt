@@ -58,7 +58,7 @@ lazy val standardSettings = Def.settings(
       "org.scalaz"     %% "scalaz-effect"             % scalazVersion,
       "org.specs2"     %% "specs2-core"               % specsVersion.value % "test",
       "org.specs2"     %% "specs2-scalacheck"         % specsVersion.value % "test",
-      "org.scalacheck" %% "scalacheck"                % "1.14.1"       % "test",
+      "org.scalacheck" %% "scalacheck"                % "1.14.2"       % "test",
       "org.scalaz"     %% "scalaz-scalacheck-binding" % s"${scalazVersion}-scalacheck-1.14" % "test"
     )
   },
