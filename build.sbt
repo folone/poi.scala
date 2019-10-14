@@ -34,7 +34,7 @@ lazy val credentialsSetting = credentials += {
   }
 }
 
-val scalazVersion = "7.2.28"
+val scalazVersion = "7.2.29"
 val poiVersion = "3.14"
 val specsVersion = Def.setting(
   CrossVersion.partialVersion(scalaVersion.value) match {
