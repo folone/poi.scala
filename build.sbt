@@ -1,9 +1,9 @@
-val Scala212 = "2.12.8"
+val Scala212 = "2.12.11"
 
 lazy val buildSettings = Def.settings(
   organization       := "info.folone",
   scalaVersion       := Scala212,
-  crossScalaVersions := Seq(Scala212, "2.11.12", "2.10.7", "2.13.0"),
+  crossScalaVersions := Seq(Scala212, "2.11.12", "2.10.7", "2.13.2"),
 
   scalacOptions      := Seq(
     "-encoding", "UTF-8",
@@ -41,13 +41,14 @@ val specsVersion = Def.setting(
     case Some((2, 10)) =>
       "3.9.5"
     case _ =>
-      "4.5.1"
+      "4.9.3"
   }
 )
 
 lazy val standardSettings = Def.settings(
   buildSettings,
   name := "poi-scala",
+  fork in Test := true,
   releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   libraryDependencies ++= {
