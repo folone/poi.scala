@@ -34,7 +34,7 @@ lazy val credentialsSetting = credentials += {
   }
 }
 
-val scalazVersion = "7.2.30"
+val scalazVersion = "7.3.0"
 val poiVersion = "3.14"
 val specsVersion = Def.setting(
   "4.9.4"
@@ -55,7 +55,7 @@ lazy val standardSettings = Def.settings(
       "org.specs2"     %% "specs2-core"               % specsVersion.value % "test",
       "org.specs2"     %% "specs2-scalacheck"         % specsVersion.value % "test",
       "org.scalacheck" %% "scalacheck"                % "1.14.3"       % "test",
-      "org.scalaz"     %% "scalaz-scalacheck-binding" % s"${scalazVersion}-scalacheck-1.14" % "test"
+      "org.scalaz"     %% "scalaz-scalacheck-binding" % scalazVersion % "test"
     )
   },
   publishMavenStyle := true,

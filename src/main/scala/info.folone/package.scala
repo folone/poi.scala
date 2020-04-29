@@ -8,7 +8,7 @@ package object poi extends Instances with Lenses
 
 trait Instances {
 
-  type Result[A] = EitherT[IO, Throwable, A]
+  type Result[A] = EitherT[Throwable, IO, A]
 
   // Typeclass instances
 
@@ -38,6 +38,7 @@ trait Instances {
   implicit val cellInstance: Semigroup[Cell] with Equal[Cell] with Show[Cell] = new Semigroup[Cell] with Equal[Cell] with Show[Cell] {
     override def append(f1: Cell, f2: => Cell): Cell = f2
     override def equal(a1: Cell, a2: Cell): Boolean = a1.index == a2.index
+    override def show(as: Cell): Cord = Cord(shows(as))
     override def shows(as: Cell): String =
       as match {
         case StringCell(index, data)  => "StringCell("  + index + ", \""  + data + "\")"
@@ -53,6 +54,7 @@ trait Instances {
       Row(f2.index)(mergeSets(f1.cells, f2.cells, (_: Cell).index))
     override def equal(a1: Row, a2: Row): Boolean =
       a1.index == a2.index && a1.cells.toStream.corresponds(a2.cells.toStream)(Equal[Cell].equal)
+    override def show(as: Row): Cord = Cord(shows(as))
     override def shows(as: Row): String = "Row (" + as.index + ")(" + as.cells.toIndexedSeq.sortBy(_.index) + ")"
   }
   implicit val sheetInstance: Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] = new Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] {
@@ -65,6 +67,7 @@ trait Instances {
         .foldLeft (true) { (acc, v) =>
           acc && Equal[Row].equal(v._1, v._2)
         }
+    override def show(as: Sheet): Cord = Cord(shows(as))
     override def shows(as: Sheet): String = "Sheet (\"" + as.name + "\")(" + as.rows.toIndexedSeq.sortBy(_.index) + ")"
   }
   implicit val wbInstance: Monoid[Workbook] with Equal[Workbook] with Show[Workbook] = new Monoid[Workbook] with Equal[Workbook] with Show[Workbook] {
@@ -78,6 +81,7 @@ trait Instances {
         acc && Equal[Sheet].equal(v._1, v._2)
       }
     override def shows(as: Workbook): String = "Workbook(" + as.sheets.toIndexedSeq.sortBy(_.name) + ")"
+    override def show(as: Workbook): Cord = Cord(shows(as))
   }
 
   // Utility functions
