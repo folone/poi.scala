@@ -41,7 +41,7 @@ val specsVersion = Def.setting(
     case Some((2, 10)) =>
       "3.9.5"
     case _ =>
-      "4.9.3"
+      "4.9.4"
   }
 )
 
