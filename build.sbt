@@ -3,7 +3,7 @@ val Scala212 = "2.12.11"
 lazy val buildSettings = Def.settings(
   organization       := "info.folone",
   scalaVersion       := Scala212,
-  crossScalaVersions := Seq(Scala212, "2.11.12", "2.10.7", "2.13.2"),
+  crossScalaVersions := Seq(Scala212, "2.11.12", "2.13.2"),
 
   scalacOptions      := Seq(
     "-encoding", "UTF-8",
@@ -37,12 +37,7 @@ lazy val credentialsSetting = credentials += {
 val scalazVersion = "7.2.30"
 val poiVersion = "3.14"
 val specsVersion = Def.setting(
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, 10)) =>
-      "3.9.5"
-    case _ =>
-      "4.9.4"
-  }
+  "4.9.4"
 )
 
 lazy val standardSettings = Def.settings(
