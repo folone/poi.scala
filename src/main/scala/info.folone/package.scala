@@ -132,8 +132,8 @@ trait Instances {
     combine(list1.map(l => (on(l), l)).toMap, list2.map(l => (on(l), l)).toMap).map { case (_, y) => y }.toSet
 
   private def combine[A, B: Semigroup](m1: Map[A, B], m2: Map[A, B]): Map[A, B] = {
-    val k1 = Set(m1.keysIterator.toList: _*)
-    val k2 = Set(m2.keysIterator.toList: _*)
+    val k1 = m1.keysIterator.toSet
+    val k2 = m2.keysIterator.toSet
     val intersection = k1 & k2
     val r1 = for (key <- intersection) yield (key -> Semigroup[B].append(m1(key), m2(key)))
     val r2 = m1.filterKeys(!intersection.contains(_)) ++
