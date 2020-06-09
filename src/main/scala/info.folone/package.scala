@@ -3,6 +3,7 @@ package info.folone.scala
 import poi._
 import scalaz._
 import effect.IO
+import scala.annotation.tailrec
 
 package object poi extends Instances with Lenses
 
@@ -36,8 +37,8 @@ trait Instances {
     }
   }
 
-  implicit val cellInstance: Semigroup[Cell] with Equal[Cell] with Show[Cell] =
-    new Semigroup[Cell] with Equal[Cell] with Show[Cell] {
+  implicit val cellInstance: Semigroup[Cell] with Order[Cell] with Show[Cell] =
+    new Semigroup[Cell] with Order[Cell] with Show[Cell] {
       override def append(f1: Cell, f2: => Cell): Cell = f2
       override def equal(a1: Cell, a2: Cell): Boolean = a1.index == a2.index
       override def show(as: Cell): Cord = Cord(shows(as))
@@ -50,6 +51,46 @@ trait Instances {
           case FormulaCell(index, data) => "FormulaCell(" + index + ", \"=" + data + "\")"
           case StyledCell(cell, style) => "StyledCell(" + shows(cell) + ", <style>)"
         }
+      private[this] def cellToOrderId(cell: Cell): Int = {
+        cell match {
+          case _: StringCell => 1
+          case _: NumericCell => 2
+          case _: DateCell => 3
+          case _: BooleanCell => 4
+          case _: FormulaCell => 5
+          case _: StyledCell => 6
+        }
+      }
+      @tailrec
+      override def order(x: Cell, y: Cell): Ordering = {
+        import scalaz.std.anyVal._
+        import scalaz.std.string._
+        import scalaz.syntax.order._
+        Order[Int].order(x.index, y.index) match {
+          case Ordering.EQ =>
+            Order[Int].order(cellToOrderId(x), cellToOrderId(y)) match {
+              case Ordering.EQ =>
+                x match {
+                  case StringCell(_, data) =>
+                    data cmp y.asInstanceOf[StringCell].data
+                  case NumericCell(_, data) =>
+                    data cmp y.asInstanceOf[NumericCell].data
+                  case DateCell(_, data) =>
+                    Ordering.fromInt(data.compareTo(y.asInstanceOf[DateCell].data))
+                  case BooleanCell(_, data) =>
+                    data cmp y.asInstanceOf[BooleanCell].data
+                  case cell: FormulaCell =>
+                    cell.data cmp y.asInstanceOf[FormulaCell].data
+                  case cell: StyledCell =>
+                    order(cell.nestedCell, y.asInstanceOf[StyledCell].nestedCell)
+                }
+              case other =>
+                other
+            }
+          case other =>
+            other
+        }
+      }
     }
   implicit val rowInstance: Semigroup[Row] with Equal[Row] with Show[Row] =
     new Semigroup[Row] with Equal[Row] with Show[Row] {

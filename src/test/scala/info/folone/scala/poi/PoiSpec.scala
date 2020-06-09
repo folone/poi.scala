@@ -128,8 +128,8 @@ class PoiSpec extends Specification with ScalaCheck {
     "satisfy for Semigroup[Cell]" in properties {
       semigroup.laws[Cell]
     }
-    "satisfy for Equal[Cell]" in properties {
-      equal.laws[Cell]
+    "satisfy for Order[Cell]" in properties {
+      order.laws[Cell]
     }
     "satisfy for Semigroup[Row]" in properties {
       semigroup.laws[Row]
