@@ -5,10 +5,11 @@ import java.util.Date
 import scalaz.{Equal, Show}
 
 sealed abstract class Cell(val index: Int, val style: Option[CellStyle]) {
-  def styles(sheet: String, row: Int): Map[CellStyle, List[CellAddr]] = style match {
-    case None => Map()
-    case Some(s) => Map(s -> List(CellAddr(sheet, row, index)))
-  }
+  def styles(sheet: String, row: Int): Map[CellStyle, List[CellAddr]] =
+    style match {
+      case None => Map()
+      case Some(s) => Map(s -> List(CellAddr(sheet, row, index)))
+    }
   override def toString: String = Show[Cell].shows(this)
 }
 case class StringCell(override val index: Int, data: String) extends Cell(index, None)
@@ -26,9 +27,11 @@ object FormulaCell {
     new FormulaCell(index, data.dropWhile(_ == '='))
   def unapply(cell: FormulaCell): Option[(Int, String)] = Some((cell.index, cell.data))
 }
-class StyledCell private (override val index: Int, override val style: Option[CellStyle], val nestedCell: Cell) extends Cell(index, style) {
+class StyledCell private (override val index: Int, override val style: Option[CellStyle], val nestedCell: Cell)
+    extends Cell(index, style) {
   import equalities.styleCellEqualInstance
-  def unstyledCell: Cell = if (nestedCell.isInstanceOf[StyledCell]) nestedCell.asInstanceOf[StyledCell].nestedCell else nestedCell
+  def unstyledCell: Cell =
+    if (nestedCell.isInstanceOf[StyledCell]) nestedCell.asInstanceOf[StyledCell].nestedCell else nestedCell
   override def equals(obj: Any) =
     obj != null && obj.isInstanceOf[StyledCell] && Equal[StyledCell].equal(obj.asInstanceOf[StyledCell], this)
   override def hashCode: Int = index.hashCode + style.hashCode + nestedCell.hashCode()

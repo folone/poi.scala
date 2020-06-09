@@ -19,5 +19,5 @@ class WorkbookImpure(wb: Workbook) {
 
 object load {
   def apply(path: String): Workbook =
-    Workbook(path).fold(ex  => throw ex, identity).unsafePerformIO
+    Workbook(path).fold(ex => throw ex, identity).unsafePerformIO
 }

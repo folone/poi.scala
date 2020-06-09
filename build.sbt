@@ -1,17 +1,16 @@
 val Scala212 = "2.12.11"
 
 lazy val buildSettings = Def.settings(
-  organization       := "info.folone",
-  scalaVersion       := Scala212,
+  organization := "info.folone",
+  scalaVersion := Scala212,
   crossScalaVersions := Seq(Scala212, "2.11.12", "2.13.2"),
-
-  scalacOptions      := Seq(
-    "-encoding", "UTF-8",
+  scalacOptions := Seq(
+    "-encoding",
+    "UTF-8",
     "-deprecation",
     "-unchecked",
     "-explaintypes"
   ),
-
   parallelExecution in Compile := true
 )
 
@@ -29,7 +28,7 @@ lazy val credentialsSetting = credentials += {
   Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
     case Seq(Some(user), Some(pass)) =>
       Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
-    case _                           =>
+    case _ =>
       Credentials(Path.userHome / ".ivy2" / ".credentials")
   }
 }
@@ -48,14 +47,14 @@ lazy val standardSettings = Def.settings(
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   libraryDependencies ++= {
     Seq(
-      "org.apache.poi" %  "poi"                       % poiVersion,
-      "org.apache.poi" %  "poi-ooxml"                 % poiVersion,
-      "org.scalaz"     %% "scalaz-core"               % scalazVersion,
-      "org.scalaz"     %% "scalaz-effect"             % scalazVersion,
-      "org.specs2"     %% "specs2-core"               % specsVersion.value % "test",
-      "org.specs2"     %% "specs2-scalacheck"         % specsVersion.value % "test",
-      "org.scalacheck" %% "scalacheck"                % "1.14.3"       % "test",
-      "org.scalaz"     %% "scalaz-scalacheck-binding" % scalazVersion % "test"
+      "org.apache.poi" % "poi" % poiVersion,
+      "org.apache.poi" % "poi-ooxml" % poiVersion,
+      "org.scalaz" %% "scalaz-core" % scalazVersion,
+      "org.scalaz" %% "scalaz-effect" % scalazVersion,
+      "org.specs2" %% "specs2-core" % specsVersion.value % "test",
+      "org.specs2" %% "specs2-scalacheck" % specsVersion.value % "test",
+      "org.scalacheck" %% "scalacheck" % "1.14.3" % "test",
+      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test"
     )
   },
   publishMavenStyle := true,
@@ -78,13 +77,14 @@ lazy val standardSettings = Def.settings(
     <developers>
     {
       Seq(
-        ("folone",       "George Leontiev"),
-        ("fedgehog",     "Maxim Fedorov"),
+        ("folone", "George Leontiev"),
+        ("fedgehog", "Maxim Fedorov"),
         ("Michael Rans", "Michael Rans"),
-        ("daneko",       "Kouichi Akatsuka"),
-        ("rintcius",     "Rintcius Blok")
-      ).map { case (id, name) =>
-        <developer>
+        ("daneko", "Kouichi Akatsuka"),
+        ("rintcius", "Rintcius Blok")
+      ).map {
+        case (id, name) =>
+          <developer>
           <id>{id}</id>
           <name>{name}</name>
           <url>http://github.com/{id}</url>

@@ -1,8 +1,15 @@
 package info.folone.scala.poi
 
 import org.apache.poi._
-import ss.usermodel.{DateUtil, WorkbookFactory, Cell => POICell, CellStyle => POICellStyle, Row => POIRow, Workbook => POIWorkbook}
-import java.io.{ File, FileOutputStream, OutputStream, InputStream }
+import ss.usermodel.{
+  DateUtil,
+  WorkbookFactory,
+  Cell => POICell,
+  CellStyle => POICellStyle,
+  Row => POIRow,
+  Workbook => POIWorkbook
+}
+import java.io.{File, FileOutputStream, OutputStream, InputStream}
 
 import scalaz._
 import std.map._
@@ -11,22 +18,21 @@ import syntax.applicative._
 import syntax.monoid._
 import effect.IO
 
-
 class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF) {
   val sheets: Set[Sheet] = sheetMap.values.toSet
 
   private def setPoiCell(defaultRowHeight: Short, row: POIRow, cell: Cell, poiCell: POICell): Unit = {
     cell match {
-      case StringCell(index, data)  =>
+      case StringCell(index, data) =>
         poiCell.setCellValue(data)
         val cellHeight = (data.split("\n").size) * defaultRowHeight
-        if(cellHeight > row.getHeight)
+        if (cellHeight > row.getHeight)
           row setHeight cellHeight.asInstanceOf[Short]
       case BooleanCell(index, data) => poiCell.setCellValue(data)
       case DateCell(index, data) => poiCell.setCellValue(data)
       case NumericCell(index, data) => poiCell.setCellValue(data)
       case FormulaCell(index, data) => poiCell.setCellFormula(data)
-      case styledCell@StyledCell(_, _) => {
+      case styledCell @ StyledCell(_, _) => {
         setPoiCell(defaultRowHeight, row, styledCell.nestedCell, poiCell)
       }
     }
@@ -46,7 +52,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
         val row = sheet createRow index
         cells foreach { cl =>
           val poiCell = row createCell cl.index
-          setPoiCell(sheet.getDefaultRowHeight,row, cl, poiCell)
+          setPoiCell(sheet.getDefaultRowHeight, row, cl, poiCell)
         }
       }
     }
@@ -120,7 +126,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
 object Workbook {
 
   def apply(sheets: Set[Sheet], format: WorkbookVersion = HSSF): Workbook =
-    new Workbook(sheets.map( s => (s.name, s)).toMap, format)
+    new Workbook(sheets.map(s => (s.name, s)).toMap, format)
 
   def apply(path: String): Result[Workbook] = {
     val action: IO[File] = IO { new File(path) }
@@ -143,45 +149,50 @@ object Workbook {
   private def fromInputStream(format: WorkbookVersion) =
     readWorkbook[InputStream](format, t => WorkbookFactory.create(t))
 
-  private def readWorkbook[T](format: WorkbookVersion, workbookF: T => POIWorkbook) = IO { is: T =>
-    val wb   = workbookF(is)
-    val data = for {
-      i     <- 0 until wb.getNumberOfSheets
-      sheet = wb.getSheetAt(i) if (sheet != null)
-      k     <- 0 to sheet.getLastRowNum
-      row   = sheet.getRow(k) if (row != null)
-      j     <- 0 until row.getLastCellNum
-      cell  = row.getCell(j) if (cell != null)
-        } yield (sheet, row, cell)
-    val result = data.groupBy(_._1).mapValues { lst =>
-      lst.map { case (s, r, c) => (r, c)}.groupBy(_._1)
-        .mapValues(l => l.map { case (r, c) => c }.toList)
-    }
-    val sheets = result.map { case (sheet, rowLst) =>
-      Sheet(sheet.getSheetName) {
-        rowLst.map { case (row, cellLst) =>
-          Row(row.getRowNum) {
-            cellLst.flatMap { cell =>
-              val index = cell.getColumnIndex
-              cell.getCellType match {
-                case POICell.CELL_TYPE_NUMERIC =>
-                  if (DateUtil.isCellDateFormatted(cell))
-                    Some(DateCell(index, cell.getDateCellValue))
-                  else
-                    Some(NumericCell(index, cell.getNumericCellValue))
-                case POICell.CELL_TYPE_BOOLEAN =>
-                  Some(BooleanCell(index, cell.getBooleanCellValue))
-                case POICell.CELL_TYPE_FORMULA =>
-                  Some(FormulaCell(index, cell.getCellFormula))
-                case POICell.CELL_TYPE_STRING  =>
-                  Some(StringCell(index, cell.getStringCellValue))
-                case _                      => None
-              }
+  private def readWorkbook[T](format: WorkbookVersion, workbookF: T => POIWorkbook) =
+    IO { is: T =>
+      val wb = workbookF(is)
+      val data = for {
+        i <- 0 until wb.getNumberOfSheets
+        sheet = wb.getSheetAt(i) if (sheet != null)
+        k <- 0 to sheet.getLastRowNum
+        row = sheet.getRow(k) if (row != null)
+        j <- 0 until row.getLastCellNum
+        cell = row.getCell(j) if (cell != null)
+      } yield (sheet, row, cell)
+      val result = data.groupBy(_._1).mapValues { lst =>
+        lst
+          .map { case (s, r, c) => (r, c) }
+          .groupBy(_._1)
+          .mapValues(l => l.map { case (r, c) => c }.toList)
+      }
+      val sheets = result.map {
+        case (sheet, rowLst) =>
+          Sheet(sheet.getSheetName) {
+            rowLst.map {
+              case (row, cellLst) =>
+                Row(row.getRowNum) {
+                  cellLst.flatMap { cell =>
+                    val index = cell.getColumnIndex
+                    cell.getCellType match {
+                      case POICell.CELL_TYPE_NUMERIC =>
+                        if (DateUtil.isCellDateFormatted(cell))
+                          Some(DateCell(index, cell.getDateCellValue))
+                        else
+                          Some(NumericCell(index, cell.getNumericCellValue))
+                      case POICell.CELL_TYPE_BOOLEAN =>
+                        Some(BooleanCell(index, cell.getBooleanCellValue))
+                      case POICell.CELL_TYPE_FORMULA =>
+                        Some(FormulaCell(index, cell.getCellFormula))
+                      case POICell.CELL_TYPE_STRING =>
+                        Some(StringCell(index, cell.getStringCellValue))
+                      case _ => None
+                    }
+                  }.toSet
+                }
             }.toSet
           }
-        }.toSet
-      }
-    }.toSet
-    Workbook(sheets)
-  }
+      }.toSet
+      Workbook(sheets)
+    }
 }

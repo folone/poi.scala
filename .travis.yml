@@ -3,4 +3,4 @@ dist: xenial
 jdk:
 - openjdk8
 - openjdk11
-script: sbt ";clean;+compile;+test"
+script: sbt "all scalafmtCheck test:scalafmtCheck scalafmtSbtCheck" ";clean;+compile;+test"

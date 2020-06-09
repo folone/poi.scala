@@ -11,37 +11,40 @@ class PoiLensesSpec extends Specification {
       stringCellLens.set(StringCell(1, "data"), "newData") must beEqualTo(StringCell(1, "newData"))
     }
     "rowLens contains" >> {
-      rowLens.contains(StringCell(2, "data1")).get(Row(1)(Set(StringCell(1,"data"), StringCell(2, "data1")))) must beTrue
+      rowLens
+        .contains(StringCell(2, "data1"))
+        .get(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1")))) must beTrue
     }
     "rowLens does not contain" >> {
-      rowLens.contains(StringCell(2, "data1")).get(Row(1)(Set(StringCell(1,"data"), StringCell(2, "data")))) must beFalse
+      rowLens
+        .contains(StringCell(2, "data1"))
+        .get(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data")))) must beFalse
     }
     "rowLens +=" >> {
       (rowLens += StringCell(2, "data1")).run(Row(1)(Set(StringCell(1, "data"), StringCell(3, "data3")))) mustEqual
-      (Row(1)
-       (Set(StringCell(1,"data"), StringCell(3, "data3"), StringCell(2, "data1"))),
-       Set(StringCell(1, "data"), StringCell(3, "data3"), StringCell(2, "data1")))
+        (Row(1)(Set(StringCell(1, "data"), StringCell(3, "data3"), StringCell(2, "data1"))),
+        Set(StringCell(1, "data"), StringCell(3, "data3"), StringCell(2, "data1")))
     }
     "rowLens &=" >> {
       (rowLens &= Set(StringCell(2, "data1"))).run(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1")))) mustEqual
-      (Row(1)(Set(StringCell(2, "data1"))),Set(StringCell(2, "data1")))
+        (Row(1)(Set(StringCell(2, "data1"))), Set(StringCell(2, "data1")))
     }
     "rowLens &~=" >> {
-      (rowLens &~= Set(StringCell(2, "data1"))).run(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1")))) mustEqual
-      (Row(1)(Set(StringCell(1, "data"))),Set(StringCell(1, "data")))
+      (rowLens &~= Set(StringCell(2, "data1")))
+        .run(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1")))) mustEqual
+        (Row(1)(Set(StringCell(1, "data"))), Set(StringCell(1, "data")))
     }
     "rowLens |=" >> {
       (rowLens |= Set(StringCell(2, "data1"))).run(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1")))) mustEqual
-      (Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1"))),Set(StringCell(1, "data"), StringCell(2, "data1")))
+        (Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1"))), Set(StringCell(1, "data"), StringCell(2, "data1")))
 
       (rowLens |= Set(StringCell(2, "data1"))).run(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data2")))) mustEqual
-      (Row(1)
-       (Set(StringCell(1, "data"), StringCell(2, "data2"), StringCell(2, "data1"))),
-       Set(StringCell(1, "data"), StringCell(2, "data2"), StringCell(2, "data1")))
+        (Row(1)(Set(StringCell(1, "data"), StringCell(2, "data2"), StringCell(2, "data1"))),
+        Set(StringCell(1, "data"), StringCell(2, "data2"), StringCell(2, "data1")))
     }
     "rowLens -=" >> {
       (rowLens -= StringCell(2, "data1")).run(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1")))) mustEqual
-      (Row(1)(Set(StringCell(1, "data"))), Set(StringCell(1, "data")))
+        (Row(1)(Set(StringCell(1, "data"))), Set(StringCell(1, "data")))
     }
   }
 }

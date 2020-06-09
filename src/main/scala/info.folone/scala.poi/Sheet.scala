@@ -6,9 +6,10 @@ import std.list._
 import syntax.monoid._
 
 class Sheet(val name: String)(val rows: Set[Row]) {
-  def styles: Map[CellStyle, List[CellAddr]] = rows.foldRight(Map[CellStyle, List[CellAddr]]()) {
-    case (row, map) => map |+| row.styles(name)
-  }
+  def styles: Map[CellStyle, List[CellAddr]] =
+    rows.foldRight(Map[CellStyle, List[CellAddr]]()) {
+      case (row, map) => map |+| row.styles(name)
+    }
   override def toString: String = Show[Sheet].shows(this)
   override def equals(obj: Any): Boolean =
     obj != null && obj.isInstanceOf[Sheet] && Equal[Sheet].equal(obj.asInstanceOf[Sheet], this)
