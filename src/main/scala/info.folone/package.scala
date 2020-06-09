@@ -96,8 +96,10 @@ trait Instances {
     new Semigroup[Row] with Equal[Row] with Show[Row] {
       override def append(f1: Row, f2: => Row): Row =
         Row(f2.index)(mergeSets(f1.cells, f2.cells, (_: Cell).index))
-      override def equal(a1: Row, a2: Row): Boolean =
-        a1.index == a2.index && a1.cells.toStream.corresponds(a2.cells.toStream)(Equal[Cell].equal)
+      override def equal(a1: Row, a2: Row): Boolean = {
+        import scalaz.std.set._
+        a1.index == a2.index && Equal[Set[Cell]].equal(a1.cells, a2.cells)
+      }
       override def show(as: Row): Cord = Cord(shows(as))
       override def shows(as: Row): String = "Row (" + as.index + ")(" + as.cells.toIndexedSeq.sortBy(_.index) + ")"
     }

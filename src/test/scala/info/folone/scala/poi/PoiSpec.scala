@@ -12,6 +12,8 @@ import org.scalacheck._
 import scalaz.scalacheck.ScalazProperties._
 import Arbitrary._
 
+import scala.util.Random
+
 class PoiSpec extends Specification with ScalaCheck {
   "Poi" should {
     "create workbook" in {
@@ -121,6 +123,18 @@ class PoiSpec extends Specification with ScalaCheck {
     "have filled cells" in new Workbook {
       val cellText = book.asPoi.getSheet("test").getRow(0).getCell(0).getStringCellValue
       cellText must beEqualTo("theCell")
+    }
+  }
+
+  "Row" should {
+    "equals" in {
+      val cells = for {
+        x <- 1 to 2
+        y <- 1 to 2
+      } yield NumericCell(x, y)
+      val row1 = Row(0)(cells.toSet)
+      val row2 = Row(0)(Random.shuffle(cells).toSet)
+      row1 == row2
     }
   }
 
