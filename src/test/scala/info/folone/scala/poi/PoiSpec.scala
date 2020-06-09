@@ -125,17 +125,29 @@ class PoiSpec extends Specification with ScalaCheck {
   }
 
   "Typeclasses" should {
-    "satisfy for Cell" in properties {
+    "satisfy for Semigroup[Cell]" in properties {
       semigroup.laws[Cell]
     }
-    "satisfy for Row" in properties {
+    "satisfy for Equal[Cell]" in properties {
+      equal.laws[Cell]
+    }
+    "satisfy for Semigroup[Row]" in properties {
       semigroup.laws[Row]
     }
-    "satisfy for Sheet" in properties {
+    "satisfy for Equal[Row]" in properties {
+      equal.laws[Row]
+    }
+    "satisfy for Semigroup[Sheet]" in properties {
       semigroup.laws[Sheet]
     }
-    "satisfy for Workbook" in properties {
+    "satisfy for Equal[Sheet]" in properties {
+      equal.laws[Sheet]
+    }
+    "satisfy for Monoid[Workbook]" in properties {
       monoid.laws[info.folone.scala.poi.Workbook]
+    }
+    "satisfy for Equal[Workbook]" in properties {
+      equal.laws[info.folone.scala.poi.Workbook]
     }
   }
 
