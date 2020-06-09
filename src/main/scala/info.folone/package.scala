@@ -110,10 +110,7 @@ trait Instances {
       override def equal(a1: Sheet, a2: Sheet): Boolean =
         a1.name == a2.name &&
           (a1.rows.toIndexedSeq.sortBy((x: Row) => x.index) zip
-            a2.rows.toIndexedSeq.sortBy((x: Row) => x.index))
-            .foldLeft(true) { (acc, v) =>
-              acc && Equal[Row].equal(v._1, v._2)
-            }
+            a2.rows.toIndexedSeq.sortBy((x: Row) => x.index)).forall(v => Equal[Row].equal(v._1, v._2))
       override def show(as: Sheet): Cord = Cord(shows(as))
       override def shows(as: Sheet): String =
         "Sheet (\"" + as.name + "\")(" + as.rows.toIndexedSeq.sortBy(_.index) + ")"
@@ -125,10 +122,7 @@ trait Instances {
         Workbook(mergeSets(f1.sheets, f2.sheets, (_: Sheet).name))
       override def equal(a1: Workbook, a2: Workbook): Boolean =
         (a1.sheets.toIndexedSeq.sortBy((x: Sheet) => x.name) zip
-          a2.sheets.toIndexedSeq.sortBy((x: Sheet) => x.name))
-          .foldLeft(true) { (acc, v) =>
-            acc && Equal[Sheet].equal(v._1, v._2)
-          }
+          a2.sheets.toIndexedSeq.sortBy((x: Sheet) => x.name)).forall(v => Equal[Sheet].equal(v._1, v._2))
       override def shows(as: Workbook): String = "Workbook(" + as.sheets.toIndexedSeq.sortBy(_.name) + ")"
       override def show(as: Workbook): Cord = Cord(shows(as))
     }
