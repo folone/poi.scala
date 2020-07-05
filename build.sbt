@@ -3,7 +3,7 @@ val Scala212 = "2.12.11"
 lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
-  crossScalaVersions := Seq(Scala212, "2.11.12", "2.13.2"),
+  crossScalaVersions := Seq(Scala212, "2.11.12", "2.13.3"),
   scalacOptions := Seq(
     "-encoding",
     "UTF-8",
