@@ -82,9 +82,8 @@ lazy val standardSettings = Def.settings(
         ("Michael Rans", "Michael Rans"),
         ("daneko", "Kouichi Akatsuka"),
         ("rintcius", "Rintcius Blok")
-      ).map {
-        case (id, name) =>
-          <developer>
+      ).map { case (id, name) =>
+        <developer>
           <id>{id}</id>
           <name>{name}</name>
           <url>http://github.com/{id}</url>

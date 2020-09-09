@@ -166,32 +166,30 @@ object Workbook {
           .groupBy(_._1)
           .mapValues(l => l.map { case (r, c) => c }.toList)
       }
-      val sheets = result.map {
-        case (sheet, rowLst) =>
-          Sheet(sheet.getSheetName) {
-            rowLst.map {
-              case (row, cellLst) =>
-                Row(row.getRowNum) {
-                  cellLst.flatMap { cell =>
-                    val index = cell.getColumnIndex
-                    cell.getCellType match {
-                      case POICell.CELL_TYPE_NUMERIC =>
-                        if (DateUtil.isCellDateFormatted(cell))
-                          Some(DateCell(index, cell.getDateCellValue))
-                        else
-                          Some(NumericCell(index, cell.getNumericCellValue))
-                      case POICell.CELL_TYPE_BOOLEAN =>
-                        Some(BooleanCell(index, cell.getBooleanCellValue))
-                      case POICell.CELL_TYPE_FORMULA =>
-                        Some(FormulaCell(index, cell.getCellFormula))
-                      case POICell.CELL_TYPE_STRING =>
-                        Some(StringCell(index, cell.getStringCellValue))
-                      case _ => None
-                    }
-                  }.toSet
+      val sheets = result.map { case (sheet, rowLst) =>
+        Sheet(sheet.getSheetName) {
+          rowLst.map { case (row, cellLst) =>
+            Row(row.getRowNum) {
+              cellLst.flatMap { cell =>
+                val index = cell.getColumnIndex
+                cell.getCellType match {
+                  case POICell.CELL_TYPE_NUMERIC =>
+                    if (DateUtil.isCellDateFormatted(cell))
+                      Some(DateCell(index, cell.getDateCellValue))
+                    else
+                      Some(NumericCell(index, cell.getNumericCellValue))
+                  case POICell.CELL_TYPE_BOOLEAN =>
+                    Some(BooleanCell(index, cell.getBooleanCellValue))
+                  case POICell.CELL_TYPE_FORMULA =>
+                    Some(FormulaCell(index, cell.getCellFormula))
+                  case POICell.CELL_TYPE_STRING =>
+                    Some(StringCell(index, cell.getStringCellValue))
+                  case _ => None
                 }
-            }.toSet
-          }
+              }.toSet
+            }
+          }.toSet
+        }
       }.toSet
       Workbook(sheets)
     }
