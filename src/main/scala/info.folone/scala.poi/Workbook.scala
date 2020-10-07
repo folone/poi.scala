@@ -90,8 +90,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     styled(styles)
   }
 
-  /**
-    * Fits column's width to maximum width of non-empty cell at cell address.
+  /** Fits column's width to maximum width of non-empty cell at cell address.
     * Quite expensive. Use as late as possible.
     *
     * @param addrs addresses of cells, which columns size should fit cells content
