@@ -1,4 +1,4 @@
-# Poi Scala [![Build Status](https://secure.travis-ci.org/folone/poi.scala.png)](http://travis-ci.org/folone/poi.scala)
+# Poi Scala
 
 Apache poi dsl for scala
 

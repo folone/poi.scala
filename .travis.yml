@@ -1,6 +1,0 @@
-language: scala
-dist: xenial
-jdk:
-- openjdk8
-- openjdk11
-script: sbt "all scalafmtCheck test:scalafmtCheck scalafmtSbtCheck" ";clean;+compile;+test"

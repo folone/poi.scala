@@ -1,0 +1,33 @@
+name: CI
+on:
+  pull_request:
+  push:
+  schedule:
+  - cron: '0 0 * * 0'
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - java: 8
+            os: windows-latest
+          - java: 8
+            os: ubuntu-latest
+          - java: 11
+            os: ubuntu-latest
+    steps:
+    - run: "git config --global core.autocrlf false"
+      shell: bash
+    - uses: actions/checkout@v1
+    - uses: olafurpg/setup-scala@v10
+      with:
+        java-version: "adopt@1.${{ matrix.java }}"
+    - uses: coursier/cache-action@v5
+    - shell: bash
+      run: sbt
+           -v
+           "all scalafmtCheck test:scalafmtCheck scalafmtSbtCheck"
+           "+compile"
+           "+test"
