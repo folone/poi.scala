@@ -1,6 +1,7 @@
 package info.folone.scala.poi
 
 import org.specs2._
+import java.io.File
 
 class PoiLoadFileSpec extends Specification {
   def is =
@@ -35,11 +36,15 @@ class PoiLoadFileSpec extends Specification {
     XSSF
   )
 
-  val testBookPath = "/tmp/testBook.xlsx"
-
   val targetWorksheet = {
-    new impure.WorkbookImpure(testBook).overwrite(testBookPath)
-    impure.load(testBookPath).sheets.head
+    val testBookFile = File.createTempFile("tmp", "xlsx")
+    val testBookPath = testBookFile.getAbsolutePath
+    try {
+      new impure.WorkbookImpure(testBook).overwrite(testBookPath)
+      impure.load(testBookPath).sheets.head
+    } finally {
+      testBookFile.delete()
+    }
   }
 
   def e1 = targetWorksheet.rows must have size (4)

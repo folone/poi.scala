@@ -14,6 +14,8 @@ import Arbitrary._
 
 import scala.util.Random
 
+import java.io.File
+
 class PoiSpec extends Specification with ScalaCheck {
   "Poi" should {
     "create workbook" in {
@@ -36,7 +38,7 @@ class PoiSpec extends Specification with ScalaCheck {
           }
         )
       }
-      val path = "/tmp/book.xls"
+      val path = File.createTempFile("tmp", "xlsx").getAbsolutePath
       val io = wb.safeToFile(path)
       io.fold(ex => throw ex, identity).unsafePerformIO
       impure.load(path) === wb
