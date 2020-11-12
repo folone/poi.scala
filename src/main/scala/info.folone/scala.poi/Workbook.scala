@@ -5,6 +5,7 @@ import ss.usermodel.{
   DateUtil,
   WorkbookFactory,
   Cell => POICell,
+  CellType => POICellType,
   CellStyle => POICellStyle,
   Row => POIRow,
   Workbook => POIWorkbook
@@ -172,16 +173,16 @@ object Workbook {
               cellLst.flatMap { cell =>
                 val index = cell.getColumnIndex
                 cell.getCellType match {
-                  case POICell.CELL_TYPE_NUMERIC =>
+                  case POICellType.NUMERIC =>
                     if (DateUtil.isCellDateFormatted(cell))
                       Some(DateCell(index, cell.getDateCellValue))
                     else
                       Some(NumericCell(index, cell.getNumericCellValue))
-                  case POICell.CELL_TYPE_BOOLEAN =>
+                  case POICellType.BOOLEAN =>
                     Some(BooleanCell(index, cell.getBooleanCellValue))
-                  case POICell.CELL_TYPE_FORMULA =>
+                  case POICellType.FORMULA =>
                     Some(FormulaCell(index, cell.getCellFormula))
-                  case POICell.CELL_TYPE_STRING =>
+                  case POICellType.STRING =>
                     Some(StringCell(index, cell.getStringCellValue))
                   case _ => None
                 }
