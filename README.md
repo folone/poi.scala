@@ -40,7 +40,7 @@ sheetOne: info.folone.scala.poi.Workbook = Workbook(Set(Sheet ("name")(Set(Row (
 scala> val path = "/tmp/workbook.xls"
 path: String = /tmp/workbook.xls
 
-scala> sheetOne.safeToFile(path).fold(ex => throw ex, identity).unsafePerformIO
+scala> sheetOne.safeToFile(path).fold(ex => throw ex, identity).unsafePerformIO()
 
 scala> val sheetTwo = Workbook {
         Set(Sheet("name") {
@@ -71,7 +71,7 @@ scala> val res = Workbook(path).fold(
 )
 res: scalaz.effect.IO[Boolean] = scalaz.effect.IOFunctions$$anon$5@7ad4ad93
 
-scala> res.unsafePerformIO
+scala> res.unsafePerformIO()
 res5: Boolean = true
 
 scala> import impure._

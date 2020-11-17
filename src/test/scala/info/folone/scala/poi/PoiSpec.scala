@@ -40,7 +40,7 @@ class PoiSpec extends Specification with ScalaCheck {
       }
       val path = File.createTempFile("tmp", "xlsx").getAbsolutePath
       val io = wb.safeToFile(path)
-      io.fold(ex => throw ex, identity).unsafePerformIO
+      io.fold(ex => throw ex, identity).unsafePerformIO()
       impure.load(path) === wb
     }
   }
