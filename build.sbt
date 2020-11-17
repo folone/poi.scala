@@ -1,4 +1,4 @@
-val Scala212 = "2.12.11"
+val Scala212 = "2.12.12"
 
 lazy val buildSettings = Def.settings(
   organization := "info.folone",
@@ -36,7 +36,7 @@ lazy val credentialsSetting = credentials += {
 val scalazVersion = "7.3.2"
 val poiVersion = "4.1.2"
 val specsVersion = Def.setting(
-  "4.9.4"
+  "4.10.5"
 )
 
 lazy val standardSettings = Def.settings(
@@ -53,7 +53,6 @@ lazy val standardSettings = Def.settings(
       "org.scalaz" %% "scalaz-effect" % scalazVersion,
       "org.specs2" %% "specs2-core" % specsVersion.value % "test",
       "org.specs2" %% "specs2-scalacheck" % specsVersion.value % "test",
-      "org.scalacheck" %% "scalacheck" % "1.14.3" % "test",
       "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test"
     )
   },
