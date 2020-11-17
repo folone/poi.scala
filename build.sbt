@@ -8,9 +8,17 @@ lazy val buildSettings = Def.settings(
     "-encoding",
     "UTF-8",
     "-deprecation",
-    "-unchecked",
-    "-explaintypes"
+    "-unchecked"
   ),
+  scalacOptions ++= {
+    if (isDotty.value) {
+      Seq()
+    } else {
+      Seq(
+        "-explaintypes"
+      )
+    }
+  },
   parallelExecution in Compile := true
 )
 
@@ -49,11 +57,10 @@ lazy val standardSettings = Def.settings(
     Seq(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
-      "org.scalaz" %% "scalaz-core" % scalazVersion,
-      "org.scalaz" %% "scalaz-effect" % scalazVersion,
-      "org.specs2" %% "specs2-core" % specsVersion.value % "test",
-      "org.specs2" %% "specs2-scalacheck" % specsVersion.value % "test",
-      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test"
+      "org.scalaz" %% "scalaz-effect" % scalazVersion withDottyCompat scalaVersion.value,
+      "org.specs2" %% "specs2-core" % specsVersion.value % "test" withDottyCompat scalaVersion.value,
+      "org.specs2" %% "specs2-scalacheck" % specsVersion.value % "test" withDottyCompat scalaVersion.value,
+      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test" withDottyCompat scalaVersion.value
     )
   },
   publishMavenStyle := true,
