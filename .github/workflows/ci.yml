@@ -28,6 +28,6 @@ jobs:
     - shell: bash
       run: sbt
            -v
-           "all scalafmtCheck test:scalafmtCheck scalafmtSbtCheck"
+           "all scalafmtCheckAll scalafmtSbtCheck"
            "+compile"
            "+test"
