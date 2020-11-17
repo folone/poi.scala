@@ -150,7 +150,7 @@ object Workbook {
     readWorkbook[InputStream](format, t => WorkbookFactory.create(t))
 
   private def readWorkbook[T](format: WorkbookVersion, workbookF: T => POIWorkbook) =
-    IO { is: T =>
+    IO { (is: T) =>
       val wb = workbookF(is)
       val data = for {
         i <- 0 until wb.getNumberOfSheets
