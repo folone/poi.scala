@@ -4,7 +4,7 @@ package impure
 
 import java.io.File
 
-class WorkbookImpure(wb: Workbook) {
+class WorkbookImpure(private val wb: Workbook) extends AnyVal {
   def save(path: String): Unit =
     wb.safeToFile(path).fold(ex => throw ex, identity).unsafePerformIO()
 
