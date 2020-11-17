@@ -4,6 +4,20 @@ lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
   crossScalaVersions := Seq(Scala212, "2.11.12", "2.13.3"),
+  scalacOptions in (Compile, doc) ++= {
+    val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
+    if (isDotty.value) {
+      Nil
+    } else {
+      val hash = sys.process.Process("git rev-parse HEAD").lineStream_!.head
+      Seq(
+        "-sourcepath",
+        base,
+        "-doc-source-url",
+        "https://github.com/folone/poi.scala/tree/" + hash + "€{FILE_PATH}.scala"
+      )
+    }
+  },
   scalacOptions := Seq(
     "-encoding",
     "UTF-8",
