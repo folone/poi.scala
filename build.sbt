@@ -19,6 +19,7 @@ lazy val buildSettings = Def.settings(
     }
   },
   scalacOptions := Seq(
+    "-feature",
     "-encoding",
     "UTF-8",
     "-deprecation",
