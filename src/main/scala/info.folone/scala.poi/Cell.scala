@@ -25,7 +25,7 @@ class FormulaCell(override val index: Int, val data: String) extends Cell(index,
 object FormulaCell {
   def apply(index: Int, data: String): FormulaCell =
     new FormulaCell(index, data.dropWhile(_ == '='))
-  def unapply(cell: FormulaCell): Option[(Int, String)] = Some((cell.index, cell.data))
+  def unapply(cell: FormulaCell): Some[(Int, String)] = Some((cell.index, cell.data))
 }
 class StyledCell private (override val index: Int, override val style: Option[CellStyle], val nestedCell: Cell)
     extends Cell(index, style) {

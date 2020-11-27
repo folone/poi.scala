@@ -18,5 +18,5 @@ class Row(val index: Int)(val cells: Set[Cell]) {
 
 object Row {
   def apply(index: Int)(cells: Set[Cell]): Row = new Row(index)(cells)
-  def unapply(row: Row): Option[(Int, Set[Cell])] = Some((row.index, row.cells))
+  def unapply(row: Row): Some[(Int, Set[Cell])] = Some((row.index, row.cells))
 }

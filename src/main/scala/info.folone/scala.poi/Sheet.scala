@@ -17,5 +17,5 @@ class Sheet(val name: String)(val rows: Set[Row]) {
 }
 object Sheet {
   def apply(name: String)(rows: Set[Row]): Sheet = new Sheet(name)(rows)
-  def unapply(sheet: Sheet): Option[(String, Set[Row])] = Some((sheet.name, sheet.rows))
+  def unapply(sheet: Sheet): Some[(String, Set[Row])] = Some((sheet.name, sheet.rows))
 }
