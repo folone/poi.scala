@@ -100,7 +100,7 @@ res8: Boolean = true
 
 ### SBT:
 
-`libraryDependencies += "info.folone" %% "poi-scala" % "0.19"`
+`libraryDependencies += "info.folone" %% "poi-scala" % "0.20"`
 
 ### Maven:
 
