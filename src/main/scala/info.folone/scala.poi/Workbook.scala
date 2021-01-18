@@ -46,10 +46,10 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
       case SXSSF => new org.apache.poi.xssf.streaming.SXSSFWorkbook(-1)
     }
     sheets foreach { sh =>
-      val Sheet((name), (rows)) = sh
+      val Sheet(name, rows) = sh
       val sheet = workbook createSheet name
       rows foreach { rw =>
-        val Row((index), (cells)) = rw
+        val Row(index, cells) = rw
         val row = sheet createRow index
         cells foreach { cl =>
           val poiCell = row createCell cl.index
