@@ -1,4 +1,4 @@
-val Scala212 = "2.12.12"
+val Scala212 = "2.12.13"
 
 lazy val buildSettings = Def.settings(
   organization := "info.folone",
