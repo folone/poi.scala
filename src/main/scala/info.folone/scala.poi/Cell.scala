@@ -31,7 +31,10 @@ class StyledCell private (override val index: Int, override val style: Option[Ce
     extends Cell(index, style) {
   import equalities.styleCellEqualInstance
   def unstyledCell: Cell =
-    if (nestedCell.isInstanceOf[StyledCell]) nestedCell.asInstanceOf[StyledCell].nestedCell else nestedCell
+    nestedCell match {
+      case cell: StyledCell => cell.nestedCell
+      case _ => nestedCell
+    }
   override def equals(obj: Any) =
     obj != null && obj.isInstanceOf[StyledCell] && Equal[StyledCell].equal(obj.asInstanceOf[StyledCell], this)
   override def hashCode: Int = index.hashCode + style.hashCode + nestedCell.hashCode()
