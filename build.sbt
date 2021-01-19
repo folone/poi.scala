@@ -70,8 +70,8 @@ lazy val standardSettings = Def.settings(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
       "org.scalaz" %% "scalaz-effect" % scalazVersion withDottyCompat scalaVersion.value,
-      "org.specs2" %% "specs2-core" % "4.10.5" % "test" withDottyCompat scalaVersion.value,
-      "org.specs2" %% "specs2-scalacheck" % "4.10.5" % "test" withDottyCompat scalaVersion.value,
+      "org.specs2" %% "specs2-core" % "4.10.6" % "test" withDottyCompat scalaVersion.value,
+      "org.specs2" %% "specs2-scalacheck" % "4.10.6" % "test" withDottyCompat scalaVersion.value,
       "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test" withDottyCompat scalaVersion.value
     )
   },
