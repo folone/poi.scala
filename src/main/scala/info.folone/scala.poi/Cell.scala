@@ -41,5 +41,5 @@ class StyledCell private (override val index: Int, override val style: Option[Ce
 }
 object StyledCell {
   def apply(cell: Cell, style: CellStyle): StyledCell = new StyledCell(cell.index, Some(style), cell)
-  def unapply(cell: StyledCell): Option[(Cell, CellStyle)] = cell.style map { case style => (cell.nestedCell, style) }
+  def unapply(cell: StyledCell): Option[(Cell, CellStyle)] = cell.style map { style => (cell.nestedCell, style) }
 }
