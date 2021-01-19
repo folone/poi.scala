@@ -22,6 +22,7 @@ import effect.IO
 class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF) {
   val sheets: Set[Sheet] = sheetMap.values.toSet
 
+  @annotation.tailrec
   private def setPoiCell(defaultRowHeight: Short, row: POIRow, cell: Cell, poiCell: POICell): Unit = {
     cell match {
       case StringCell(index, data) =>
