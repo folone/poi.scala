@@ -58,9 +58,6 @@ lazy val credentialsSetting = credentials += {
 
 val scalazVersion = "7.3.2"
 val poiVersion = "5.0.0"
-val specsVersion = Def.setting(
-  "4.10.5"
-)
 
 lazy val standardSettings = Def.settings(
   buildSettings,
@@ -73,8 +70,8 @@ lazy val standardSettings = Def.settings(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
       "org.scalaz" %% "scalaz-effect" % scalazVersion withDottyCompat scalaVersion.value,
-      "org.specs2" %% "specs2-core" % specsVersion.value % "test" withDottyCompat scalaVersion.value,
-      "org.specs2" %% "specs2-scalacheck" % specsVersion.value % "test" withDottyCompat scalaVersion.value,
+      "org.specs2" %% "specs2-core" % "4.10.5" % "test" withDottyCompat scalaVersion.value,
+      "org.specs2" %% "specs2-scalacheck" % "4.10.5" % "test" withDottyCompat scalaVersion.value,
       "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test" withDottyCompat scalaVersion.value
     )
   },
