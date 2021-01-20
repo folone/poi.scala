@@ -56,7 +56,7 @@ lazy val credentialsSetting = credentials += {
   }
 }
 
-val scalazVersion = "7.3.2"
+val scalazVersion = "7.3.3"
 val poiVersion = "5.0.0"
 
 lazy val standardSettings = Def.settings(
