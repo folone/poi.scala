@@ -4,7 +4,7 @@ lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
   crossScalaVersions := Seq(Scala212, "2.11.12", "2.13.4"),
-  scalacOptions in (Compile, doc) ++= {
+  (Compile / doc / scalacOptions) ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
     if (isDotty.value) {
       Nil
@@ -34,7 +34,7 @@ lazy val buildSettings = Def.settings(
       )
     }
   },
-  parallelExecution in Compile := true
+  Compile / parallelExecution := true
 )
 
 lazy val publishSetting = {
@@ -62,7 +62,7 @@ val poiVersion = "5.0.0"
 lazy val standardSettings = Def.settings(
   buildSettings,
   name := "poi-scala",
-  fork in Test := true,
+  Test / fork := true,
   releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   libraryDependencies ++= {
@@ -76,7 +76,7 @@ lazy val standardSettings = Def.settings(
     )
   },
   publishMavenStyle := true,
-  publishArtifact in Test := false,
+  Test / publishArtifact := false,
   credentialsSetting,
   publishSetting,
   pomExtra := (
