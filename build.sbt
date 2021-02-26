@@ -3,7 +3,7 @@ val Scala212 = "2.12.13"
 lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
-  crossScalaVersions := Seq(Scala212, "2.11.12", "2.13.4"),
+  crossScalaVersions := Seq(Scala212, "2.13.5", "2.13.4"),
   (Compile / doc / scalacOptions) ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
     if (isDotty.value) {
