@@ -31,5 +31,5 @@ jobs:
            "all scalafmtCheckAll scalafmtSbtCheck"
            "+compile"
            "+test"
-           "++ 3.0.0-M3!"
+           "++ 3.0.0-RC3!"
            compile
