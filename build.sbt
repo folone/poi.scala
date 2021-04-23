@@ -1,12 +1,16 @@
 val Scala212 = "2.12.13"
 
+val isScala3 = Def.setting(
+  CrossVersion.partialVersion(scalaVersion.value).exists(_._1 == 3)
+)
+
 lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
   crossScalaVersions := Seq(Scala212, "2.11.12", "2.13.4"),
   (Compile / doc / scalacOptions) ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
-    if (isDotty.value) {
+    if (isScala3.value) {
       Nil
     } else {
       val hash = sys.process.Process("git rev-parse HEAD").lineStream_!.head
@@ -26,7 +30,7 @@ lazy val buildSettings = Def.settings(
     "-unchecked"
   ),
   scalacOptions ++= {
-    if (isDotty.value) {
+    if (isScala3.value) {
       Seq()
     } else {
       Seq(
@@ -69,10 +73,10 @@ lazy val standardSettings = Def.settings(
     Seq(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
-      "org.scalaz" %% "scalaz-effect" % scalazVersion withDottyCompat scalaVersion.value,
-      "org.specs2" %% "specs2-core" % "4.10.6" % "test" withDottyCompat scalaVersion.value,
-      "org.specs2" %% "specs2-scalacheck" % "4.10.6" % "test" withDottyCompat scalaVersion.value,
-      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test" withDottyCompat scalaVersion.value
+      "org.scalaz" %% "scalaz-effect" % scalazVersion cross CrossVersion.for3Use2_13,
+      "org.specs2" %% "specs2-core" % "4.10.6" % "test" cross CrossVersion.for3Use2_13,
+      "org.specs2" %% "specs2-scalacheck" % "4.10.6" % "test" cross CrossVersion.for3Use2_13,
+      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test" cross CrossVersion.for3Use2_13
     )
   },
   publishMavenStyle := true,
