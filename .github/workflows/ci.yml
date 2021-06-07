@@ -28,8 +28,9 @@ jobs:
     - shell: bash
       run: sbt
            -v
-           "all scalafmtCheckAll scalafmtSbtCheck"
+           scalafmtSbtCheck
+           "+scalafmtCheckAll"
            "+compile"
            "+test"
-           "++ 3.0.0-RC3!"
+           "++ 3.0.1-RC1!"
            compile
