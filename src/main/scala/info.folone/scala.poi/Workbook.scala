@@ -92,10 +92,10 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     styled(styles)
   }
 
-  /** Fits column's width to maximum width of non-empty cell at cell address.
-    * Quite expensive. Use as late as possible.
+  /** Fits column's width to maximum width of non-empty cell at cell address. Quite expensive. Use as late as possible.
     *
-    * @param addrs addresses of cells, which columns size should fit cells content
+    * @param addrs
+    *   addresses of cells, which columns size should fit cells content
     */
   def autosizeColumns(addrs: Set[CellAddr]): Workbook = {
     addrs foreach { a => book.getSheet(a.sheet).autoSizeColumn(a.col) }
