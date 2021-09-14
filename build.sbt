@@ -1,4 +1,4 @@
-val Scala212 = "2.12.14"
+val Scala212 = "2.12.15"
 
 val isScala3 = Def.setting(
   CrossVersion.partialVersion(scalaVersion.value).exists(_._1 == 3)
