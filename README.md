@@ -100,7 +100,7 @@ res8: Boolean = true
 
 ### SBT:
 
-`libraryDependencies += "info.folone" %% "poi-scala" % "0.20"`
+`libraryDependencies += "info.folone" %% "poi-scala" % "0.21"`
 
 ### Maven:
 
@@ -108,6 +108,6 @@ res8: Boolean = true
 <dependency>
     <groupId>info.folone</groupId>
     <artifactId>poi-scala_${scala.version}</artifactId>
-    <version>0.19</version>
+    <version>0.21</version>
 </dependency>
 ```
