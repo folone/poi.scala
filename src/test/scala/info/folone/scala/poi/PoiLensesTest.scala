@@ -1,6 +1,7 @@
 package info.folone.scala.poi
 
 import org.specs2.mutable._
+import scalaz.idInstance
 
 class PoiLensesSpec extends Specification {
   "Lenses on poi classes" should {

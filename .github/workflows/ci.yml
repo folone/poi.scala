@@ -32,5 +32,3 @@ jobs:
            "+scalafmtCheckAll"
            "+compile"
            "+test"
-           "++ 3.0.1-RC1!"
-           compile
