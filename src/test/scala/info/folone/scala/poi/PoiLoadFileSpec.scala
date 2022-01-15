@@ -1,27 +1,9 @@
 package info.folone.scala.poi
 
-import org.specs2._
+import org.specs2.mutable.Specification
 import java.io.File
 
 class PoiLoadFileSpec extends Specification {
-  def is =
-    "LoadWorkbook" ^
-      """
-|   | A  | B  | C  |
-|:-:|:--:|:--:|:--:|
-| 1 | A1 | B1 | C1 |
-| 2 | A2 | B2 | C2 |
-| 3 | A3 | B3 | C3 |
-| 4 | A4 | B4 | C4 |
-""" ^
-      "is load" ^ loadWorkbookTest ^ end
-
-  def loadWorkbookTest = s2"""
-    rows have size 4        $e1
-    cell have size 12       $e2
-    and contains [A1...C4]  $e3
-  """
-
   val testBook = Workbook(
     Set(
       Sheet("test")(
@@ -47,16 +29,24 @@ class PoiLoadFileSpec extends Specification {
     }
   }
 
-  def e1 = targetWorksheet.rows must have size (4)
-  def e2 = targetWorksheet.rows.toList.map { _.cells.size }.sum === 12
-  def e3 = {
-    val expect = Set("A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C1", "C2", "C3", "C4")
-    val actual =
-      for (
-        row <- targetWorksheet.rows;
-        StringCell(_, cell) <- row.cells
-      ) yield cell
+  "LoadWorkbook" should {
+    "rows have size 4" in {
+      targetWorksheet.rows must have size (4)
+    }
 
-    actual === expect
+    "Acell have size 12" in {
+      targetWorksheet.rows.toList.map { _.cells.size }.sum === 12
+    }
+
+    "contains [A1...C4]" in {
+      val expect = Set("A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C1", "C2", "C3", "C4")
+      val actual =
+        for (
+          row <- targetWorksheet.rows;
+          StringCell(_, cell) <- row.cells
+        ) yield cell
+
+      actual === expect
+    }
   }
 }

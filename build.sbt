@@ -8,17 +8,6 @@ lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
   crossScalaVersions := Seq(Scala212, "2.11.12", "2.13.8", "3.1.0"),
-  Test / sources := {
-    if (isScala3.value) {
-      // TODO
-      val exclude = Set("PoiLoadFileSpec.scala")
-      (Test / sources).value.filterNot { f =>
-        exclude(f.getName)
-      }
-    } else {
-      (Test / sources).value
-    }
-  },
   (Compile / doc / scalacOptions) ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
     if (isScala3.value) {
