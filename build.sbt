@@ -73,10 +73,10 @@ lazy val standardSettings = Def.settings(
     Seq(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
-      "org.scalaz" %% "scalaz-effect" % scalazVersion cross CrossVersion.for3Use2_13,
+      "org.scalaz" %% "scalaz-effect" % scalazVersion,
       "org.specs2" %% "specs2-core" % "4.10.6" % "test" cross CrossVersion.for3Use2_13,
       "org.specs2" %% "specs2-scalacheck" % "4.10.6" % "test" cross CrossVersion.for3Use2_13,
-      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test" cross CrossVersion.for3Use2_13
+      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test"
     )
   },
   publishMavenStyle := true,
