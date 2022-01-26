@@ -73,11 +73,24 @@ lazy val standardSettings = Def.settings(
     Seq(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
-      "org.scalaz" %% "scalaz-effect" % scalazVersion cross CrossVersion.for3Use2_13,
-      "org.specs2" %% "specs2-core" % "4.10.6" % "test" cross CrossVersion.for3Use2_13,
-      "org.specs2" %% "specs2-scalacheck" % "4.10.6" % "test" cross CrossVersion.for3Use2_13,
-      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test" cross CrossVersion.for3Use2_13
+      "org.scalaz" %% "scalaz-effect" % scalazVersion,
+      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test"
     )
+  },
+  libraryDependencies += {
+    scalaBinaryVersion.value match {
+      case "2.11" =>
+        "org.specs2" %% "specs2-scalacheck" % "4.10.6" % "test"
+      case _ =>
+        "org.specs2" %% "specs2-scalacheck" % "4.13.2" % "test" cross CrossVersion.for3Use2_13
+    }
+  },
+  conflictWarning := {
+    if (scalaBinaryVersion.value == "3") {
+      ConflictWarning("warn", Level.Warn, false)
+    } else {
+      conflictWarning.value
+    }
   },
   publishMavenStyle := true,
   Test / publishArtifact := false,
