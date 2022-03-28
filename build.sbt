@@ -82,7 +82,7 @@ lazy val standardSettings = Def.settings(
       case "2.11" =>
         "org.specs2" %% "specs2-scalacheck" % "4.10.6" % "test"
       case _ =>
-        "org.specs2" %% "specs2-scalacheck" % "4.15.0" % "test" cross CrossVersion.for3Use2_13
+        "org.specs2" %% "specs2-scalacheck" % "4.15.0" % "test"
     }
   },
   conflictWarning := {
