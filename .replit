@@ -1,0 +1,17 @@
+compile = ["./sbt", "+compile"]
+run = ["./sbt", "+test"]
+hidden = [".metals"]
+
+[languages.scala]
+pattern = "**/*.scala"
+
+[languages.scala.languageServer]
+start = ["metals"]
+
+[gitHubImports]
+requiredFiles = [".replit", "replit.nix", ".metals"]
+
+[nix]
+
+[nix.channel]
+channel = "stable-22_05"

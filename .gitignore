@@ -13,6 +13,9 @@ target/
 *~
 *#
 .#*
+.metals
 
 z_local.sbt
 .bsp/
+
+sbt-launch.jar
