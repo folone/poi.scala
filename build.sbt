@@ -7,7 +7,7 @@ val isScala3 = Def.setting(
 lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
-  crossScalaVersions := Seq(Scala212, "2.11.12", "2.13.10", "3.2.1"),
+  crossScalaVersions := Seq(Scala212, "2.13.10", "3.2.1"),
   (Compile / doc / scalacOptions) ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
     if (isScala3.value) {
@@ -74,16 +74,9 @@ lazy val standardSettings = Def.settings(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
       "org.scalaz" %% "scalaz-effect" % scalazVersion,
-      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test"
+      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test",
+      "org.specs2" %% "specs2-scalacheck" % "4.19.0" % "test"
     )
-  },
-  libraryDependencies += {
-    scalaBinaryVersion.value match {
-      case "2.11" =>
-        "org.specs2" %% "specs2-scalacheck" % "4.10.6" % "test"
-      case _ =>
-        "org.specs2" %% "specs2-scalacheck" % "4.19.0" % "test"
-    }
   },
   conflictWarning := {
     if (scalaBinaryVersion.value == "3") {
