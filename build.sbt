@@ -51,12 +51,17 @@ lazy val publishSetting = {
   }
 }
 
-lazy val credentialsSetting = credentials += {
+lazy val credentialsSetting = credentials ++= {
   Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
     case Seq(Some(user), Some(pass)) =>
-      Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
+      Seq(Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass))
     case _ =>
-      Credentials(Path.userHome / ".ivy2" / ".credentials")
+      val x = Path.userHome / ".ivy2" / ".credentials"
+      if (x.exists) {
+        Seq(Credentials(x))
+      } else {
+        Nil
+      }
   }
 }
 
