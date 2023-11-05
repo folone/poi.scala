@@ -80,7 +80,7 @@ lazy val standardSettings = Def.settings(
       "org.apache.poi" % "poi-ooxml" % poiVersion,
       "org.scalaz" %% "scalaz-effect" % scalazVersion,
       "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test",
-      "org.specs2" %% "specs2-scalacheck" % "4.20.2" % "test"
+      "org.specs2" %% "specs2-scalacheck" % "4.20.3" % "test"
     )
   },
   conflictWarning := {
