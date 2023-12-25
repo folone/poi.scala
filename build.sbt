@@ -41,39 +41,14 @@ lazy val buildSettings = Def.settings(
   Compile / parallelExecution := true
 )
 
-lazy val publishSetting = {
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("staging" at nexus + "service/local/staging/deploy/maven2")
-  }
-}
-
-lazy val credentialsSetting = credentials ++= {
-  Seq("build.publish.user", "build.publish.password").map(k => Option(System.getProperty(k))) match {
-    case Seq(Some(user), Some(pass)) =>
-      Seq(Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass))
-    case _ =>
-      val x = Path.userHome / ".ivy2" / ".credentials"
-      if (x.exists) {
-        Seq(Credentials(x))
-      } else {
-        Nil
-      }
-  }
-}
-
 val scalazVersion = "7.3.8"
 val poiVersion = "5.2.5"
 
 lazy val standardSettings = Def.settings(
   buildSettings,
+  licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   name := "poi-scala",
   Test / fork := true,
-  releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   libraryDependencies ++= {
     Seq(
       "org.apache.poi" % "poi" % poiVersion,
@@ -90,23 +65,9 @@ lazy val standardSettings = Def.settings(
       conflictWarning.value
     }
   },
-  publishMavenStyle := true,
   Test / publishArtifact := false,
-  credentialsSetting,
-  publishSetting,
   pomExtra := (
     <url>https://github.com/folone/poi.scala</url>
-    <licenses>
-      <license>
-        <name>Apache License</name>
-        <url>http://opensource.org/licenses/Apache-2.0</url>
-        <distribution>repo</distribution>
-      </license>
-    </licenses>
-    <scm>
-      <url>git@github.com:folone/poi.scala.git</url>
-      <connection>scm:git:git@github.com:folone/poi.scala.git</connection>
-    </scm>
     <developers>
     {
       Seq(
