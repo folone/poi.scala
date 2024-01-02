@@ -1,6 +1,8 @@
 # Poi Scala
 
-Apache poi dsl for scala
+[![poi-scala Scala version support](https://index.scala-lang.org/folone/poi.scala/poi-scala/latest.svg)](https://index.scala-lang.org/folone/poi.scala/poi-scala)
+
+Programmaticly create Excel sheets in scala (via Apache poi library).
 
 ## Usage
 
@@ -100,7 +102,7 @@ res8: Boolean = true
 
 ### SBT:
 
-`libraryDependencies += "info.folone" %% "poi-scala" % "0.24"`
+`libraryDependencies += "info.folone" %% "poi-scala" % "${poi-scala.version}"`
 
 ### Maven:
 
@@ -108,12 +110,12 @@ res8: Boolean = true
 <dependency>
     <groupId>info.folone</groupId>
     <artifactId>poi-scala_${scala.version}</artifactId>
-    <version>0.24</version>
+    <version>${poi-scala.version}</version>
 </dependency>
 ```
 
 ## Releasing
 
-This project uses [sbt-ci-release](https://github.com/sbt/sbt-ci-release) plugin. Snapshots are being published on every push to `master`. To publish a new stable release, just create a new tag like so: ` git tag -a v0.25 -m "v0.25" && git push origin v0.25`.
+This project uses [sbt-ci-release](https://github.com/sbt/sbt-ci-release) plugin. Snapshots are being published on every push to `master`. To publish a new stable release, just create a new tag like so: ` git tag -a v$next_version -m "v$next_version" && git push origin v$next_version`.
 
 [![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
