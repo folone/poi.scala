@@ -1,7 +1,5 @@
 # Poi Scala
 
-[![poi-scala Scala version support](https://index.scala-lang.org/folone/poi.scala/poi-scala/latest.svg)](https://index.scala-lang.org/folone/poi.scala/poi-scala)
-
 Programmaticly create Excel sheets in scala (via Apache poi library).
 
 ## Usage
@@ -99,6 +97,8 @@ res8: Boolean = true
 
 
 ## Setup
+
+[![poi-scala Scala version support](https://index.scala-lang.org/folone/poi.scala/poi-scala/latest.svg)](https://index.scala-lang.org/folone/poi.scala/poi-scala)
 
 ### SBT:
 
