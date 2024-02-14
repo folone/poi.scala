@@ -43,7 +43,7 @@ class PoiLoadFileSpec extends Specification {
       val actual =
         for (
           row <- targetWorksheet.rows;
-          StringCell(_, cell) <- row.cells
+          case StringCell(_, cell) <- row.cells
         ) yield cell
 
       actual === expect
