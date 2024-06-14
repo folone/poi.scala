@@ -22,8 +22,10 @@ class PoiLensesSpec extends Specification {
     }
     "rowLens +=" >> {
       (rowLens += StringCell(2, "data1")).run(Row(1)(Set(StringCell(1, "data"), StringCell(3, "data3")))) mustEqual
-        (Row(1)(Set(StringCell(1, "data"), StringCell(3, "data3"), StringCell(2, "data1"))),
-        Set(StringCell(1, "data"), StringCell(3, "data3"), StringCell(2, "data1")))
+        (
+          Row(1)(Set(StringCell(1, "data"), StringCell(3, "data3"), StringCell(2, "data1"))),
+          Set(StringCell(1, "data"), StringCell(3, "data3"), StringCell(2, "data1"))
+        )
     }
     "rowLens &=" >> {
       (rowLens &= Set(StringCell(2, "data1"))).run(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1")))) mustEqual
@@ -39,8 +41,10 @@ class PoiLensesSpec extends Specification {
         (Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1"))), Set(StringCell(1, "data"), StringCell(2, "data1")))
 
       (rowLens |= Set(StringCell(2, "data1"))).run(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data2")))) mustEqual
-        (Row(1)(Set(StringCell(1, "data"), StringCell(2, "data2"), StringCell(2, "data1"))),
-        Set(StringCell(1, "data"), StringCell(2, "data2"), StringCell(2, "data1")))
+        (
+          Row(1)(Set(StringCell(1, "data"), StringCell(2, "data2"), StringCell(2, "data1"))),
+          Set(StringCell(1, "data"), StringCell(2, "data2"), StringCell(2, "data1"))
+        )
     }
     "rowLens -=" >> {
       (rowLens -= StringCell(2, "data1")).run(Row(1)(Set(StringCell(1, "data"), StringCell(2, "data1")))) mustEqual
