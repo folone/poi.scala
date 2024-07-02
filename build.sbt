@@ -42,7 +42,7 @@ lazy val buildSettings = Def.settings(
 )
 
 val scalazVersion = "7.3.8"
-val poiVersion = "5.2.5"
+val poiVersion = "5.3.0"
 
 lazy val standardSettings = Def.settings(
   buildSettings,
