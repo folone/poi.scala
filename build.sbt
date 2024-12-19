@@ -58,13 +58,6 @@ lazy val standardSettings = Def.settings(
       "org.specs2" %% "specs2-scalacheck" % "4.20.9" % "test"
     )
   },
-  conflictWarning := {
-    if (scalaBinaryVersion.value == "3") {
-      ConflictWarning("warn", Level.Warn, false)
-    } else {
-      conflictWarning.value
-    }
-  },
   Test / publishArtifact := false,
   pomExtra := (
     <url>https://github.com/folone/poi.scala</url>
