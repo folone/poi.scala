@@ -1,6 +1,7 @@
 name: Release
 on:
   push:
+    branches: [master, main]
     tags: ["*"]
 jobs:
   publish:
@@ -14,6 +15,7 @@ jobs:
           distribution: temurin
           java-version: 8
           cache: sbt
+      - uses: sbt/setup-sbt@v1
       - run: sbt ci-release
         if: ${{ github.repository_owner == 'folone' }}
         env:
