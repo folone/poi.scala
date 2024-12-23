@@ -116,7 +116,7 @@ res8: Boolean = true
 
 ## Releasing
 
-This project uses [sbt-ci-release](https://github.com/sbt/sbt-ci-release) plugin. Snapshots are being published on every push to `master`.
+This project uses [sbt-ci-release](https://github.com/sbt/sbt-ci-release) plugin. [Snapshots](https://oss.sonatype.org/content/repositories/snapshots/info/folone/poi-scala_3/) are being published on every push to `master`.
 
 To publish a new stable release, just create a new tag like so: ` git tag -a v$next_version -m "v$next_version" && git push origin v$next_version`. Note that the tag name **has to** start with a `v`, followed by a version number (for example `v0.25`). You can verify a correctly pushed release by looking at the GitHub actions logs. If it says `Tag push detected, publishing a stable release`, you've correctly pushed a new release ([example](https://github.com/folone/poi.scala/actions/runs/7322677149/job/19944450027)).
 
