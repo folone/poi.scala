@@ -7,7 +7,7 @@ val isScala3 = Def.setting(
 lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
-  crossScalaVersions := Seq(Scala212, "2.13.15", "3.3.4"),
+  crossScalaVersions := Seq(Scala212, "2.13.16", "3.3.6"),
   (Compile / doc / scalacOptions) ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
     if (isScala3.value) {
@@ -42,7 +42,7 @@ lazy val buildSettings = Def.settings(
 )
 
 val scalazVersion = "7.3.8"
-val poiVersion = "5.3.0"
+val poiVersion = "5.4.1"
 
 lazy val standardSettings = Def.settings(
   buildSettings,
@@ -55,7 +55,7 @@ lazy val standardSettings = Def.settings(
       "org.apache.poi" % "poi-ooxml" % poiVersion,
       "org.scalaz" %% "scalaz-effect" % scalazVersion,
       "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test",
-      "org.specs2" %% "specs2-scalacheck" % "4.20.9" % "test"
+      "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test"
     )
   },
   Test / publishArtifact := false,
