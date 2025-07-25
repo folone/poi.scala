@@ -395,9 +395,6 @@ make format
 
 # Check code formatting
 make format-check
-
-# Run tests with coverage
-make coverage
 ```
 
 ### Utilities

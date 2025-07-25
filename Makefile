@@ -2,7 +2,7 @@
 # Common targets for Scala development workflow
 
 .PHONY: help compile test test-only test-quick clean package run console scalastyle docs publish-local \
-        deps update coverage watch-compile watch-test format format-check test-integration test-unit \
+        deps update watch-compile watch-test format format-check test-integration test-unit \
         test-laws test-primitives test-features dev-setup dev pre-release info check-sbt \
         cross-compile cross-test cross-test-only cross-package cross-publish-local cross-clean
 
@@ -40,7 +40,6 @@ help:
 	@echo "  scalastyle   - Run scalastyle checks"
 	@echo "  format       - Format code"
 	@echo "  format-check - Check code formatting"
-	@echo "  coverage     - Run tests with coverage report"
 	@echo ""
 	@echo "Documentation & Publishing:"
 	@echo "  docs         - Generate documentation"
@@ -118,10 +117,6 @@ deps:
 # Update dependencies
 update:
 	./sbt update
-
-# Run tests with coverage
-coverage:
-	./sbt clean coverage test coverageReport
 
 # Continuous compilation (watches for file changes)
 watch-compile:
@@ -216,4 +211,4 @@ check-sbt:
 	fi
 
 # All targets depend on sbt being available
-compile test test-only test-quick clean package run console scalastyle docs publish-local deps update coverage cross-compile cross-test cross-test-only cross-package cross-publish-local cross-clean: check-sbt
+compile test test-only test-quick clean package run console scalastyle docs publish-local deps update cross-compile cross-test cross-test-only cross-package cross-publish-local cross-clean: check-sbt
