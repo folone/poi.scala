@@ -4,9 +4,9 @@ import org.specs2.mutable._
 import java.util.Date
 
 class ReadmeExampleSpec extends Specification {
-  
+
   "README Performance Examples" should {
-    
+
     "work as documented in the README" in {
       // This example is taken directly from the README
       val streamingConfig = SXSSFConfig(
@@ -32,22 +32,23 @@ class ReadmeExampleSpec extends Specification {
             i % 2 == 0
           )
         }
-        
-        Workbook.streaming(Set.empty[Sheet], streamingConfig, Some(memoryConfig))
+
+        Workbook
+          .streaming(Set.empty[Sheet], streamingConfig, Some(memoryConfig))
           .addSheetWithBulkData("LargeDataset", largeData)
       }
 
       // Verify results
       workbook.sheets must haveSize(1)
       creationTime must be_>=(0L)
-      
+
       // Monitor memory usage (example from README)
       val memUsage = workbook.getMemoryUsage
       memUsage.usagePercentage must beBetween(0.0, 100.0)
-      
+
       success
     }
-    
+
     "demonstrate bulk operations as shown in README" in {
       // Bulk data creation example from README
       val largeDataset = (1 to 50).map { i =>
@@ -61,12 +62,13 @@ class ReadmeExampleSpec extends Specification {
       }
 
       // Add sheet with bulk data (from README example)
-      val workbook = Workbook.forLargeDataset(Set.empty)
+      val workbook = Workbook
+        .forLargeDataset(Set.empty)
         .addSheetWithBulkData("Products", largeDataset)
 
       workbook.sheets must haveSize(1)
       workbook.sheetMap("Products").rows must haveSize(50)
-      
+
       // Bulk styling example from README
       val headerAddresses = (0 until 5).map(col => CellAddr("Products", 0, col))
       val headerStyle = CellStyle(
@@ -76,7 +78,7 @@ class ReadmeExampleSpec extends Specification {
 
       val styleMap = BulkOperations.applyStylingInBulk(headerAddresses, headerStyle)
       val styledWorkbook = workbook.styled(styleMap)
-      
+
       styledWorkbook.sheets must haveSize(1)
       success
     }

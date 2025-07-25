@@ -197,7 +197,7 @@ class IntegrationSpec extends Specification {
 
     "demonstrate comprehensive performance optimizations" in {
       println("\n=== Performance Integration Test ===")
-      
+
       // 1. Create a workbook with memory monitoring
       println("1. Creating streaming workbook with memory monitoring...")
       val memoryConfig = MemoryConfig(
@@ -219,7 +219,8 @@ class IntegrationSpec extends Specification {
         }
 
         // Create workbook optimized for large datasets
-        Workbook.forLargeDataset(Set.empty, rowAccessWindow = 100)
+        Workbook
+          .forLargeDataset(Set.empty, rowAccessWindow = 100)
           .addSheetWithBulkData("Products", largeData)
       }
 
@@ -247,14 +248,14 @@ class IntegrationSpec extends Specification {
       println("3. Monitoring memory usage...")
       val memUsage = updatedWorkbook.getMemoryUsage
       println(f"   Memory usage: ${memUsage.usagePercentage}%.1f%% (${memUsage.used / (1024 * 1024)}%,.1f MB)")
-      
+
       memUsage.usagePercentage must beBetween(0.0, 100.0)
       memUsage.used must be_>=(0L)
       memUsage.total must be_>=(memUsage.used)
 
       // 4. Bulk styling demonstration
       println("4. Applying bulk styling...")
-      
+
       // Create a regular workbook for styling (SXSSF doesn't support styling after creation)
       val stylingData = (1 to 25).map { i =>
         Seq(s"Product $i", (Math.random() * 1000).round.toDouble, new Date())
@@ -288,11 +289,11 @@ class IntegrationSpec extends Specification {
       }
 
       println(s"   Saved workbook in ${saveTimeMs}ms")
-      
+
       // Verify file was created and can be loaded
       outputFile.exists() must beTrue
       outputFile.length() must be_>(0L)
-      
+
       val loadedWb = impure.load(outputPath)
       loadedWb.sheets.size must beEqualTo(1)
       loadedWb.sheets.head.name must beEqualTo("StyledProducts")
@@ -307,11 +308,11 @@ class IntegrationSpec extends Specification {
       println(f"   Memory efficiency: ${memUsage.usagePercentage}%.1f%% usage")
       println(f"   Processed 550 rows with bulk operations")
       println(f"   Applied styling and saved successfully")
-      
+
       // Assertions for performance bounds (reasonable limits)
       totalTime must be_<(5000L) // Should complete in under 5 seconds
       memUsage.usagePercentage must be_<(10.0) // Should use less than 10% memory
-      
+
       true must beTrue
     }
   }
