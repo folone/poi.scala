@@ -146,9 +146,9 @@ trait Instances {
     val k2 = m2.keysIterator.toSet
     val intersection = k1 & k2
     val r1 = for (key <- intersection) yield (key -> Semigroup[B].append(m1(key), m2(key)))
-    val r2 = m1.filterKeys(!intersection.contains(_)) ++
-      m2.filterKeys(!intersection.contains(_))
-    r2.toMap ++ r1
+    val r2 = m1.filter { case (key, _) => !intersection.contains(key) } ++
+      m2.filter { case (key, _) => !intersection.contains(key) }
+    r2 ++ r1
   }
 }
 
