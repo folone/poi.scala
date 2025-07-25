@@ -18,6 +18,7 @@ import std.list._
 import syntax.applicative._
 import syntax.monoid._
 import effect.IO
+import scala.language.reflectiveCalls
 
 class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF) {
   val sheets: Set[Sheet] = sheetMap.values.toSet
@@ -34,6 +35,8 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
       case DateCell(index, data) => poiCell.setCellValue(data)
       case NumericCell(index, data) => poiCell.setCellValue(data)
       case FormulaCell(index, data) => poiCell.setCellFormula(data)
+      case BlankCell(index) => poiCell.setBlank()
+      case ErrorCell(index, errorCode) => poiCell.setCellErrorValue(errorCode)
       case styledCell @ StyledCell(_, _) => {
         setPoiCell(defaultRowHeight, row, styledCell.nestedCell, poiCell)
       }
@@ -48,12 +51,12 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     }
     sheets foreach { sh =>
       val Sheet(name, rows) = sh
-      val sheet = workbook createSheet name
+      val sheet = workbook.createSheet(name)
       rows foreach { rw =>
         val Row(index, cells) = rw
-        val row = sheet createRow index
+        val row = sheet.createRow(index)
         cells foreach { cl =>
-          val poiCell = row createCell cl.index
+          val poiCell = row.createCell(cl.index)
           setPoiCell(sheet.getDefaultRowHeight, row, cl, poiCell)
         }
       }
@@ -66,6 +69,38 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
       val pStyle = wb.createCellStyle()
       pStyle setFont cs.font.appliedTo(wb.createFont)
       pStyle setDataFormat cs.dataFormat.appliedTo(wb.createDataFormat)
+
+      // Apply alignment
+      cs.alignment.foreach(a => pStyle.setAlignment(a.toPOI))
+      cs.verticalAlignment.foreach(va => pStyle.setVerticalAlignment(va.toPOI))
+
+      // Apply colors
+      cs.backgroundColor.foreach { color =>
+        pStyle.setFillForegroundColor(color.toIndex)
+        pStyle.setFillPattern(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND)
+      }
+      cs.foregroundColor.foreach(color => pStyle.setFillForegroundColor(color.toIndex))
+
+      // Apply borders
+      cs.borders.foreach { borders =>
+        borders.top.foreach(b => pStyle.setBorderTop(b.toPOI))
+        borders.bottom.foreach(b => pStyle.setBorderBottom(b.toPOI))
+        borders.left.foreach(b => pStyle.setBorderLeft(b.toPOI))
+        borders.right.foreach(b => pStyle.setBorderRight(b.toPOI))
+
+        borders.topColor.foreach(c => pStyle.setTopBorderColor(c.toIndex))
+        borders.bottomColor.foreach(c => pStyle.setBottomBorderColor(c.toIndex))
+        borders.leftColor.foreach(c => pStyle.setLeftBorderColor(c.toIndex))
+        borders.rightColor.foreach(c => pStyle.setRightBorderColor(c.toIndex))
+      }
+
+      // Apply other properties
+      pStyle.setWrapText(cs.wrapText)
+      pStyle.setLocked(cs.locked)
+      pStyle.setHidden(cs.hidden)
+      pStyle.setRotation(cs.rotation)
+      pStyle.setIndention(cs.indent)
+
       pStyle
     }
 
@@ -119,7 +154,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
 
   override def toString: String = Show[Workbook].shows(this)
   override def equals(obj: Any): Boolean =
-    obj != null && obj.isInstanceOf[Workbook] && Equal[Workbook].equal(obj.asInstanceOf[Workbook], this)
+    obj != null && obj.isInstanceOf[Workbook] && scalaz.Equal[Workbook].equal(obj.asInstanceOf[Workbook], this)
   override def hashCode: Int = this.sheetMap.hashCode
 
 }
@@ -185,6 +220,10 @@ object Workbook {
                     Some(FormulaCell(index, cell.getCellFormula))
                   case POICellType.STRING =>
                     Some(StringCell(index, cell.getStringCellValue))
+                  case POICellType.BLANK =>
+                    Some(BlankCell(index))
+                  case POICellType.ERROR =>
+                    Some(ErrorCell(index, cell.getErrorCellValue))
                   case _ => None
                 }
               }.toSet

@@ -14,6 +14,7 @@ target/
 *#
 .#*
 .metals
+.bloop
 
 z_local.sbt
 .bsp/
