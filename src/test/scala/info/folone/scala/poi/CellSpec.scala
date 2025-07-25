@@ -150,12 +150,12 @@ class CellSpec extends Specification {
 
   "Cell toString" should {
     "work for all cell types" in {
-      StringCell(0, "test").toString must not(beEmpty)
-      NumericCell(1, 42.0).toString must not(beEmpty)
-      BooleanCell(2, true).toString must not(beEmpty)
-      BlankCell(3).toString must not(beEmpty)
-      FormulaCell(4, "SUM(A1:A3)").toString must not(beEmpty)
-      ErrorCell(5, 0x2a.toByte).toString must not(beEmpty)
+      StringCell(0, "test").toString.nonEmpty must beTrue
+      NumericCell(1, 42.0).toString.nonEmpty must beTrue
+      BooleanCell(2, true).toString.nonEmpty must beTrue
+      BlankCell(3).toString.nonEmpty must beTrue
+      FormulaCell(4, "SUM(A1:A3)").toString.nonEmpty must beTrue
+      ErrorCell(5, 0x2a.toByte).toString.nonEmpty must beTrue
     }
   }
 
