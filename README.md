@@ -293,6 +293,41 @@ val newStyleSheet = Sheet.enhanced(
 </dependency>
 ```
 
+## Telemetry
+
+To help improve the library and understand usage patterns, poi-scala includes minimal, privacy-respecting telemetry that sends a single anonymous ping when the library is first used in your application.
+
+### What is collected
+
+- Library name and version
+- Scala version being used
+- Anonymous usage ping (no personal information)
+- Geographic region (country-level only)
+
+### What is NOT collected
+
+- No personal information
+- No code or data from your application
+- No IP addresses stored
+- No tracking across sessions
+
+### How to disable
+
+Telemetry can be easily disabled by setting a system property:
+
+```bash
+# For SBT projects
+sbt -Dpoi.scala.telemetry.disabled=true run
+
+# For command line Java applications
+java -Dpoi.scala.telemetry.disabled=true -jar your-app.jar
+
+# As environment variable in your application
+System.setProperty("poi.scala.telemetry.disabled", "true")
+```
+
+The telemetry is designed to fail silently and never interfere with your application's functionality.
+
 ## Development
 
 This project includes a Makefile with common development tasks for easy workflow management.

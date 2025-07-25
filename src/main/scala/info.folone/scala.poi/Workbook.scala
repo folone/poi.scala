@@ -21,6 +21,7 @@ import effect.IO
 import scala.language.reflectiveCalls
 
 class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF) {
+  Telemetry.pingOnce()
   val sheets: Set[Sheet] = sheetMap.values.toSet
 
   @annotation.tailrec
