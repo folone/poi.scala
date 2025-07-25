@@ -12,7 +12,7 @@ class Row(val index: Int)(val cells: Set[Cell]) {
     }
   override def toString: String = Show[Row].shows(this)
   override def equals(obj: Any): Boolean =
-    obj != null && obj.isInstanceOf[Row] && Equal[Row].equal(obj.asInstanceOf[Row], this)
+    obj != null && obj.isInstanceOf[Row] && scalaz.Equal[Row].equal(obj.asInstanceOf[Row], this)
   override def hashCode: Int = index.hashCode + cells.hashCode
 }
 

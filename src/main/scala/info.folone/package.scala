@@ -30,8 +30,10 @@ trait Instances {
           case (n1: NumericCell, n2: NumericCell) => n1 == n2
           case (d1: DateCell, d2: DateCell) => d1 == d2
           case (b1: BooleanCell, b2: BooleanCell) => b1 == b2
-          case (f1: FormulaCell, f2: FormulaCell) => Equal[FormulaCell].equal(f1, f2)
-          case (s1: StyledCell, s2: StyledCell) => Equal[StyledCell].equal(s1, s2)
+          case (f1: FormulaCell, f2: FormulaCell) => scalaz.Equal[FormulaCell].equal(f1, f2)
+          case (s1: StyledCell, s2: StyledCell) => scalaz.Equal[StyledCell].equal(s1, s2)
+          case (bl1: BlankCell, bl2: BlankCell) => bl1.index == bl2.index
+          case (e1: ErrorCell, e2: ErrorCell) => e1.index == e2.index && e1.errorCode == e2.errorCode
           case (_, _) => false
         }
     }
@@ -50,6 +52,8 @@ trait Instances {
           case BooleanCell(index, data) => "BooleanCell(" + index + ", " + data + ")"
           case FormulaCell(index, data) => "FormulaCell(" + index + ", \"=" + data + "\")"
           case StyledCell(cell, style) => "StyledCell(" + shows(cell) + ", <style>)"
+          case BlankCell(index) => "BlankCell(" + index + ")"
+          case ErrorCell(index, errorCode) => "ErrorCell(" + index + ", " + errorCode + ")"
         }
       private[this] def cellToOrderId(cell: Cell): Int = {
         cell match {
@@ -59,6 +63,8 @@ trait Instances {
           case _: BooleanCell => 4
           case _: FormulaCell => 5
           case _: StyledCell => 6
+          case _: BlankCell => 7
+          case _: ErrorCell => 8
         }
       }
       @tailrec
@@ -83,6 +89,10 @@ trait Instances {
                     cell.data cmp y.asInstanceOf[FormulaCell].data
                   case cell: StyledCell =>
                     order(cell.nestedCell, y.asInstanceOf[StyledCell].nestedCell)
+                  case BlankCell(_) =>
+                    Ordering.EQ // BlankCells are equal to each other
+                  case ErrorCell(_, errorCode) =>
+                    Ordering.fromInt(errorCode.compare(y.asInstanceOf[ErrorCell].errorCode))
                 }
               case other =>
                 other
@@ -98,7 +108,7 @@ trait Instances {
         Row(f2.index)(mergeSets(f1.cells, f2.cells, (_: Cell).index))
       override def equal(a1: Row, a2: Row): Boolean = {
         import scalaz.std.set._
-        a1.index == a2.index && Equal[Set[Cell]].equal(a1.cells, a2.cells)
+        a1.index == a2.index && scalaz.Equal[Set[Cell]].equal(a1.cells, a2.cells)
       }
       override def show(as: Row): Cord = Cord(shows(as))
       override def shows(as: Row): String = "Row (" + as.index + ")(" + as.cells.toIndexedSeq.sortBy(_.index) + ")"
@@ -110,7 +120,7 @@ trait Instances {
       override def equal(a1: Sheet, a2: Sheet): Boolean =
         a1.name == a2.name &&
           (a1.rows.toIndexedSeq.sortBy((x: Row) => x.index) zip
-            a2.rows.toIndexedSeq.sortBy((x: Row) => x.index)).forall(v => Equal[Row].equal(v._1, v._2))
+            a2.rows.toIndexedSeq.sortBy((x: Row) => x.index)).forall(v => scalaz.Equal[Row].equal(v._1, v._2))
       override def show(as: Sheet): Cord = Cord(shows(as))
       override def shows(as: Sheet): String =
         "Sheet (\"" + as.name + "\")(" + as.rows.toIndexedSeq.sortBy(_.index) + ")"
@@ -122,7 +132,7 @@ trait Instances {
         Workbook(mergeSets(f1.sheets, f2.sheets, (_: Sheet).name))
       override def equal(a1: Workbook, a2: Workbook): Boolean =
         (a1.sheets.toIndexedSeq.sortBy((x: Sheet) => x.name) zip
-          a2.sheets.toIndexedSeq.sortBy((x: Sheet) => x.name)).forall(v => Equal[Sheet].equal(v._1, v._2))
+          a2.sheets.toIndexedSeq.sortBy((x: Sheet) => x.name)).forall(v => scalaz.Equal[Sheet].equal(v._1, v._2))
       override def shows(as: Workbook): String = "Workbook(" + as.sheets.toIndexedSeq.sortBy(_.name) + ")"
       override def show(as: Workbook): Cord = Cord(shows(as))
     }
