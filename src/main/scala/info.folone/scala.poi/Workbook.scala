@@ -20,7 +20,11 @@ import syntax.monoid._
 import effect.IO
 import scala.language.reflectiveCalls
 
-class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF) {
+class Workbook(
+    val sheetMap: Map[String, Sheet],
+    format: WorkbookVersion = HSSF,
+    memoryConfig: Option[MemoryConfig] = None
+) {
   Telemetry.pingOnce()
   val sheets: Set[Sheet] = sheetMap.values.toSet
 
@@ -49,19 +53,39 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
       case HSSF => new org.apache.poi.hssf.usermodel.HSSFWorkbook
       case XSSF => new org.apache.poi.xssf.usermodel.XSSFWorkbook
       case SXSSF => new org.apache.poi.xssf.streaming.SXSSFWorkbook(-1)
+      case config: SXSSFConfig =>
+        val sxssfWorkbook = new org.apache.poi.xssf.streaming.SXSSFWorkbook(config.rowAccessWindowSize)
+        sxssfWorkbook.setCompressTempFiles(config.compressTmpFiles)
+        // Note: setRandomAccessWindowSize is protected, so we can't call it directly
+        // The row access window size is set via the constructor parameter
+        sxssfWorkbook
     }
-    sheets foreach { sh =>
-      val Sheet(name, rows) = sh
-      val sheet = workbook.createSheet(name)
-      rows foreach { rw =>
-        val Row(index, cells) = rw
-        val row = sheet.createRow(index)
-        cells foreach { cl =>
-          val poiCell = row.createCell(cl.index)
-          setPoiCell(sheet.getDefaultRowHeight, row, cl, poiCell)
+
+    // Apply memory monitoring if configured
+    val createSheetOperation = () => {
+      sheets foreach { sh =>
+        val Sheet(name, rows) = sh
+        val sheet = workbook.createSheet(name)
+        rows foreach { rw =>
+          val Row(index, cells) = rw
+          val row = sheet.createRow(index)
+          cells foreach { cl =>
+            val poiCell = row.createCell(cl.index)
+            setPoiCell(sheet.getDefaultRowHeight, row, cl, poiCell)
+          }
         }
       }
     }
+
+    memoryConfig match {
+      case Some(config) =>
+        MemoryMonitor.withMemoryMonitoring(config)(createSheetOperation()) match {
+          case scala.util.Success(_) => // Operation completed successfully
+          case scala.util.Failure(ex) => throw ex
+        }
+      case None => createSheetOperation()
+    }
+
     workbook
   }
 
@@ -138,6 +162,65 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     this
   }
 
+  // Performance optimized bulk operations
+  def addSheetWithBulkData(
+      name: String,
+      data: Seq[Seq[Any]],
+      config: Option[SXSSFConfig] = None
+  ): Workbook = {
+    val timer = PerformanceTimer()
+    val (newWorkbook, timeMs) = timer.time {
+      val rows = data.zipWithIndex.map { case (rowData, rowIndex) =>
+        val cells: Set[Cell] = rowData.zipWithIndex.map { case (cellData, colIndex) =>
+          cellData match {
+            case s: String => StringCell(colIndex, s): Cell
+            case d: Double => NumericCell(colIndex, d): Cell
+            case i: Int => NumericCell(colIndex, i.toDouble): Cell
+            case b: Boolean => BooleanCell(colIndex, b): Cell
+            case date: java.util.Date => DateCell(colIndex, date): Cell
+            case _ => StringCell(colIndex, cellData.toString): Cell
+          }
+        }.toSet
+        Row(rowIndex)(cells)
+      }.toSet
+
+      val newSheet = Sheet(name)(rows)
+      val newSheetMap = sheetMap + (name -> newSheet)
+      new Workbook(newSheetMap, format, memoryConfig)
+    }
+
+    memoryConfig.foreach { config =>
+      if (config.logMemoryUsage) {
+        println(s"Bulk data operation completed in ${timeMs}ms")
+      }
+    }
+
+    newWorkbook
+  }
+
+  def addRowsInBulk(sheetName: String, rowData: Seq[(Int, Seq[(Int, Any)])]): Workbook = {
+    sheetMap.get(sheetName) match {
+      case Some(sheet) =>
+        val newRows = BulkOperations.createRowsInBulk(rowData)
+        val updatedSheet = new Sheet(sheet.name, sheet.rows ++ newRows)
+        val newSheetMap = sheetMap + (sheetName -> updatedSheet)
+        new Workbook(newSheetMap, format, memoryConfig)
+      case None =>
+        throw new IllegalArgumentException(s"Sheet '$sheetName' not found")
+    }
+  }
+
+  def withMemoryMonitoring(config: MemoryConfig): Workbook = {
+    new Workbook(sheetMap, format, Some(config))
+  }
+
+  def getMemoryUsage: MemoryUsage = MemoryMonitor.getCurrentMemoryUsage
+
+  def optimizeMemory(): Workbook = {
+    MemoryMonitor.forceGarbageCollection()
+    this
+  }
+
   def safeToFile(path: String): Result[Unit] = {
     def close(resource: FileOutputStream): IO[Unit] = IO { resource.close() }
     val action = IO { new FileOutputStream(new File(path)) }.bracket(close) { file =>
@@ -164,6 +247,35 @@ object Workbook {
 
   def apply(sheets: Set[Sheet], format: WorkbookVersion = HSSF): Workbook =
     new Workbook(sheets.map(s => (s.name, s)).toMap, format)
+
+  def apply(sheets: Set[Sheet], format: WorkbookVersion, memoryConfig: MemoryConfig): Workbook =
+    new Workbook(sheets.map(s => (s.name, s)).toMap, format, Some(memoryConfig))
+
+  // Streaming workbook creation with configurable SXSSF
+  def streaming(
+      sheets: Set[Sheet],
+      config: SXSSFConfig = SXSSFConfig(),
+      memoryConfig: Option[MemoryConfig] = None
+  ): Workbook =
+    new Workbook(sheets.map(s => (s.name, s)).toMap, config, memoryConfig)
+
+  // Create workbook optimized for large datasets
+  def forLargeDataset(
+      sheets: Set[Sheet],
+      rowAccessWindow: Int = 100,
+      enableMemoryMonitoring: Boolean = true
+  ): Workbook = {
+    val sxssfConfig = SXSSFConfig(
+      rowAccessWindowSize = rowAccessWindow,
+      compressTmpFiles = true,
+      useSharedStringsTable = false
+    )
+    val memoryConfig = if (enableMemoryMonitoring) {
+      Some(MemoryConfig(enableMonitoring = true, logMemoryUsage = true))
+    } else None
+
+    new Workbook(sheets.map(s => (s.name, s)).toMap, sxssfConfig, memoryConfig)
+  }
 
   def apply(path: String): Result[Workbook] = {
     val action: IO[File] = IO { new File(path) }

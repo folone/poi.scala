@@ -194,5 +194,125 @@ class IntegrationSpec extends Specification {
 
       true must beTrue
     }
+
+    "demonstrate comprehensive performance optimizations" in {
+      println("\n=== Performance Integration Test ===")
+      
+      // 1. Create a workbook with memory monitoring
+      println("1. Creating streaming workbook with memory monitoring...")
+      val memoryConfig = MemoryConfig(
+        enableMonitoring = true,
+        logMemoryUsage = true
+      )
+
+      val timer = PerformanceTimer()
+      val (largeWorkbook, timeMs) = timer.time {
+        // Create a large dataset efficiently (smaller for test)
+        val largeData = (1 to 500).map { i =>
+          Seq(
+            s"Product $i",
+            (Math.random() * 1000).round.toDouble,
+            new Date(),
+            i % 2 == 0,
+            s"Category ${i % 10}"
+          )
+        }
+
+        // Create workbook optimized for large datasets
+        Workbook.forLargeDataset(Set.empty, rowAccessWindow = 100)
+          .addSheetWithBulkData("Products", largeData)
+      }
+
+      println(s"   Created workbook with 500 rows in ${timeMs}ms")
+      largeWorkbook.sheets must haveSize(1)
+      largeWorkbook.sheetMap("Products").rows must haveSize(500)
+
+      // 2. Add bulk data to existing sheet
+      println("2. Adding bulk data to existing sheet...")
+      val bulkData = (0 until 50).map { rowIndex =>
+        val cellData = (0 until 5).map { colIndex =>
+          (colIndex, s"Bulk Cell $rowIndex-$colIndex")
+        }
+        (rowIndex + 500, cellData) // Start from row 500
+      }
+
+      val (updatedWorkbook, bulkTimeMs) = timer.time {
+        largeWorkbook.addRowsInBulk("Products", bulkData)
+      }
+
+      println(s"   Added 50 rows in bulk in ${bulkTimeMs}ms")
+      updatedWorkbook.sheetMap("Products").rows must haveSize(550)
+
+      // 3. Memory usage monitoring
+      println("3. Monitoring memory usage...")
+      val memUsage = updatedWorkbook.getMemoryUsage
+      println(f"   Memory usage: ${memUsage.usagePercentage}%.1f%% (${memUsage.used / (1024 * 1024)}%,.1f MB)")
+      
+      memUsage.usagePercentage must beBetween(0.0, 100.0)
+      memUsage.used must be_>=(0L)
+      memUsage.total must be_>=(memUsage.used)
+
+      // 4. Bulk styling demonstration
+      println("4. Applying bulk styling...")
+      
+      // Create a regular workbook for styling (SXSSF doesn't support styling after creation)
+      val stylingData = (1 to 25).map { i =>
+        Seq(s"Product $i", (Math.random() * 1000).round.toDouble, new Date())
+      }
+
+      val (styledWorkbook, styleTimeMs) = timer.time {
+        val regularWb = Workbook(Set.empty[Sheet], XSSF)
+          .addSheetWithBulkData("StyledProducts", stylingData)
+
+        // Apply header styling
+        val headerAddresses = (0 until 3).map(col => CellAddr("StyledProducts", 0, col))
+        val headerStyle = CellStyle(
+          font = Font(bold = true, heightInPoints = 12),
+          backgroundColor = Some(GreyColor)
+        )
+
+        val styleMap = BulkOperations.applyStylingInBulk(headerAddresses, headerStyle)
+        regularWb.styled(styleMap)
+      }
+
+      println(s"   Applied styling to 3 header cells in ${styleTimeMs}ms")
+      styledWorkbook.sheets must haveSize(1)
+
+      // 5. Save and verify file I/O
+      println("5. Testing file I/O performance...")
+      val outputFile = File.createTempFile("performance-integration-test", ".xlsx")
+      val outputPath = outputFile.getAbsolutePath
+
+      val (_, saveTimeMs) = timer.time {
+        styledWorkbook.safeToFile(outputPath).fold(ex => throw ex, identity _).unsafePerformIO()
+      }
+
+      println(s"   Saved workbook in ${saveTimeMs}ms")
+      
+      // Verify file was created and can be loaded
+      outputFile.exists() must beTrue
+      outputFile.length() must be_>(0L)
+      
+      val loadedWb = impure.load(outputPath)
+      loadedWb.sheets.size must beEqualTo(1)
+      loadedWb.sheets.head.name must beEqualTo("StyledProducts")
+
+      // Clean up
+      outputFile.delete()
+
+      // Summary
+      val totalTime = timeMs + bulkTimeMs + styleTimeMs + saveTimeMs
+      println(f"=== Performance Test Summary ===")
+      println(f"   Total operations time: ${totalTime}ms")
+      println(f"   Memory efficiency: ${memUsage.usagePercentage}%.1f%% usage")
+      println(f"   Processed 550 rows with bulk operations")
+      println(f"   Applied styling and saved successfully")
+      
+      // Assertions for performance bounds (reasonable limits)
+      totalTime must be_<(5000L) // Should complete in under 5 seconds
+      memUsage.usagePercentage must be_<(10.0) // Should use less than 10% memory
+      
+      true must beTrue
+    }
   }
 }
