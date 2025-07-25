@@ -50,8 +50,8 @@ class WorkbookSpec extends Specification {
       val wb2 = Workbook(Set(sheet))
       val wb3 = Workbook(Set(Sheet("Different")(Set.empty[Row])))
 
-      (wb1 === wb2) must beTrue
-      (wb1 === wb3) must beFalse
+      (wb1 === wb2) must beEqualTo(true)
+      (wb1 === wb3) must beEqualTo(false)
     }
 
     "work with complex sheets" in {

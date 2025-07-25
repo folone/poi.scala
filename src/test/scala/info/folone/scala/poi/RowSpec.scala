@@ -73,8 +73,8 @@ class RowSpec extends Specification {
       val row2 = Row(0)(cells)
       val row3 = Row(1)(cells)
 
-      (row1 === row2) must beTrue
-      (row1 === row3) must beFalse
+      (row1 === row2) must beEqualTo(true)
+      (row1 === row3) must beEqualTo(false)
     }
   }
 
@@ -121,8 +121,8 @@ class RowSpec extends Specification {
       val emptyRow = Row(0)(Set.empty)
       val filledRow = Row(1)(Set(StringCell(0, "test"), NumericCell(1, 42.0)))
 
-      emptyRow.toString must not(beEmpty)
-      filledRow.toString must not(beEmpty)
+      emptyRow.toString.nonEmpty must beTrue
+      filledRow.toString.nonEmpty must beTrue
     }
   }
 

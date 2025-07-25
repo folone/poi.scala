@@ -12,8 +12,8 @@ class EnhancedStylingSpec extends Specification {
       style.font.name must beEqualTo("Arial")
       style.dataFormat.format must beEqualTo("General")
       style.alignment must beNone
-      style.wrapText must beFalse
-      style.locked must beTrue
+      style.wrapText must beEqualTo(false)
+      style.locked must beEqualTo(true)
     }
 
     "create style with custom alignment" in {
@@ -52,10 +52,10 @@ class EnhancedStylingSpec extends Specification {
       )
 
       font.name must beEqualTo("Times New Roman")
-      font.bold must beTrue
-      font.italic must beTrue
-      font.underline must beTrue
-      font.strikeout must beTrue
+      font.bold must beEqualTo(true)
+      font.italic must beEqualTo(true)
+      font.underline must beEqualTo(true)
+      font.strikeout must beEqualTo(true)
       font.heightInPoints must beEqualTo(12)
     }
   }
@@ -91,7 +91,7 @@ class EnhancedStylingSpec extends Specification {
       io.fold(ex => throw ex, identity).unsafePerformIO()
 
       // Verify the file was created
-      new File(path).exists() must beTrue
+      new File(path).exists() must beEqualTo(true)
       new File(path).delete()
       success
     }
