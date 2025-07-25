@@ -73,8 +73,10 @@ class RowSpec extends Specification {
       val row2 = Row(0)(cells)
       val row3 = Row(1)(cells)
 
-      (row1 === row2) must beEqualTo(true)
-      (row1 === row3) must beEqualTo(false)
+      import scalaz.Equal
+      val equalInstance = implicitly[Equal[Row]]
+      equalInstance.equal(row1, row2) must beEqualTo(true)
+      equalInstance.equal(row1, row3) must beEqualTo(false)
     }
   }
 
