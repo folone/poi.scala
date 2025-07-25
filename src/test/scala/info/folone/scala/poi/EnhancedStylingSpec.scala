@@ -18,14 +18,14 @@ class EnhancedStylingSpec extends Specification {
 
     "create style with custom alignment" in {
       val style = CellStyle(alignment = Some(CenterAlignment), verticalAlignment = Some(MiddleAlignment))
-      style.alignment must beSome(CenterAlignment)
-      style.verticalAlignment must beSome(MiddleAlignment)
+      style.alignment must beSome[HorizontalAlignment](CenterAlignment)
+      style.verticalAlignment must beSome[VerticalAlignment](MiddleAlignment)
     }
 
     "create style with colors" in {
       val style = CellStyle(backgroundColor = Some(YellowColor), foregroundColor = Some(RedColor))
-      style.backgroundColor must beSome(YellowColor)
-      style.foregroundColor must beSome(RedColor)
+      style.backgroundColor must beSome[Color](YellowColor)
+      style.foregroundColor must beSome[Color](RedColor)
     }
 
     "create style with borders" in {

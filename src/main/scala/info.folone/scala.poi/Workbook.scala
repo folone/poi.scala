@@ -196,11 +196,11 @@ object Workbook {
         j <- 0 until row.getLastCellNum
         cell = row.getCell(j) if (cell != null)
       } yield (sheet, row, cell)
-      val result = data.groupBy(_._1).mapValues { lst =>
-        lst
+      val result = data.groupBy(_._1).map { case (sheet, lst) =>
+        sheet -> lst
           .map { case (s, r, c) => (r, c) }
           .groupBy(_._1)
-          .mapValues(l => l.map { case (r, c) => c }.toList)
+          .map { case (row, cellList) => row -> cellList.map { case (r, c) => c }.toList }
       }
       val sheets = result.map { case (sheet, rowLst) =>
         Sheet(sheet.getSheetName) {
