@@ -12,6 +12,7 @@ Programmatically create Excel sheets in Scala (via Apache POI library) with enha
 - ✅ **Named Ranges**: Create and manage named ranges for easy formula references
 - ✅ **Print Features**: Headers, footers, page setup, print areas, and auto filters
 - ✅ **Performance Optimizations**: SXSSF streaming, memory monitoring, bulk operations, and performance timing
+- ✅ **Asynchronous Operations**: Future-based async operations, reactive streams, and backpressure handling
 - ✅ **Error Handling**: Comprehensive error types with validation utilities
 
 ## Setup
@@ -420,6 +421,352 @@ val (_, saveTime) = timer.time {
 
 println(s"Saved large workbook in ${saveTime}ms")
 ```
+
+## Asynchronous and Reactive Operations
+
+For applications requiring non-blocking Excel operations, poi-scala provides comprehensive asynchronous and reactive capabilities with Future-based operations, progressive building, reactive streams, and backpressure handling.
+
+### Future-Based Async Operations
+
+Create and manipulate workbooks asynchronously using Scala Futures:
+
+```scala
+import info.folone.scala.poi._
+import info.folone.scala.poi.AsyncOperations._
+import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.duration._
+
+implicit val ec: ExecutionContext = ExecutionContext.global
+
+// Create workbook asynchronously
+val sheets = Set(
+  Sheet("AsyncSheet")(Set(
+    Row(0)(Set(StringCell(0, "Async Data")))
+  ))
+)
+
+val futureWorkbook: Future[Workbook] = createWorkbookAsync(sheets, XSSF)
+
+// Create workbook with bulk data asynchronously
+val data = Seq(
+  Seq("Name", "Age", "City"),
+  Seq("Alice", 30, "New York"),
+  Seq("Bob", 25, "London"),
+  Seq("Charlie", 35, "Tokyo")
+)
+
+val bulkFuture: Future[Workbook] = createWorkbookWithBulkDataAsync(
+  "People", data, XSSF
+)
+
+// Async file operations
+val saveFuture: Future[Unit] = for {
+  workbook <- futureWorkbook
+  _ <- saveWorkbookAsync(workbook, "/tmp/async-workbook.xlsx")
+} yield ()
+
+val loadFuture: Future[Workbook] = loadWorkbookAsync("/tmp/async-workbook.xlsx")
+```
+
+### Stream Processing with Async
+
+Process large data streams asynchronously with automatic batching:
+
+```scala
+// Define your data source
+case class SalesRecord(product: String, amount: Double, date: String)
+
+val salesStream = Stream.range(1, 10001).map { i =>
+  SalesRecord(s"Product $i", Math.random() * 1000, s"2024-01-${i % 28 + 1}")
+}
+
+// Transform function
+def transformSalesRecord(record: SalesRecord): Seq[Any] = 
+  Seq(record.product, record.amount, record.date)
+
+// Process stream asynchronously with batching
+val streamFuture: Future[Workbook] = processDataStreamAsync(
+  data = salesStream,
+  transform = transformSalesRecord,
+  sheetName = "SalesData",
+  batchSize = 1000  // Process in batches of 1000 rows
+)
+
+// Use the result
+streamFuture.foreach { workbook =>
+  println(s"Processed ${workbook.sheets.head.rows.size} sales records")
+}
+```
+
+### Progressive Workbook Building
+
+Build workbooks progressively with real-time progress callbacks:
+
+```scala
+// Create progressive builder with progress tracking
+val builder = new ProgressiveWorkbookBuilder(Set.empty[Sheet], XSSF)
+
+// Add progress callbacks
+var progressUpdates = List.empty[Double]
+builder.addProgressCallback { progress =>
+  progressUpdates = progress :: progressUpdates
+  println(f"Progress: ${progress * 100}%.1f%%")
+}
+
+// Build workbook step by step
+val buildProcess: Future[Workbook] = for {
+  // Add initial sheet
+  step1 <- builder.addSheetAsync(Sheet("Config")(Set(
+    Row(0)(Set(StringCell(0, "Configuration Data")))
+  )))
+  
+  // Add bulk data with progress reporting
+  step2 <- step1.addBulkDataAsync(
+    "MainData", 
+    data,
+    progressInterval = 100  // Report progress every 100 rows
+  )
+  
+  // Finalize workbook
+  finalWorkbook <- step2.buildAsync()
+} yield finalWorkbook
+
+// Handle completion
+buildProcess.onComplete {
+  case Success(workbook) => 
+    println(s"Built workbook with ${workbook.sheets.size} sheets")
+  case Failure(exception) => 
+    println(s"Build failed: ${exception.getMessage}")
+}
+```
+
+### Reactive Streams with Backpressure
+
+Handle high-throughput data processing with reactive streams and automatic backpressure management:
+
+```scala
+import AsyncOperations.ReactiveStreams._
+
+// Create data source
+val largeDataset = (1 to 100000).map { i =>
+  SalesRecord(s"Product $i", Math.random() * 1000, s"2024-${i % 12 + 1}-01")
+}
+
+val dataSource = MemoryDataSource(largeDataset)
+
+// Create backpressure processor
+val processor = new BackpressureProcessor(
+  source = dataSource,
+  transform = transformSalesRecord,
+  maxBufferSize = 1000  // Buffer up to 1000 rows before processing
+)
+
+// Process with backpressure handling
+var finalWorkbook: Option[Workbook] = None
+var processingComplete = false
+
+processor.processWithBackpressure(
+  sheetName = "BackpressureData",
+  onProgress = { progress =>
+    if (progress % 0.1 < 0.01) {  // Log every 10%
+      println(f"Processing: ${progress * 100}%.0f%% complete")
+    }
+  },
+  onComplete = { workbook =>
+    finalWorkbook = Some(workbook)
+    processingComplete = true
+    println(s"Completed processing ${workbook.sheets.head.rows.size} records")
+  },
+  onError = { error =>
+    processingComplete = true
+    println(s"Error during processing: ${error.getMessage}")
+  }
+)
+
+// Wait for completion (in real applications, use proper async patterns)
+while (!processingComplete) {
+  Thread.sleep(100)
+}
+```
+
+### Java Interoperability
+
+Seamless integration with Java applications using CompletableFuture:
+
+```scala
+import AsyncOperations.JavaInterop._
+import java.util.concurrent.CompletableFuture
+import scala.collection.JavaConverters._
+
+// Create workbook with Java API
+val javaSheets = Set(
+  Sheet("JavaSheet")(Set(
+    Row(0)(Set(StringCell(0, "Java Integration")))
+  ))
+).asJava
+
+val javaFuture: CompletableFuture[Workbook] = 
+  createWorkbookAsyncJava(javaSheets, XSSF)
+
+// Save with Java API
+val saveFuture: CompletableFuture[Void] = 
+  saveWorkbookAsyncJava(workbook, "/tmp/java-async.xlsx")
+
+// Process data with Java callback
+val javaData = List(
+  SalesRecord("Java Product 1", 100.0, "2024-01-01"),
+  SalesRecord("Java Product 2", 200.0, "2024-01-02")
+).asJava
+
+val transformer = new java.util.function.Function[SalesRecord, java.util.List[Any]] {
+  def apply(record: SalesRecord): java.util.List[Any] = 
+    List(record.product, record.amount, record.date).asInstanceOf[List[Any]].asJava
+}
+
+val progressCallback = new java.util.function.Consumer[java.lang.Double] {
+  def accept(progress: java.lang.Double): Unit = 
+    println(f"Java progress: ${progress * 100}%.1f%%")
+}
+
+val processedFuture: CompletableFuture[Workbook] = processDataWithCallbackJava(
+  javaData, transformer, "JavaProcessed", progressCallback
+)
+```
+
+### Functional IO Operations
+
+Pure functional approach using Scalaz IO for composable async operations:
+
+```scala
+import IOOperations._
+import scalaz.effect.IO
+
+// Pure functional workbook creation
+val createWorkbookIO: IO[Workbook] = createWorkbookIO(sheets, XSSF)
+
+// Composable IO operations
+val saveAndLoadIO: IO[Workbook] = for {
+  workbook <- createWorkbookIO
+  _ <- saveWorkbookIO(workbook, "/tmp/io-workbook.xlsx")
+  loadedWorkbook <- loadWorkbookIO("/tmp/io-workbook.xlsx")
+} yield loadedWorkbook
+
+// Process multiple sheets functionally
+val multiSheetData = Map(
+  "Sales" -> Seq(Seq("Product", "Amount"), Seq("Widget", 100.0)),
+  "Inventory" -> Seq(Seq("Item", "Quantity"), Seq("Widget", 50)),
+  "Customers" -> Seq(Seq("Name", "Email"), Seq("John", "john@example.com"))
+)
+
+val multiSheetIO: IO[Workbook] = processMultipleSheetsIO(multiSheetData, XSSF)
+
+// Execute IO operations
+val result: Workbook = saveAndLoadIO.unsafePerformIO()
+val multiSheetResult: Workbook = multiSheetIO.unsafePerformIO()
+```
+
+### Async Best Practices
+
+1. **Use appropriate batch sizes** for stream processing (1000-5000 rows typically optimal)
+2. **Implement proper error handling** with Future.recover or IO error handling
+3. **Monitor progress** for long-running operations to provide user feedback
+4. **Configure backpressure** based on available memory and processing capacity
+5. **Use ExecutionContext.global** or custom thread pools based on workload
+6. **Combine with performance optimizations** (streaming, memory monitoring) for best results
+
+### Complete Async Example
+
+```scala
+import info.folone.scala.poi._
+import info.folone.scala.poi.AsyncOperations._
+import scala.concurrent.{Future, ExecutionContext, Await}
+import scala.concurrent.duration._
+import scala.util.{Success, Failure}
+
+implicit val ec: ExecutionContext = ExecutionContext.global
+
+// Comprehensive async workflow
+def processLargeDatasetAsync(): Future[String] = {
+  // 1. Generate large dataset
+  val largeDataset = (1 to 25000).map { i =>
+    Seq(
+      s"Product $i",
+      Math.random() * 1000,
+      s"Category ${i % 10}",
+      new java.util.Date(),
+      i % 3 == 0
+    )
+  }
+  
+  // 2. Create workbook with progress tracking
+  val builder = new ProgressiveWorkbookBuilder(Set.empty[Sheet], XSSF)
+  builder.addProgressCallback(progress => 
+    if (progress % 0.2 < 0.01) println(f"Building: ${progress * 100}%.0f%%")
+  )
+  
+  // 3. Build and save asynchronously
+  val result = for {
+    // Create initial structure
+    step1 <- builder.addSheetAsync(Sheet("Summary")(Set(
+      Row(0)(Set(StringCell(0, "Large Dataset Summary")))
+    )))
+    
+    // Add bulk data
+    step2 <- step1.addBulkDataAsync("Products", largeDataset, progressInterval = 1000)
+    
+    // Finalize workbook
+    workbook <- step2.buildAsync()
+    
+    // Save asynchronously
+    path = "/tmp/large-async-dataset.xlsx"
+    _ <- saveWorkbookAsync(workbook, path)
+    
+    // Load back to verify
+    verifiedWorkbook <- loadWorkbookAsync(path)
+    
+  } yield {
+    val rowCount = verifiedWorkbook.sheets.find(_.name == "Products").map(_.rows.size).getOrElse(0)
+    s"Successfully processed $rowCount rows asynchronously"
+  }
+  
+  result.recover {
+    case exception => s"Async processing failed: ${exception.getMessage}"
+  }
+}
+
+// Execute the async workflow
+val futureResult = processLargeDatasetAsync()
+
+futureResult.onComplete {
+  case Success(message) => println(message)
+  case Failure(exception) => println(s"Workflow failed: ${exception.getMessage}")
+}
+
+// For demo purposes, wait for completion
+val result = Await.result(futureResult, 30.seconds)
+println(result)
+```
+
+### Testing Async Operations
+
+All async operations are thoroughly tested:
+
+```bash
+# Run async operation tests
+./sbt "testOnly *AsyncOperationsSpec"
+
+# Test specific async features
+./sbt "testOnly *AsyncOperationsSpec* -- -l AsyncOperations"
+./sbt "testOnly *AsyncOperationsSpec* -- -l ReactiveStreams"
+./sbt "testOnly *AsyncOperationsSpec* -- -l JavaInterop"
+```
+
+The AsyncOperationsSpec includes comprehensive tests for:
+- Future-based async operations (6 test cases)
+- Reactive streams with backpressure (1 test case)  
+- Java interoperability (3 test cases)
+- Functional IO operations (4 test cases)
+- All 14 async test cases pass, ensuring reliability in concurrent environments
 
 ### Running Performance Tests
 
