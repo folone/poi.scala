@@ -1,7 +1,7 @@
 package info.folone.scala.poi
 
 import java.util.concurrent.atomic.AtomicLong
-import scala.util.{Try, Success, Failure}
+import scala.util.{Failure, Success, Try}
 
 // Memory monitoring utilities
 object MemoryMonitor {
@@ -65,14 +65,15 @@ object MemoryMonitor {
         Failure(ex)
     }
   }
+
 }
 
 case class MemoryUsage(
-    used: Long,
-    total: Long,
-    max: Long,
-    free: Long,
-    usagePercentage: Double
+  used: Long,
+  total: Long,
+  max: Long,
+  free: Long,
+  usagePercentage: Double
 )
 
 // Lazy evaluation support for large datasets
@@ -85,7 +86,7 @@ trait LazyWorkbookOps {
 // Bulk operations for better performance
 object BulkOperations {
 
-  def createCellsInBulk(rowIndex: Int, cellData: Seq[(Int, Any)]): Set[Cell] = {
+  def createCellsInBulk(rowIndex: Int, cellData: Seq[(Int, Any)]): Set[Cell] =
     cellData.map { case (index, data) =>
       data match {
         case s: String => StringCell(index, s): Cell
@@ -95,20 +96,18 @@ object BulkOperations {
         case _ => StringCell(index, data.toString): Cell
       }
     }.toSet
-  }
 
-  def createRowsInBulk(rowData: Seq[(Int, Seq[(Int, Any)])]): Set[Row] = {
+  def createRowsInBulk(rowData: Seq[(Int, Seq[(Int, Any)])]): Set[Row] =
     rowData.map { case (rowIndex, cellData) =>
       Row(rowIndex)(createCellsInBulk(rowIndex, cellData))
     }.toSet
-  }
 
   def applyStylingInBulk(
-      cellAddresses: Seq[CellAddr],
-      style: CellStyle
-  ): Map[CellStyle, List[CellAddr]] = {
+    cellAddresses: Seq[CellAddr],
+    style: CellStyle
+  ): Map[CellStyle, List[CellAddr]] =
     Map(style -> cellAddresses.toList)
-  }
+
 }
 
 // Performance monitoring for operations
@@ -135,6 +134,7 @@ class PerformanceTimer {
     stop()
     (result, elapsedMillis)
   }
+
 }
 
 object PerformanceTimer {
@@ -144,4 +144,5 @@ object PerformanceTimer {
     val timer = new PerformanceTimer()
     timer.time(operation)
   }
+
 }

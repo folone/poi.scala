@@ -20,9 +20,9 @@ import syntax.applicative._
 import syntax.monoid._
 
 class Workbook(
-    val sheetMap: Map[String, Sheet],
-    format: WorkbookVersion = HSSF,
-    memoryConfig: Option[MemoryConfig] = None
+  val sheetMap: Map[String, Sheet],
+  format: WorkbookVersion = HSSF,
+  memoryConfig: Option[MemoryConfig] = None
 ) {
   Telemetry.pingOnce()
   val sheets: Set[Sheet] = sheetMap.values.toSet
@@ -59,7 +59,7 @@ class Workbook(
     }
 
     // Apply memory monitoring if configured
-    val createSheetOperation = () => {
+    val createSheetOperation = () =>
       sheets foreach { sh =>
         val Sheet(name, rows) = sh
         val sheet = workbook.createSheet(name)
@@ -72,7 +72,6 @@ class Workbook(
           }
         }
       }
-    }
 
     memoryConfig match {
       case Some(config) =>
@@ -162,9 +161,9 @@ class Workbook(
 
   // Performance optimized bulk operations
   def addSheetWithBulkData(
-      name: String,
-      data: Seq[Seq[Any]],
-      config: Option[SXSSFConfig] = None
+    name: String,
+    data: Seq[Seq[Any]],
+    config: Option[SXSSFConfig] = None
   ): Workbook = {
     val timer = PerformanceTimer()
     val (newWorkbook, timeMs) = timer.time {
@@ -196,7 +195,7 @@ class Workbook(
     newWorkbook
   }
 
-  def addRowsInBulk(sheetName: String, rowData: Seq[(Int, Seq[(Int, Any)])]): Workbook = {
+  def addRowsInBulk(sheetName: String, rowData: Seq[(Int, Seq[(Int, Any)])]): Workbook =
     sheetMap.get(sheetName) match {
       case Some(sheet) =>
         val newRows = BulkOperations.createRowsInBulk(rowData)
@@ -206,11 +205,9 @@ class Workbook(
       case None =>
         throw new IllegalArgumentException(s"Sheet '$sheetName' not found")
     }
-  }
 
-  def withMemoryMonitoring(config: MemoryConfig): Workbook = {
+  def withMemoryMonitoring(config: MemoryConfig): Workbook =
     new Workbook(sheetMap, format, Some(config))
-  }
 
   def getMemoryUsage: MemoryUsage = MemoryMonitor.getCurrentMemoryUsage
 
@@ -253,17 +250,17 @@ object Workbook {
 
   // Streaming workbook creation with configurable SXSSF
   def streaming(
-      sheets: Set[Sheet],
-      config: SXSSFConfig = SXSSFConfig(),
-      memoryConfig: Option[MemoryConfig] = None
+    sheets: Set[Sheet],
+    config: SXSSFConfig = SXSSFConfig(),
+    memoryConfig: Option[MemoryConfig] = None
   ): Workbook =
     new Workbook(sheets.map(s => (s.name, s)).toMap, config, memoryConfig)
 
   // Create workbook optimized for large datasets
   def forLargeDataset(
-      sheets: Set[Sheet],
-      rowAccessWindow: Int = 100,
-      enableMemoryMonitoring: Boolean = true
+    sheets: Set[Sheet],
+    rowAccessWindow: Int = 100,
+    enableMemoryMonitoring: Boolean = true
   ): Workbook = {
     val sxssfConfig = SXSSFConfig(
       rowAccessWindowSize = rowAccessWindow,

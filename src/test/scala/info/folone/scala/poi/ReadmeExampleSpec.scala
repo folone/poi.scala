@@ -1,7 +1,7 @@
 package info.folone.scala.poi
 
-import org.specs2.mutable._
 import java.util.Date
+import org.specs2.mutable._
 
 class ReadmeExampleSpec extends Specification {
 
