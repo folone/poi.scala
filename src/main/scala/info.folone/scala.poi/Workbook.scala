@@ -1,31 +1,30 @@
 package info.folone.scala.poi
 
+import java.io.{File, FileOutputStream, InputStream, OutputStream}
 import org.apache.poi._
-import ss.usermodel.{
-  DateUtil,
-  WorkbookFactory,
-  Cell => POICell,
-  CellType => POICellType,
-  CellStyle => POICellStyle,
-  Row => POIRow,
-  Workbook => POIWorkbook
-}
-import java.io.{File, FileOutputStream, OutputStream, InputStream}
-
+import scala.language.reflectiveCalls
 import scalaz._
-import std.map._
+import scalaz.effect.IO
+import ss.usermodel.{
+  Cell => POICell,
+  CellStyle => POICellStyle,
+  CellType => POICellType,
+  DateUtil,
+  Row => POIRow,
+  Workbook => POIWorkbook,
+  WorkbookFactory
+}
 import std.list._
+import std.map._
 import syntax.applicative._
 import syntax.monoid._
-import effect.IO
-import scala.language.reflectiveCalls
 
 class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF) {
   Telemetry.pingOnce()
   val sheets: Set[Sheet] = sheetMap.values.toSet
 
   @annotation.tailrec
-  private def setPoiCell(defaultRowHeight: Short, row: POIRow, cell: Cell, poiCell: POICell): Unit = {
+  private def setPoiCell(defaultRowHeight: Short, row: POIRow, cell: Cell, poiCell: POICell): Unit =
     cell match {
       case StringCell(index, data) =>
         poiCell.setCellValue(data)
@@ -38,11 +37,9 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
       case FormulaCell(index, data) => poiCell.setCellFormula(data)
       case BlankCell(index) => poiCell.setBlank()
       case ErrorCell(index, errorCode) => poiCell.setCellErrorValue(errorCode)
-      case styledCell @ StyledCell(_, _) => {
+      case styledCell @ StyledCell(_, _) =>
         setPoiCell(defaultRowHeight, row, styledCell.nestedCell, poiCell)
-      }
     }
-  }
 
   private lazy val book = {
     val workbook = format match {
@@ -128,34 +125,37 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     styled(styles)
   }
 
-  /** Fits column's width to maximum width of non-empty cell at cell address. Quite expensive. Use as late as possible.
-    *
-    * @param addrs
-    *   addresses of cells, which columns size should fit cells content
-    */
+  /**
+   * Fits column's width to maximum width of non-empty cell at cell address. Quite expensive. Use as late as possible.
+   *
+   * @param addrs
+   *   addresses of cells, which columns size should fit cells content
+   */
   def autosizeColumns(addrs: Set[CellAddr]): Workbook = {
     addrs foreach { a => book.getSheet(a.sheet).autoSizeColumn(a.col) }
     this
   }
 
   def safeToFile(path: String): Result[Unit] = {
-    def close(resource: FileOutputStream): IO[Unit] = IO { resource.close() }
-    val action = IO { new FileOutputStream(new File(path)) }.bracket(close) { file =>
-      IO { book write file }
+    def close(resource: FileOutputStream): IO[Unit] = IO(resource.close())
+    val action = IO(new FileOutputStream(new File(path))).bracket(close) { file =>
+      IO(book write file)
     }
     EitherT(action.catchLeft)
   }
 
   def safeToStream(stream: OutputStream): Result[Unit] = {
-    val action = IO { book write stream }
+    val action = IO(book write stream)
     EitherT(action.catchLeft)
   }
 
   def asPoi: POIWorkbook = book
 
   override def toString: String = Show[Workbook].shows(this)
+
   override def equals(obj: Any): Boolean =
     obj != null && obj.isInstanceOf[Workbook] && scalaz.Equal[Workbook].equal(obj.asInstanceOf[Workbook], this)
+
   override def hashCode: Int = this.sheetMap.hashCode
 
 }
@@ -166,17 +166,18 @@ object Workbook {
     new Workbook(sheets.map(s => (s.name, s)).toMap, format)
 
   def apply(path: String): Result[Workbook] = {
-    val action: IO[File] = IO { new File(path) }
+    val action: IO[File] = IO(new File(path))
     EitherT((action <*> fromFile(HSSF)).catchLeft)
   }
 
   def apply(path: String, format: WorkbookVersion): Result[Workbook] = {
-    val action: IO[File] = IO { new File(path) }
+    val action: IO[File] = IO(new File(path))
     EitherT((action <*> fromFile(format)).catchLeft)
   }
 
   def apply(is: InputStream): Result[Workbook] =
     EitherT(fromInputStream(HSSF).map(f => f(is)).catchLeft)
+
   def apply(is: InputStream, format: WorkbookVersion): Result[Workbook] =
     EitherT(fromInputStream(format).map(f => f(is)).catchLeft)
 
@@ -191,11 +192,11 @@ object Workbook {
       val wb = workbookF(is)
       val data = for {
         i <- 0 until wb.getNumberOfSheets
-        sheet = wb.getSheetAt(i) if (sheet != null)
+        sheet = wb.getSheetAt(i) if sheet != null
         k <- 0 to sheet.getLastRowNum
-        row = sheet.getRow(k) if (row != null)
+        row = sheet.getRow(k) if row != null
         j <- 0 until row.getLastCellNum
-        cell = row.getCell(j) if (cell != null)
+        cell = row.getCell(j) if cell != null
       } yield (sheet, row, cell)
       val result = data.groupBy(_._1).map { case (sheet, lst) =>
         sheet -> lst
@@ -234,4 +235,5 @@ object Workbook {
       }.toSet
       Workbook(sheets)
     }
+
 }

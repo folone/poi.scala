@@ -36,8 +36,8 @@ case class ValidationError(violations: List[String]) extends PoiError {
 // Validation utilities
 object WorkbookValidator {
   import scalaz._
-  import syntax.validation._
   import std.list._
+  import syntax.validation._
 
   type ValidationResult[A] = ValidationNel[String, A]
 
@@ -101,7 +101,7 @@ object WorkbookValidator {
     }
   }
 
-  private def isValidFormula(formula: String): Boolean = {
+  private def isValidFormula(formula: String): Boolean =
     // Basic formula validation - the formula should not be empty and should look like a valid Excel formula
     // Since FormulaCell.apply strips leading "=", we validate the formula content without "="
     if (formula.isEmpty || formula.length > 8192) {
@@ -111,11 +111,11 @@ object WorkbookValidator {
       val invalidPatterns = List("INVALID_FUNCTION", "BADFUNCTION", "ERROR_FUNC")
       !invalidPatterns.exists(pattern => formula.toUpperCase.contains(pattern))
     }
-  }
 
   private def extractSheetReferences(formula: String): List[String] = {
     // Simple regex to extract sheet references like 'Sheet1'!A1
     val sheetRefPattern = """'([^']+)'!""".r
     sheetRefPattern.findAllMatchIn(formula).map(_.group(1)).toList
   }
+
 }

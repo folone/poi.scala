@@ -1,8 +1,8 @@
 package info.folone.scala.poi
 
+import java.util.Date
 import org.specs2.mutable._
 import org.specs2.specification.Scope
-import java.util.Date
 
 class DataValidationSpec extends Specification {
 
@@ -165,4 +165,5 @@ class DataValidationSpec extends Specification {
   trait DataValidationScope extends Scope {
     val testRange = CellRange("Sheet1", 0, 0, 9, 0) // A1:A10
   }
+
 }

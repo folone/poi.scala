@@ -1,8 +1,8 @@
 package info.folone.scala.poi
 
+import java.io.File
 import org.specs2.mutable._
 import org.specs2.specification.Scope
-import java.io.File
 
 class EnhancedStylingSpec extends Specification {
 
@@ -98,6 +98,7 @@ class EnhancedStylingSpec extends Specification {
   }
 
   trait StyledWorkbookScope extends Scope {
+
     val enhancedStyle = CellStyle(
       font = Font(name = "Arial", bold = true, heightInPoints = 14),
       alignment = Some(CenterAlignment),
@@ -117,5 +118,7 @@ class EnhancedStylingSpec extends Specification {
       ),
       wrapText = true
     )
+
   }
+
 }

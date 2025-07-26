@@ -1,7 +1,8 @@
 package info.folone.scala.poi
 
-import scalaz._, Scalaz._
 import org.specs2.mutable._
+import scalaz._
+import Scalaz._
 
 class MonoidLawsSpec extends Specification {
 

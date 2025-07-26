@@ -1,8 +1,8 @@
 package info.folone.scala.poi
 
+import java.util.Date
 import org.specs2.mutable._
 import org.specs2.specification.Scope
-import java.util.Date
 import scalaz.syntax.equal._
 
 class CellSpec extends Specification {
@@ -160,6 +160,7 @@ class CellSpec extends Specification {
   }
 
   trait CellScope extends Scope {
+
     val basicStyle = CellStyle(
       font = Font(heightInPoints = 10)
     )
@@ -168,5 +169,7 @@ class CellSpec extends Specification {
       font = Font(bold = true, heightInPoints = 12),
       alignment = Some(CenterAlignment)
     )
+
   }
+
 }

@@ -9,17 +9,17 @@ import org.apache.poi.ss.util.CellRangeAddressList
 
 // Data validation support for Excel sheets
 case class DataValidation(
-    cellRange: CellRange,
-    validationType: ValidationType,
-    constraint: ValidationConstraint,
-    errorTitle: Option[String] = None,
-    errorText: Option[String] = None,
-    promptTitle: Option[String] = None,
-    promptText: Option[String] = None,
-    showErrorBox: Boolean = true,
-    showPromptBox: Boolean = true,
-    allowEmpty: Boolean = true,
-    suppressDropDown: Boolean = false
+  cellRange: CellRange,
+  validationType: ValidationType,
+  constraint: ValidationConstraint,
+  errorTitle: Option[String] = None,
+  errorText: Option[String] = None,
+  promptTitle: Option[String] = None,
+  promptText: Option[String] = None,
+  showErrorBox: Boolean = true,
+  showPromptBox: Boolean = true,
+  allowEmpty: Boolean = true,
+  suppressDropDown: Boolean = false
 )
 
 // Validation types
@@ -42,30 +42,30 @@ case class ListFormulaConstraint(formula: String) extends ValidationConstraint
 
 // Number constraints
 case class NumberConstraint(
-    operator: ComparisonOperator,
-    value1: Double,
-    value2: Option[Double] = None
+  operator: ComparisonOperator,
+  value1: Double,
+  value2: Option[Double] = None
 ) extends ValidationConstraint
 
 // Date constraints
 case class DateConstraint(
-    operator: ComparisonOperator,
-    value1: java.util.Date,
-    value2: Option[java.util.Date] = None
+  operator: ComparisonOperator,
+  value1: java.util.Date,
+  value2: Option[java.util.Date] = None
 ) extends ValidationConstraint
 
 // Time constraints
 case class TimeConstraint(
-    operator: ComparisonOperator,
-    value1: String, // Time as string like "09:00"
-    value2: Option[String] = None
+  operator: ComparisonOperator,
+  value1: String, // Time as string like "09:00"
+  value2: Option[String] = None
 ) extends ValidationConstraint
 
 // Text length constraints
 case class TextLengthConstraint(
-    operator: ComparisonOperator,
-    length1: Int,
-    length2: Option[Int] = None
+  operator: ComparisonOperator,
+  length1: Int,
+  length2: Option[Int] = None
 ) extends ValidationConstraint
 
 // Formula constraint
@@ -85,54 +85,49 @@ case object NotBetween extends ComparisonOperator
 // Helper object for creating common validations
 object ValidationHelper {
 
-  def dropdownList(range: CellRange, values: List[String]): DataValidation = {
+  def dropdownList(range: CellRange, values: List[String]): DataValidation =
     DataValidation(
       cellRange = range,
       validationType = ListValidation,
       constraint = ListConstraint(values),
       suppressDropDown = false
     )
-  }
 
-  def numberRange(range: CellRange, min: Double, max: Double): DataValidation = {
+  def numberRange(range: CellRange, min: Double, max: Double): DataValidation =
     DataValidation(
       cellRange = range,
       validationType = NumberValidation,
       constraint = NumberConstraint(Between, min, Some(max))
     )
-  }
 
-  def dateRange(range: CellRange, startDate: java.util.Date, endDate: java.util.Date): DataValidation = {
+  def dateRange(range: CellRange, startDate: java.util.Date, endDate: java.util.Date): DataValidation =
     DataValidation(
       cellRange = range,
       validationType = DateValidation,
       constraint = DateConstraint(Between, startDate, Some(endDate))
     )
-  }
 
-  def textLength(range: CellRange, minLength: Int, maxLength: Int): DataValidation = {
+  def textLength(range: CellRange, minLength: Int, maxLength: Int): DataValidation =
     DataValidation(
       cellRange = range,
       validationType = TextLengthValidation,
       constraint = TextLengthConstraint(Between, minLength, Some(maxLength))
     )
-  }
 
-  def formulaValidation(range: CellRange, formula: String): DataValidation = {
+  def formulaValidation(range: CellRange, formula: String): DataValidation =
     DataValidation(
       cellRange = range,
       validationType = FormulaValidation,
       constraint = FormulaConstraint(formula)
     )
-  }
 
-  def integerRange(range: CellRange, min: Int, max: Int): DataValidation = {
+  def integerRange(range: CellRange, min: Int, max: Int): DataValidation =
     DataValidation(
       cellRange = range,
       validationType = IntegerValidation,
       constraint = NumberConstraint(Between, min.toDouble, Some(max.toDouble))
     )
-  }
+
 }
 
 // Extension to Sheet to support data validation
@@ -168,9 +163,9 @@ class DataValidationBuilder(cellRange: CellRange) {
   }
 
   def withNumberConstraint(
-      operator: ComparisonOperator,
-      value1: Double,
-      value2: Option[Double] = None
+    operator: ComparisonOperator,
+    value1: Double,
+    value2: Option[Double] = None
   ): DataValidationBuilder = {
     this.validationType = NumberValidation
     this.constraint = Some(NumberConstraint(operator, value1, value2))
@@ -178,9 +173,9 @@ class DataValidationBuilder(cellRange: CellRange) {
   }
 
   def withDateConstraint(
-      operator: ComparisonOperator,
-      value1: java.util.Date,
-      value2: Option[java.util.Date] = None
+    operator: ComparisonOperator,
+    value1: java.util.Date,
+    value2: Option[java.util.Date] = None
   ): DataValidationBuilder = {
     this.validationType = DateValidation
     this.constraint = Some(DateConstraint(operator, value1, value2))
@@ -188,9 +183,9 @@ class DataValidationBuilder(cellRange: CellRange) {
   }
 
   def withTextLengthConstraint(
-      operator: ComparisonOperator,
-      length1: Int,
-      length2: Option[Int] = None
+    operator: ComparisonOperator,
+    length1: Int,
+    length2: Option[Int] = None
   ): DataValidationBuilder = {
     this.validationType = TextLengthValidation
     this.constraint = Some(TextLengthConstraint(operator, length1, length2))
@@ -251,6 +246,7 @@ class DataValidationBuilder(cellRange: CellRange) {
       suppressDropDown = suppressDropDown
     )
   }
+
 }
 
 object DataValidationBuilder {

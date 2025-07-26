@@ -1,9 +1,9 @@
 package info.folone.scala
 
 import poi._
-import scalaz._
-import effect.IO
 import scala.annotation.tailrec
+import scalaz._
+import scalaz.effect.IO
 
 package object poi extends Instances with Lenses
 
@@ -14,6 +14,7 @@ trait Instances {
   // Typeclass instances
 
   object equalities {
+
     implicit val formulaCellEqualInstance: Equal[FormulaCell] = new Equal[FormulaCell] {
       override def equal(f1: FormulaCell, f2: FormulaCell) = f1.index == f2.index && f1.data == f2.data
     }
@@ -37,6 +38,7 @@ trait Instances {
           case (_, _) => false
         }
     }
+
   }
 
   implicit val cellInstance: Semigroup[Cell] with Order[Cell] with Show[Cell] =
@@ -55,7 +57,7 @@ trait Instances {
           case BlankCell(index) => "BlankCell(" + index + ")"
           case ErrorCell(index, errorCode) => "ErrorCell(" + index + ", " + errorCode + ")"
         }
-      private[this] def cellToOrderId(cell: Cell): Int = {
+      private[this] def cellToOrderId(cell: Cell): Int =
         cell match {
           case _: StringCell => 1
           case _: NumericCell => 2
@@ -66,7 +68,6 @@ trait Instances {
           case _: BlankCell => 7
           case _: ErrorCell => 8
         }
-      }
       @tailrec
       override def order(x: Cell, y: Cell): Ordering = {
         import scalaz.std.anyVal._
@@ -102,6 +103,7 @@ trait Instances {
         }
       }
     }
+
   implicit val rowInstance: Semigroup[Row] with Equal[Row] with Show[Row] =
     new Semigroup[Row] with Equal[Row] with Show[Row] {
       override def append(f1: Row, f2: => Row): Row =
@@ -113,6 +115,7 @@ trait Instances {
       override def show(as: Row): Cord = Cord(shows(as))
       override def shows(as: Row): String = "Row (" + as.index + ")(" + as.cells.toIndexedSeq.sortBy(_.index) + ")"
     }
+
   implicit val sheetInstance: Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] =
     new Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] {
       override def append(f1: Sheet, f2: => Sheet): Sheet =
@@ -125,6 +128,7 @@ trait Instances {
       override def shows(as: Sheet): String =
         "Sheet (\"" + as.name + "\")(" + as.rows.toIndexedSeq.sortBy(_.index) + ")"
     }
+
   implicit val wbInstance: Monoid[Workbook] with Equal[Workbook] with Show[Workbook] =
     new Monoid[Workbook] with Equal[Workbook] with Show[Workbook] {
       override def zero: Workbook = Workbook(Set[Sheet]())
@@ -145,27 +149,35 @@ trait Instances {
     val k1 = m1.keysIterator.toSet
     val k2 = m2.keysIterator.toSet
     val intersection = k1 & k2
-    val r1 = for (key <- intersection) yield (key -> Semigroup[B].append(m1(key), m2(key)))
+    val r1 = for (key <- intersection) yield key -> Semigroup[B].append(m1(key), m2(key))
     val r2 = m1.filter { case (key, _) => !intersection.contains(key) } ++
       m2.filter { case (key, _) => !intersection.contains(key) }
     r2 ++ r1
   }
+
 }
 
 trait Lenses {
   // Lenses
   import Lens._
   import StoreT._
+
   val doubleCellLens: NumericCell @> Double =
     lensFamily(c => store(c.data)(changed => c.copy(data = changed)))
+
   val boolCellLens: BooleanCell @> Boolean =
     lensFamily(c => store(c.data)(changed => c.copy(data = changed)))
+
   val stringCellLens: StringCell @> String =
     lensFamily(c => store(c.data)(changed => c.copy(data = changed)))
+
   val rowLens =
     setLensFamily[Row, Row, Cell](lens(r => store(r.cells)(changed => Row(r.index)(changed))))
+
   val sheetLens =
     setLensFamily[Sheet, Sheet, Row](lens(s => store(s.rows)(changed => Sheet(s.name)(changed))))
+
   val wbLens =
     setLensFamily[Workbook, Workbook, Sheet](lens(wb => store(wb.sheets)(changed => Workbook(changed))))
+
 }

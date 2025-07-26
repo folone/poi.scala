@@ -1,16 +1,16 @@
 package info.folone.scala.poi
 
-import scala.util.Try
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-import java.util.concurrent.atomic.AtomicBoolean
 import java.net.URI
+import java.util.concurrent.atomic.AtomicBoolean
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.Try
 
 private[poi] object Telemetry {
   private val hasPinged = new AtomicBoolean(false)
   private val enabled = sys.props.get("poi.scala.telemetry.disabled").isEmpty
 
-  def pingOnce(): Unit = {
+  def pingOnce(): Unit =
     if (enabled && hasPinged.compareAndSet(false, true)) {
       Future {
         Try {
@@ -27,5 +27,5 @@ private[poi] object Telemetry {
         }
       }
     }
-  }
+
 }

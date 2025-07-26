@@ -160,6 +160,7 @@ class RowSpec extends Specification {
   }
 
   trait RowScope extends Scope {
+
     val headerStyle = CellStyle(
       font = Font(bold = true, heightInPoints = 12),
       alignment = Some(CenterAlignment)
@@ -169,5 +170,7 @@ class RowSpec extends Specification {
       font = Font(heightInPoints = 10),
       dataFormat = DataFormat("0.00")
     )
+
   }
+
 }

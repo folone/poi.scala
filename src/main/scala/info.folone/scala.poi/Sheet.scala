@@ -1,27 +1,27 @@
 package info.folone.scala.poi
 
 import scalaz._
-import std.map._
 import std.list._
+import std.map._
 import syntax.semigroup._
 
 class Sheet(
-    val name: String,
-    val rows: Set[Row],
-    val frozenPane: Option[FreezePane] = None,
-    val splitPane: Option[SplitPane] = None,
-    val columnWidths: Map[Int, Int] = Map.empty,
-    val rowHeights: Map[Int, Short] = Map.empty,
-    val hiddenColumns: Set[Int] = Set.empty,
-    val hiddenRows: Set[Int] = Set.empty,
-    val rowGroups: List[RowGroup] = Nil,
-    val columnGroups: List[ColumnGroup] = Nil,
-    val header: Option[Header] = None,
-    val footer: Option[Footer] = None,
-    val pageSetup: Option[PageSetup] = None,
-    val printArea: Option[CellRange] = None,
-    val autoFilter: Option[CellRange] = None,
-    val zoom: Option[Int] = None
+  val name: String,
+  val rows: Set[Row],
+  val frozenPane: Option[FreezePane] = None,
+  val splitPane: Option[SplitPane] = None,
+  val columnWidths: Map[Int, Int] = Map.empty,
+  val rowHeights: Map[Int, Short] = Map.empty,
+  val hiddenColumns: Set[Int] = Set.empty,
+  val hiddenRows: Set[Int] = Set.empty,
+  val rowGroups: List[RowGroup] = Nil,
+  val columnGroups: List[ColumnGroup] = Nil,
+  val header: Option[Header] = None,
+  val footer: Option[Footer] = None,
+  val pageSetup: Option[PageSetup] = None,
+  val printArea: Option[CellRange] = None,
+  val autoFilter: Option[CellRange] = None,
+  val zoom: Option[Int] = None
 ) {
 
   def config: SheetConfig = SheetConfig(
@@ -333,8 +333,10 @@ class Sheet(
     )
 
   override def toString: String = Show[Sheet].shows(this)
+
   override def equals(obj: Any): Boolean =
     obj != null && obj.isInstanceOf[Sheet] && scalaz.Equal[Sheet].equal(obj.asInstanceOf[Sheet], this)
+
   override def hashCode: Int = name.hashCode + rows.hashCode
 }
 
@@ -344,22 +346,22 @@ object Sheet {
 
   // Factory method for enhanced sheets with enhanced configuration
   def enhanced(
-      name: String,
-      frozenPane: Option[FreezePane] = None,
-      splitPane: Option[SplitPane] = None,
-      columnWidths: Map[Int, Int] = Map.empty,
-      rowHeights: Map[Int, Short] = Map.empty,
-      hiddenColumns: Set[Int] = Set.empty,
-      hiddenRows: Set[Int] = Set.empty,
-      rowGroups: List[RowGroup] = List.empty,
-      columnGroups: List[ColumnGroup] = List.empty,
-      header: Option[Header] = None,
-      footer: Option[Footer] = None,
-      pageSetup: Option[PageSetup] = None,
-      printArea: Option[CellRange] = None,
-      autoFilter: Option[CellRange] = None,
-      zoom: Option[Int] = None
-  )(rows: Set[Row]): Sheet = {
+    name: String,
+    frozenPane: Option[FreezePane] = None,
+    splitPane: Option[SplitPane] = None,
+    columnWidths: Map[Int, Int] = Map.empty,
+    rowHeights: Map[Int, Short] = Map.empty,
+    hiddenColumns: Set[Int] = Set.empty,
+    hiddenRows: Set[Int] = Set.empty,
+    rowGroups: List[RowGroup] = List.empty,
+    columnGroups: List[ColumnGroup] = List.empty,
+    header: Option[Header] = None,
+    footer: Option[Footer] = None,
+    pageSetup: Option[PageSetup] = None,
+    printArea: Option[CellRange] = None,
+    autoFilter: Option[CellRange] = None,
+    zoom: Option[Int] = None
+  )(rows: Set[Row]): Sheet =
     new Sheet(
       name = name,
       rows = rows,
@@ -378,28 +380,27 @@ object Sheet {
       autoFilter = autoFilter,
       zoom = zoom
     )
-  }
 
   def unapply(sheet: Sheet): Some[(String, Set[Row])] = Some((sheet.name, sheet.rows))
 }
 
 // Configuration for sheet
 case class SheetConfig(
-    name: String,
-    frozenPane: Option[FreezePane] = None,
-    splitPane: Option[SplitPane] = None,
-    columnWidths: Map[Int, Int] = Map.empty,
-    rowHeights: Map[Int, Short] = Map.empty,
-    hiddenColumns: Set[Int] = Set.empty,
-    hiddenRows: Set[Int] = Set.empty,
-    rowGroups: List[RowGroup] = List.empty,
-    columnGroups: List[ColumnGroup] = List.empty,
-    header: Option[Header] = None,
-    footer: Option[Footer] = None,
-    pageSetup: Option[PageSetup] = None,
-    printArea: Option[CellRange] = None,
-    autoFilter: Option[CellRange] = None,
-    zoom: Option[Int] = None
+  name: String,
+  frozenPane: Option[FreezePane] = None,
+  splitPane: Option[SplitPane] = None,
+  columnWidths: Map[Int, Int] = Map.empty,
+  rowHeights: Map[Int, Short] = Map.empty,
+  hiddenColumns: Set[Int] = Set.empty,
+  hiddenRows: Set[Int] = Set.empty,
+  rowGroups: List[RowGroup] = List.empty,
+  columnGroups: List[ColumnGroup] = List.empty,
+  header: Option[Header] = None,
+  footer: Option[Footer] = None,
+  pageSetup: Option[PageSetup] = None,
+  printArea: Option[CellRange] = None,
+  autoFilter: Option[CellRange] = None,
+  zoom: Option[Int] = None
 )
 
 // Supporting case classes moved here from EnhancedSheet
@@ -410,42 +411,43 @@ case class RowGroup(startRow: Int, endRow: Int, collapsed: Boolean = false)
 case class ColumnGroup(startCol: Int, endCol: Int, collapsed: Boolean = false)
 
 case class Header(
-    left: Option[String] = None,
-    center: Option[String] = None,
-    right: Option[String] = None
+  left: Option[String] = None,
+  center: Option[String] = None,
+  right: Option[String] = None
 )
 
 case class Footer(
-    left: Option[String] = None,
-    center: Option[String] = None,
-    right: Option[String] = None
+  left: Option[String] = None,
+  center: Option[String] = None,
+  right: Option[String] = None
 )
 
 case class PageMargins(
-    left: Double,
-    right: Double,
-    top: Double,
-    bottom: Double,
-    header: Double = 0.3,
-    footer: Double = 0.3
+  left: Double,
+  right: Double,
+  top: Double,
+  bottom: Double,
+  header: Double = 0.3,
+  footer: Double = 0.3
 )
+
 case class FitToPage(width: Int, height: Int)
 
 // Page setup and printing options
 case class PageSetup(
-    orientation: PageOrientation = Portrait,
-    paperSize: PaperSize = A4,
-    scale: Int = 100,
-    fitToPage: Option[FitToPage] = None,
-    margins: Option[PageMargins] = None,
-    leftMargin: Double = 0.75,
-    rightMargin: Double = 0.75,
-    topMargin: Double = 1.0,
-    bottomMargin: Double = 1.0,
-    headerMargin: Double = 0.3,
-    footerMargin: Double = 0.3,
-    fitToWidth: Option[Int] = None,
-    fitToHeight: Option[Int] = None
+  orientation: PageOrientation = Portrait,
+  paperSize: PaperSize = A4,
+  scale: Int = 100,
+  fitToPage: Option[FitToPage] = None,
+  margins: Option[PageMargins] = None,
+  leftMargin: Double = 0.75,
+  rightMargin: Double = 0.75,
+  topMargin: Double = 1.0,
+  bottomMargin: Double = 1.0,
+  headerMargin: Double = 0.3,
+  footerMargin: Double = 0.3,
+  fitToWidth: Option[Int] = None,
+  fitToHeight: Option[Int] = None
 )
 
 // Enumerations for page setup
@@ -463,11 +465,11 @@ case object Tabloid extends PaperSize
 
 // Cell range for print areas, auto filters, etc.
 case class CellRange(
-    sheetName: String,
-    startRow: Int,
-    startCol: Int,
-    endRow: Int,
-    endCol: Int
+  sheetName: String,
+  startRow: Int,
+  startCol: Int,
+  endRow: Int,
+  endCol: Int
 ) {
   def cellReference: String = s"${columnToLetter(startCol)}${startRow + 1}:${columnToLetter(endCol)}${endRow + 1}"
 
@@ -475,13 +477,14 @@ case class CellRange(
 
   def sheet: String = sheetName
 
-  private def columnToLetter(col: Int): String = {
+  private def columnToLetter(col: Int): String =
     if (col < 26) (65 + col).toChar.toString
     else columnToLetter(col / 26 - 1) + columnToLetter(col % 26)
-  }
+
 }
 
 object CellRange {
+
   def apply(sheetName: String, cellRef: String): CellRange = {
     // Parse cell reference like "A1:C5"
     val parts = cellRef.split(":")
@@ -496,4 +499,5 @@ object CellRange {
     val col = letterPart.foldLeft(0)((acc, c) => acc * 26 + (c - 'A' + 1)) - 1
     (numberPart, col)
   }
+
 }

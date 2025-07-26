@@ -1,8 +1,8 @@
 package info.folone.scala.poi
 
-import org.specs2.mutable._
 import java.io.File
 import java.util.Date
+import org.specs2.mutable._
 
 class IntegrationSpec extends Specification {
 

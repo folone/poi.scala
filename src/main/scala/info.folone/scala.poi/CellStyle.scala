@@ -2,39 +2,40 @@ package info.folone.scala.poi
 
 import org.apache.poi.hssf.usermodel.HSSFFont.FONT_ARIAL
 import org.apache.poi.ss.usermodel.{
-  Font => POIFont,
-  DataFormat => POIDataFormat,
-  HorizontalAlignment => POIHorizontalAlignment,
-  VerticalAlignment => POIVerticalAlignment,
   BorderStyle => POIBorderStyle,
+  DataFormat => POIDataFormat,
   FillPatternType => POIFillPatternType,
-  IndexedColors
+  Font => POIFont,
+  HorizontalAlignment => POIHorizontalAlignment,
+  IndexedColors,
+  VerticalAlignment => POIVerticalAlignment
 }
 
 case class CellStyle(
-    font: Font = Font(),
-    dataFormat: DataFormat = DataFormat("General"),
-    alignment: Option[HorizontalAlignment] = None,
-    verticalAlignment: Option[VerticalAlignment] = None,
-    backgroundColor: Option[Color] = None,
-    foregroundColor: Option[Color] = None,
-    borders: Option[Borders] = None,
-    wrapText: Boolean = false,
-    locked: Boolean = true,
-    hidden: Boolean = false,
-    rotation: Short = 0,
-    indent: Short = 0
+  font: Font = Font(),
+  dataFormat: DataFormat = DataFormat("General"),
+  alignment: Option[HorizontalAlignment] = None,
+  verticalAlignment: Option[VerticalAlignment] = None,
+  backgroundColor: Option[Color] = None,
+  foregroundColor: Option[Color] = None,
+  borders: Option[Borders] = None,
+  wrapText: Boolean = false,
+  locked: Boolean = true,
+  hidden: Boolean = false,
+  rotation: Short = 0,
+  indent: Short = 0
 )
 
 case class Font(
-    name: String = FONT_ARIAL,
-    bold: Boolean = false,
-    italic: Boolean = false,
-    underline: Boolean = false,
-    strikeout: Boolean = false,
-    color: Short = POIFont.COLOR_NORMAL,
-    heightInPoints: Short = 10
+  name: String = FONT_ARIAL,
+  bold: Boolean = false,
+  italic: Boolean = false,
+  underline: Boolean = false,
+  strikeout: Boolean = false,
+  color: Short = POIFont.COLOR_NORMAL,
+  heightInPoints: Short = 10
 ) {
+
   def appliedTo(pf: POIFont): POIFont = {
     pf setFontName name
     pf setBold bold
@@ -45,12 +46,14 @@ case class Font(
     pf setFontHeightInPoints heightInPoints
     pf
   }
+
 }
 
 case class DataFormat(format: String) {
-  def appliedTo(poiDataFormat: POIDataFormat): Short = {
+
+  def appliedTo(poiDataFormat: POIDataFormat): Short =
     poiDataFormat.getFormat(format)
-  }
+
 }
 
 // Alignment enums
@@ -81,14 +84,14 @@ case class CustomColor(index: Short) extends Color { def toIndex = index }
 
 // Border support
 case class Borders(
-    top: Option[BorderStyle] = None,
-    bottom: Option[BorderStyle] = None,
-    left: Option[BorderStyle] = None,
-    right: Option[BorderStyle] = None,
-    topColor: Option[Color] = None,
-    bottomColor: Option[Color] = None,
-    leftColor: Option[Color] = None,
-    rightColor: Option[Color] = None
+  top: Option[BorderStyle] = None,
+  bottom: Option[BorderStyle] = None,
+  left: Option[BorderStyle] = None,
+  right: Option[BorderStyle] = None,
+  topColor: Option[Color] = None,
+  bottomColor: Option[Color] = None,
+  leftColor: Option[Color] = None,
+  rightColor: Option[Color] = None
 )
 
 sealed trait BorderStyle { def toPOI: POIBorderStyle }

@@ -150,6 +150,7 @@ class ErrorHandlingSpec extends Specification {
   }
 
   trait ValidWorkbookScope extends Scope {
+
     val validWorkbook = Workbook(
       Set(
         Sheet("Sheet1")(
@@ -172,9 +173,11 @@ class ErrorHandlingSpec extends Specification {
         )
       )
     )
+
   }
 
   trait InvalidWorkbookScope extends Scope {
+
     // Workbook with invalid formula (starts with =)
     val workbookWithInvalidFormula = Workbook(
       Set(
@@ -229,6 +232,7 @@ class ErrorHandlingSpec extends Specification {
         )
       )
     )
+
   }
 
   // Helper matchers for validation results
@@ -237,4 +241,5 @@ class ErrorHandlingSpec extends Specification {
 
   def beFailure[A]: org.specs2.matcher.Matcher[ValidationNel[String, A]] =
     (result: ValidationNel[String, A]) => (result.isFailure, s"Expected failure but got: $result")
+
 }
