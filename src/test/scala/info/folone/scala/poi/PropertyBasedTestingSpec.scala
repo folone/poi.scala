@@ -220,7 +220,7 @@ class PropertyBasedTestingSpec extends Specification with ScalaCheck {
           case NumericCell(_, value) => !value.isNaN must beTrue
           case DateCell(_, date) => date must not(beNull)
           case BooleanCell(_, _) => ok
-          case FormulaCell(_, formula) => formula must not(beEmpty)
+          case FormulaCell(_, formula) => formula.nonEmpty must beTrue
           case BlankCell(_) => ok
           case _ => ok
         }
@@ -283,7 +283,7 @@ class PropertyBasedTestingSpec extends Specification with ScalaCheck {
 
     "preserve sheet name" in
       forAll { (sheet: Sheet) =>
-        sheet.name must not(beEmpty)
+        sheet.name.nonEmpty must beTrue
         val reconstructed = Sheet(sheet.name)(sheet.rows)
         reconstructed.name must_== sheet.name
       }
@@ -313,7 +313,7 @@ class PropertyBasedTestingSpec extends Specification with ScalaCheck {
 
     "never be empty" in
       forAll { (workbook: Workbook) =>
-        workbook.sheets must not(beEmpty)
+        workbook.sheets.nonEmpty must beTrue
       }
 
     "preserve all data through operations" in
@@ -347,7 +347,7 @@ class PropertyBasedTestingSpec extends Specification with ScalaCheck {
     "accept valid formula syntax" in
       forAll(genCellIndex, genFormula) { (index: Int, formula: String) =>
         val cell = FormulaCell(index, formula)
-        cell.data must not(beEmpty)
+        cell.data.nonEmpty must beTrue
 
         // Should handle leading equals sign correctly
         val cellWithEquals = FormulaCell(index, s"=$formula")
