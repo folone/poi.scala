@@ -1,8 +1,8 @@
 package info.folone.scala.poi
 
+import java.io.File
 import org.specs2.mutable._
 import org.specs2.specification.Scope
-import java.io.File
 
 class ExtendedCellTypesSpec extends Specification {
 
@@ -142,7 +142,7 @@ class ExtendedCellTypesSpec extends Specification {
       )
 
       // Verify we have all the cell types
-      cells must have size (4)
+      cells must have size 4
       cells.find(_.isInstanceOf[StringCell]) must beSome
       cells.find(_.isInstanceOf[NumericCell]) must beSome
       cells.find(_.isInstanceOf[BlankCell]) must beSome
@@ -151,6 +151,7 @@ class ExtendedCellTypesSpec extends Specification {
   }
 
   trait MixedCellTypesScope extends Scope {
+
     val mixedWorkbook = Workbook(
       Set(
         Sheet("mixed")(
@@ -170,5 +171,7 @@ class ExtendedCellTypesSpec extends Specification {
         )
       )
     )
+
   }
+
 }

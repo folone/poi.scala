@@ -1,9 +1,10 @@
 package info.folone.scala.poi
 
-import org.specs2.mutable.Specification
 import java.io.File
+import org.specs2.mutable.Specification
 
 class PoiLoadFileSpec extends Specification {
+
   val testBook = Workbook(
     Set(
       Sheet("test")(
@@ -24,27 +25,25 @@ class PoiLoadFileSpec extends Specification {
     try {
       new impure.WorkbookImpure(testBook).overwrite(testBookPath)
       impure.load(testBookPath).sheets.head
-    } finally {
+    } finally
       testBookFile.delete()
-    }
   }
 
   "LoadWorkbook" should {
     "rows have size 4" in {
-      targetWorksheet.rows must have size (4)
+      targetWorksheet.rows must have size 4
     }
 
-    "Acell have size 12" in {
-      targetWorksheet.rows.toList.map { _.cells.size }.sum === 12
-    }
+    "Acell have size 12" in
+      targetWorksheet.rows.toList.map(_.cells.size).sum === 12
 
     "contains [A1...C4]" in {
       val expect = Set("A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C1", "C2", "C3", "C4")
       val actual =
-        for (
-          row <- targetWorksheet.rows;
+        for {
+          row <- targetWorksheet.rows
           case StringCell(_, cell) <- row.cells
-        ) yield cell
+        } yield cell
 
       actual === expect
     }

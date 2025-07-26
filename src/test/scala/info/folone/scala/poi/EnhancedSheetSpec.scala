@@ -223,10 +223,13 @@ class EnhancedSheetSpec extends Specification {
   }
 
   trait EnhancedSheetScope extends Scope {
+
     val testRows = Set(
       Row(0)(Set(StringCell(0, "Header1"), StringCell(1, "Header2"), StringCell(2, "Header3"))),
       Row(1)(Set(StringCell(0, "Data1"), NumericCell(1, 100.0), BooleanCell(2, true))),
       Row(2)(Set(StringCell(0, "Data2"), NumericCell(1, 200.0), BooleanCell(2, false)))
     )
+
   }
+
 }

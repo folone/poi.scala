@@ -43,21 +43,24 @@ lazy val buildSettings = Def.settings(
 
 val scalazVersion = "7.3.8"
 val poiVersion = "5.4.1"
+val jmhVersion = "1.37"
 
 lazy val standardSettings = Def.settings(
   buildSettings,
   licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   name := "poi-scala",
   Test / fork := true,
-  libraryDependencies ++= {
+  libraryDependencies ++=
     Seq(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
       "org.scalaz" %% "scalaz-effect" % scalazVersion,
       "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test",
-      "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test"
-    )
-  },
+      "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.18.1" % "test",
+      "org.openjdk.jmh" % "jmh-core" % jmhVersion,
+      "org.openjdk.jmh" % "jmh-generator-annprocess" % jmhVersion
+    ),
   Test / publishArtifact := false,
   pomExtra := (
     <url>https://github.com/folone/poi.scala</url>
@@ -85,6 +88,9 @@ lazy val standardSettings = Def.settings(
 lazy val poi = Project(
   id = "poi",
   base = file(".")
-).settings(
-  standardSettings
-)
+).enablePlugins(JmhPlugin)
+  .settings(
+    standardSettings,
+    // JMH configuration - use default jmh source directory
+    Jmh / dependencyClasspath := (Compile / dependencyClasspath).value ++ (Test / dependencyClasspath).value
+  )

@@ -1,9 +1,9 @@
 package info.folone.scala.poi
 
+import org.scalacheck._
+import org.specs2.mutable._
 import org.specs2.specification.Scope
 import org.specs2.ScalaCheck
-import org.specs2.mutable._
-import org.scalacheck._
 import scalaz.scalacheck.ScalazProperties._
 import Arbitrary._
 
@@ -77,4 +77,5 @@ class TypeclassLawsSpec extends Specification with ScalaCheck {
     Arbitrary(for {
       sheets <- arbitrary[Set[Sheet]]
     } yield Workbook(sheets))
+
 }

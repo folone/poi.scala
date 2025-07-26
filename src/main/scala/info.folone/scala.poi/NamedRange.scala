@@ -5,11 +5,11 @@ import org.apache.poi.ss.util.AreaReference
 
 // Named ranges support for Excel workbooks
 case class NamedRange(
-    name: String,
-    range: CellRange,
-    scope: NamedRangeScope = WorkbookScope,
-    comment: Option[String] = None,
-    hidden: Boolean = false
+  name: String,
+  range: CellRange,
+  scope: NamedRangeScope = WorkbookScope,
+  comment: Option[String] = None,
+  hidden: Boolean = false
 ) {
   def toReference: String = range.toCellRangeAddress
 
@@ -28,6 +28,7 @@ case class NamedRange(
     !name.contains(" ") &&
     name.length <= 255
   }
+
 }
 
 // Named range scope
@@ -39,7 +40,7 @@ case class SheetScope(sheetName: String) extends NamedRangeScope
 class NamedRangeManager(workbook: Workbook) {
   private var namedRanges: Map[String, NamedRange] = Map.empty
 
-  def addNamedRange(namedRange: NamedRange): Either[PoiError, NamedRangeManager] = {
+  def addNamedRange(namedRange: NamedRange): Either[PoiError, NamedRangeManager] =
     if (!namedRange.isValidName) {
       Left(InvalidCellReference(s"Invalid named range name: ${namedRange.name}"))
     } else if (namedRanges.contains(namedRange.name)) {
@@ -48,31 +49,27 @@ class NamedRangeManager(workbook: Workbook) {
       namedRanges = namedRanges + (namedRange.name -> namedRange)
       Right(this)
     }
-  }
 
   def removeNamedRange(name: String): NamedRangeManager = {
     namedRanges = namedRanges - name
     this
   }
 
-  def getNamedRange(name: String): Option[NamedRange] = {
+  def getNamedRange(name: String): Option[NamedRange] =
     namedRanges.get(name)
-  }
 
-  def getAllNamedRanges: List[NamedRange] = {
+  def getAllNamedRanges: List[NamedRange] =
     namedRanges.values.toList
-  }
 
-  def getNamedRangesForSheet(sheetName: String): List[NamedRange] = {
+  def getNamedRangesForSheet(sheetName: String): List[NamedRange] =
     namedRanges.values.filter { nr =>
       nr.scope match {
         case SheetScope(sheet) => sheet == sheetName
         case WorkbookScope => nr.range.sheet == sheetName
       }
     }.toList
-  }
 
-  def updateNamedRange(name: String, newRange: CellRange): Either[PoiError, NamedRangeManager] = {
+  def updateNamedRange(name: String, newRange: CellRange): Either[PoiError, NamedRangeManager] =
     namedRanges.get(name) match {
       case Some(existing) =>
         namedRanges = namedRanges + (name -> existing.copy(range = newRange))
@@ -80,9 +77,8 @@ class NamedRangeManager(workbook: Workbook) {
       case None =>
         Left(InvalidCellReference(s"Named range '$name' not found"))
     }
-  }
 
-  def renameNamedRange(oldName: String, newName: String): Either[PoiError, NamedRangeManager] = {
+  def renameNamedRange(oldName: String, newName: String): Either[PoiError, NamedRangeManager] =
     namedRanges.get(oldName) match {
       case Some(existing) if !namedRanges.contains(newName) =>
         namedRanges = namedRanges - oldName + (newName -> existing.copy(name = newName))
@@ -92,7 +88,7 @@ class NamedRangeManager(workbook: Workbook) {
       case None =>
         Left(InvalidCellReference(s"Named range '$oldName' not found"))
     }
-  }
+
 }
 
 // Named range builder for fluent API
@@ -137,7 +133,7 @@ class NamedRangeBuilder(name: String) {
     this
   }
 
-  def build(): Either[PoiError, NamedRange] = {
+  def build(): Either[PoiError, NamedRange] =
     range match {
       case Some(r) =>
         val namedRange = NamedRange(name, r, scope, comment, hidden)
@@ -149,7 +145,7 @@ class NamedRangeBuilder(name: String) {
       case None =>
         Left(InvalidCellReference("Named range must have a cell range"))
     }
-  }
+
 }
 
 object NamedRangeBuilder {
@@ -158,40 +154,35 @@ object NamedRangeBuilder {
 
 // Predefined common named ranges
 object CommonNamedRanges {
-  def printArea(sheetName: String, range: CellRange): NamedRange = {
+
+  def printArea(sheetName: String, range: CellRange): NamedRange =
     NamedRange("Print_Area", range, SheetScope(sheetName), Some("Print area for the sheet"))
-  }
 
-  def printTitles(sheetName: String, range: CellRange): NamedRange = {
+  def printTitles(sheetName: String, range: CellRange): NamedRange =
     NamedRange("Print_Titles", range, SheetScope(sheetName), Some("Print titles for the sheet"))
-  }
 
-  def database(sheetName: String, range: CellRange): NamedRange = {
+  def database(sheetName: String, range: CellRange): NamedRange =
     NamedRange("Database", range, WorkbookScope, Some("Database range"))
-  }
 
-  def criteria(sheetName: String, range: CellRange): NamedRange = {
+  def criteria(sheetName: String, range: CellRange): NamedRange =
     NamedRange("Criteria", range, WorkbookScope, Some("Criteria range"))
-  }
 
-  def extract(sheetName: String, range: CellRange): NamedRange = {
+  def extract(sheetName: String, range: CellRange): NamedRange =
     NamedRange("Extract", range, WorkbookScope, Some("Extract range"))
-  }
+
 }
 
 // Extension for Workbook to support named ranges
 trait NamedRangeSupport {
   def namedRangeManager: NamedRangeManager
 
-  def addNamedRange(namedRange: NamedRange): Either[PoiError, Unit] = {
+  def addNamedRange(namedRange: NamedRange): Either[PoiError, Unit] =
     namedRangeManager.addNamedRange(namedRange).map(_ => ())
-  }
 
-  def getNamedRange(name: String): Option[NamedRange] = {
+  def getNamedRange(name: String): Option[NamedRange] =
     namedRangeManager.getNamedRange(name)
-  }
 
-  def removeNamedRange(name: String): Unit = {
+  def removeNamedRange(name: String): Unit =
     namedRangeManager.removeNamedRange(name)
-  }
+
 }
