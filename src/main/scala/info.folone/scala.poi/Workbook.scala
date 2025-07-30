@@ -19,7 +19,10 @@ import std.map._
 import syntax.applicative._
 import syntax.monoid._
 
-class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF) {
+class Workbook(
+  val sheetMap: Map[String, Sheet],
+  format: WorkbookVersion = HSSF
+) {
   Telemetry.pingOnce()
   val sheets: Set[Sheet] = sheetMap.values.toSet
 
@@ -45,8 +48,17 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     val workbook = format match {
       case HSSF => new org.apache.poi.hssf.usermodel.HSSFWorkbook
       case XSSF => new org.apache.poi.xssf.usermodel.XSSFWorkbook
-      case SXSSF => new org.apache.poi.xssf.streaming.SXSSFWorkbook(-1)
+      case SXSSF(rowAccessWindow, compressTmpFiles, useSharedStringsTable, encryptTmpFiles) =>
+        org.apache.poi.openxml4j.util.ZipInputStreamZipEntrySource.setEncryptTempFiles(encryptTmpFiles);
+        val rowAccessWindowValue = rowAccessWindow.getOrElse(-1) // Default to -1 for infinite window
+        new org.apache.poi.xssf.streaming.SXSSFWorkbook(
+          new org.apache.poi.xssf.usermodel.XSSFWorkbook,
+          rowAccessWindowValue,
+          compressTmpFiles,
+          useSharedStringsTable
+        )
     }
+
     sheets foreach { sh =>
       val Sheet(name, rows) = sh
       val sheet = workbook.createSheet(name)
@@ -59,6 +71,7 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
         }
       }
     }
+
     workbook
   }
 
@@ -136,6 +149,42 @@ class Workbook(val sheetMap: Map[String, Sheet], format: WorkbookVersion = HSSF)
     this
   }
 
+  // Performance optimized bulk operations
+  def addSheetWithBulkData(
+    name: String,
+    data: Seq[Seq[Any]],
+    config: Option[SXSSF] = None
+  ): Workbook = {
+    val rows = data.zipWithIndex.map { case (rowData, rowIndex) =>
+      val cells: Set[Cell] = rowData.zipWithIndex.map { case (cellData, colIndex) =>
+        cellData match {
+          case s: String => StringCell(colIndex, s): Cell
+          case d: Double => NumericCell(colIndex, d): Cell
+          case i: Int => NumericCell(colIndex, i.toDouble): Cell
+          case b: Boolean => BooleanCell(colIndex, b): Cell
+          case date: java.util.Date => DateCell(colIndex, date): Cell
+          case _ => StringCell(colIndex, cellData.toString): Cell
+        }
+      }.toSet
+      Row(rowIndex)(cells)
+    }.toSet
+
+    val newSheet = Sheet(name)(rows)
+    val newSheetMap = sheetMap + (name -> newSheet)
+    new Workbook(newSheetMap, format)
+  }
+
+  def addRowsInBulk(sheetName: String, rowData: Seq[(Int, Seq[(Int, Any)])]): Workbook =
+    sheetMap.get(sheetName) match {
+      case Some(sheet) =>
+        val newRows = BulkOperations.createRowsInBulk(rowData)
+        val updatedSheet = new Sheet(sheet.name, sheet.rows ++ newRows)
+        val newSheetMap = sheetMap + (sheetName -> updatedSheet)
+        new Workbook(newSheetMap, format)
+      case None =>
+        throw new IllegalArgumentException(s"Sheet '$sheetName' not found")
+    }
+
   def safeToFile(path: String): Result[Unit] = {
     def close(resource: FileOutputStream): IO[Unit] = IO(resource.close())
     val action = IO(new FileOutputStream(new File(path))).bracket(close) { file =>
@@ -164,6 +213,27 @@ object Workbook {
 
   def apply(sheets: Set[Sheet], format: WorkbookVersion = HSSF): Workbook =
     new Workbook(sheets.map(s => (s.name, s)).toMap, format)
+
+  // Streaming workbook creation with configurable SXSSF
+  def streaming(
+    sheets: Set[Sheet],
+    config: SXSSF = SXSSF()
+  ): Workbook =
+    new Workbook(sheets.map(s => (s.name, s)).toMap, config)
+
+  // Create workbook optimized for large datasets
+  def forLargeDataset(
+    sheets: Set[Sheet],
+    rowAccessWindow: Int = 100,
+    enableMemoryMonitoring: Boolean = true
+  ): Workbook = {
+    val sxssfConfig = SXSSF(
+      rowAccessWindowSize = Some(rowAccessWindow),
+      compressTmpFiles = true,
+      useSharedStringsTable = false
+    )
+    new Workbook(sheets.map(s => (s.name, s)).toMap, sxssfConfig)
+  }
 
   def apply(path: String): Result[Workbook] = {
     val action: IO[File] = IO(new File(path))
