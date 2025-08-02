@@ -135,7 +135,7 @@ jobs:
     - uses: sbt/setup-sbt@v1
     - name: Check if JMH compiles
       run: |
-        if sbt "Jmh/compile"; then
+        if sbt "benchmarks/Jmh/compile"; then
           echo "✅ JMH compilation successful"
         else
           echo "❌ JMH compilation failed, skipping benchmarks"
@@ -143,7 +143,7 @@ jobs:
         fi
     - name: Run JMH benchmarks
       run: |
-        sbt "Jmh/run -rf json -rff benchmark-results.json .*PoiBenchmarks.*" || echo "Benchmarks failed but continuing"
+        sbt "benchmarks/Jmh/run -rf json -rff benchmark-results.json .*PoiBenchmarks.*" || echo "Benchmarks failed but continuing"
     - name: Store benchmark results
       uses: actions/upload-artifact@v4
       if: always()
@@ -181,7 +181,7 @@ jobs:
     - uses: sbt/setup-sbt@v1
     - name: Check if memory benchmarks compile
       run: |
-        if sbt "Jmh/compile"; then
+        if sbt "benchmarks/Jmh/compile"; then
           echo "✅ JMH compilation successful for memory tests"
         else
           echo "❌ JMH compilation failed, skipping memory tests"
@@ -191,7 +191,7 @@ jobs:
       run: |
         # Run with larger heap for memory testing
         export SBT_OPTS="-Xmx2g -XX:+UseG1GC"
-        sbt "Jmh/run -rf json -rff memory-results.json .*MemoryBenchmarks.*" || echo "Memory benchmarks failed but continuing"
+        sbt "benchmarks/Jmh/run -rf json -rff memory-results.json .*MemoryBenchmarks.*" || echo "Memory benchmarks failed but continuing"
     - name: Store memory results
       uses: actions/upload-artifact@v4
       if: always()

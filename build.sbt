@@ -48,19 +48,7 @@ val jmhVersion = "1.37"
 lazy val standardSettings = Def.settings(
   buildSettings,
   licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-  name := "poi-scala",
   Test / fork := true,
-  libraryDependencies ++=
-    Seq(
-      "org.apache.poi" % "poi" % poiVersion,
-      "org.apache.poi" % "poi-ooxml" % poiVersion,
-      "org.scalaz" %% "scalaz-effect" % scalazVersion,
-      "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test",
-      "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.18.1" % "test",
-      "org.openjdk.jmh" % "jmh-core" % jmhVersion,
-      "org.openjdk.jmh" % "jmh-generator-annprocess" % jmhVersion
-    ),
   Test / publishArtifact := false,
   pomExtra := (
     <url>https://github.com/folone/poi.scala</url>
@@ -85,12 +73,85 @@ lazy val standardSettings = Def.settings(
   )
 )
 
-lazy val poi = Project(
-  id = "poi",
+lazy val root = Project(
+  id = "root",
   base = file(".")
+).settings(
+  standardSettings,
+  name := "poi-scala-aggregate",
+  publishArtifact := false
+).aggregate(core, scalaz, async, benchmarks, fatjar)
+
+lazy val fatjar = Project(
+  id = "fatjar",
+  base = file("poi-scala-fatjar")
+).enablePlugins(AssemblyPlugin)
+  .settings(
+    standardSettings,
+    name := "poi-scala",
+    assembly / assemblyJarName := s"${name.value}_${scalaBinaryVersion.value}-${version.value}.jar",
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", _ @_*) => MergeStrategy.discard
+      case "reference.conf" => MergeStrategy.concat
+      case _ => MergeStrategy.first
+    },
+    addArtifact(assembly / artifact, assembly)
+  )
+  .dependsOn(core, scalaz, async)
+
+lazy val core = Project(
+  id = "core",
+  base = file("poi-scala-core")
+).settings(
+  standardSettings,
+  name := "poi-scala-core",
+  libraryDependencies ++=
+    Seq(
+      "org.apache.poi" % "poi" % poiVersion,
+      "org.apache.poi" % "poi-ooxml" % poiVersion,
+      "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
+    )
+)
+
+lazy val scalaz = Project(
+  id = "scalaz",
+  base = file("poi-scala-scalaz")
+).settings(
+  standardSettings,
+  name := "poi-scala-scalaz",
+  libraryDependencies ++= Seq(
+    "org.scalaz" %% "scalaz-effect" % scalazVersion,
+    "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test",
+    "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
+    "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
+  )
+).dependsOn(core % "test->test;compile->compile")
+
+lazy val async = Project(
+  id = "async",
+  base = file("poi-scala-async")
+).settings(
+  standardSettings,
+  name := "poi-scala-async",
+  libraryDependencies ++= Seq(
+    "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
+    "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
+  )
+).dependsOn(core)
+
+lazy val benchmarks = Project(
+  id = "benchmarks",
+  base = file("benchmarks")
 ).enablePlugins(JmhPlugin)
   .settings(
     standardSettings,
-    // JMH configuration - use default jmh source directory
-    Jmh / dependencyClasspath := (Compile / dependencyClasspath).value ++ (Test / dependencyClasspath).value
+    name := "poi-scala-benchmarks",
+    publishArtifact := false,
+    libraryDependencies ++= Seq(
+      "org.openjdk.jmh" % "jmh-core" % jmhVersion,
+      "org.openjdk.jmh" % "jmh-generator-annprocess" % jmhVersion
+    ),
+    Jmh / dependencyClasspath := (Compile / dependencyClasspath).value ++ (Test / dependencyClasspath).value ++ (scalaz / Compile / dependencyClasspath).value
   )
+  .dependsOn(core, scalaz)
