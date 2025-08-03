@@ -128,6 +128,20 @@ lazy val scalaz = Project(
   )
 ).dependsOn(core % "test->test;compile->compile")
 
+lazy val cats = Project(
+  id = "cats",
+  base = file("poi-scala-cats")
+).settings(
+  standardSettings,
+  name := "poi-scala-cats",
+  libraryDependencies ++= Seq(
+    "org.typelevel" %% "cats-core" % "2.12.0",
+    "org.typelevel" %% "cats-effect" % "3.5.4",
+    "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
+    "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
+  )
+).dependsOn(core % "test->test;compile->compile")
+
 lazy val async = Project(
   id = "async",
   base = file("poi-scala-async")
@@ -152,6 +166,6 @@ lazy val benchmarks = Project(
       "org.openjdk.jmh" % "jmh-core" % jmhVersion,
       "org.openjdk.jmh" % "jmh-generator-annprocess" % jmhVersion
     ),
-    Jmh / dependencyClasspath := (Compile / dependencyClasspath).value ++ (Test / dependencyClasspath).value ++ (scalaz / Compile / dependencyClasspath).value ++ (async / Compile / dependencyClasspath).value
+    Jmh / dependencyClasspath := (Compile / dependencyClasspath).value ++ (Test / dependencyClasspath).value ++ (scalaz / Compile / dependencyClasspath).value ++ (cats / Compile / dependencyClasspath).value ++ (async / Compile / dependencyClasspath).value
   )
-  .dependsOn(core, scalaz, async)
+  .dependsOn(core, scalaz, cats, async)
