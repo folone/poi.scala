@@ -163,8 +163,7 @@ jobs:
         body: |
           📊 **Benchmark Results**
 
-          [View Benchmark Report](https://g.omg.lol/poi.scala/dev/bench/)
-          [Alternative Link](https://folone.github.io/poi.scala/dev/bench/)
+          [View Benchmark Report](https://folone.github.io/poi.scala/dev/bench/)
 
   memory-testing:
     name: Memory & Stress Testing
