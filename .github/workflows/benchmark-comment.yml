@@ -1,0 +1,40 @@
+name: Benchmark Comment
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+jobs:
+  benchmark-comment:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Download benchmark results
+        uses: actions/download-artifact@v4
+        with:
+          name: benchmark-results
+
+      - name: Compare benchmark results
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: JMH Benchmarks
+          tool: 'jmh'
+          output-file-path: benchmark-results.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          # Do not fail the build, just comment on the PR.
+          fail-on-alert: false
+
+      - name: Post benchmark page link
+        if: github.event.workflow_run.event == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          body: |
+            📊 **Benchmark Results**
+
+            The detailed benchmark results are available for review on our website.
+
+            [View Benchmark Report](https://folone.github.io/poi.scala/dev/bench/)
