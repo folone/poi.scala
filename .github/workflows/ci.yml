@@ -2,6 +2,7 @@ name: CI Pipeline
 on:
   pull_request:
   push:
+    branches: [master]
   schedule:
   - cron: '0 0 * * 0'
 
@@ -144,26 +145,26 @@ jobs:
     - name: Run JMH benchmarks
       run: |
         sbt "benchmarks/Jmh/run -rf json -rff benchmark-results.json .*PoiBenchmarks.*" || echo "Benchmarks failed but continuing"
-    - name: Store benchmark results
-      uses: actions/upload-artifact@v4
-      if: always()
+    - name: Compare benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
       with:
-        name: benchmark-results
-        path: benchmark-results.json
-    - name: Performance regression check
-      run: |
-        echo "Checking for performance regressions..."
-        if [ -f benchmark-results.json ]; then
-          echo "Benchmark results generated successfully"
-          # Add basic performance validation
-          if grep -q "error" benchmark-results.json; then
-            echo "❌ Benchmark errors detected"
-          else
-            echo "✅ All benchmarks completed successfully"
-          fi
-        else
-          echo "⚠️ No benchmark results found"
-        fi
+        name: JMH Benchmarks
+        tool: 'jmh'
+        output-file-path: benchmarks/benchmark-results.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        # Do not fail the build, just comment on the PR.
+        fail-on-alert: false
+    - name: Post benchmark page link
+      if: github.event_name == 'pull_request'
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          📊 **Benchmark Results**
+
+          [View Benchmark Report](https://g.omg.lol/poi.scala/dev/bench/)
+          [Alternative Link](https://folone.github.io/poi.scala/dev/bench/)
 
   memory-testing:
     name: Memory & Stress Testing
@@ -192,12 +193,16 @@ jobs:
         # Run with larger heap for memory testing
         export SBT_OPTS="-Xmx2g -XX:+UseG1GC"
         sbt "benchmarks/Jmh/run -rf json -rff memory-results.json .*MemoryBenchmarks.*" || echo "Memory benchmarks failed but continuing"
-    - name: Store memory results
-      uses: actions/upload-artifact@v4
-      if: always()
+    - name: Compare memory benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
       with:
-        name: memory-test-results
-        path: memory-results.json
+        name: JMH Memory Benchmarks
+        tool: 'jmh'
+        output-file-path: benchmarks/memory-results.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        # Do not fail the build, just comment on the PR.
+        fail-on-alert: false
 
   # REQUIRED STATUS CHECK - All critical jobs must pass
   required-checks:
