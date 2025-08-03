@@ -152,6 +152,6 @@ lazy val benchmarks = Project(
       "org.openjdk.jmh" % "jmh-core" % jmhVersion,
       "org.openjdk.jmh" % "jmh-generator-annprocess" % jmhVersion
     ),
-    Jmh / dependencyClasspath := (Compile / dependencyClasspath).value ++ (Test / dependencyClasspath).value ++ (scalaz / Compile / dependencyClasspath).value
+    Jmh / dependencyClasspath := (Compile / dependencyClasspath).value ++ (Test / dependencyClasspath).value ++ (scalaz / Compile / dependencyClasspath).value ++ (async / Compile / dependencyClasspath).value
   )
-  .dependsOn(core, scalaz)
+  .dependsOn(core, scalaz, async)
