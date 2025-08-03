@@ -12,27 +12,9 @@ jobs:
     if: github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Download benchmark results
-        uses: actions/github-script@v6
+        uses: actions/download-artifact@v4
         with:
-          script: |
-            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.payload.workflow_run.id,
-            });
-            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
-              return artifact.name == "benchmark-results"
-            })[0];
-            let download = await github.rest.actions.downloadArtifact({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              artifact_id: matchArtifact.id,
-              archive_format: 'zip',
-            });
-            let fs = require('fs');
-            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/benchmark-results.zip`, Buffer.from(download.data));
-      - name: Unzip benchmark results
-        run: unzip benchmark-results.zip
+          name: benchmark-results
 
       - name: Compare benchmark results
         uses: benchmark-action/github-action-benchmark@v1
@@ -55,4 +37,4 @@ jobs:
 
             The detailed benchmark results are available for review on our website.
 
-            [View Benchmark Report](https://g.omg.lol/poi.scala/dev/bench/)
+            [View Benchmark Report](https://folone.github.io/poi.scala/dev/bench/)
