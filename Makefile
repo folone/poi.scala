@@ -128,11 +128,11 @@ watch-test:
 
 # Format code
 format:
-	./sbt scalafmtAll
+	./sbt scalafmtAll scalafmtSbt
 
 # Check code formatting
 format-check:
-	./sbt scalafmtCheckAll
+	./sbt scalafmtCheckAll scalafmtSbtCheck
 
 # Integration test specific targets
 test-integration:
