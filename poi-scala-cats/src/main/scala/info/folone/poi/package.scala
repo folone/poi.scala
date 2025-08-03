@@ -1,12 +1,10 @@
-package info.folone.scala
+package info.folone.poi
 
-import cats._
-import cats.implicits._
-import poi._
+import _root_.cats._
+import _root_.cats.implicits._
+import _root_.scala.annotation.tailrec
 
-import scala.annotation.tailrec
-
-package object poi extends Instances
+package object cats extends Instances
 
 trait Instances {
 
