@@ -73,6 +73,7 @@ jobs:
           fi
 
       - name: Combine benchmark results
+        id: combine-results
         if: steps.check-benchmarks.outputs.found == 'true'
         run: |
           # Combine all benchmark JSON files into a single file for processing
@@ -85,19 +86,29 @@ jobs:
             # Use jq to properly merge all JSON arrays into one
             jq -s 'map(.[]) | flatten' benchmark-results-*.json > benchmark-results.json
             
-            echo "Combined $(jq length benchmark-results.json 2>/dev/null || echo "0") benchmark results"
+            RESULT_COUNT=$(jq length benchmark-results.json 2>/dev/null || echo "0")
+            echo "Combined $RESULT_COUNT benchmark results"
             ls -la benchmark-results.json
             
-            # Debug: show first few lines of the combined file
-            echo "Sample of combined results:"
-            head -20 benchmark-results.json || echo "File is empty or invalid"
+            # Check if we have actual benchmark data (not just empty arrays)
+            if [ "$RESULT_COUNT" -gt 0 ]; then
+              echo "has-results=true" >> $GITHUB_OUTPUT
+              echo "✅ Found valid benchmark results"
+              # Debug: show first few lines of the combined file
+              echo "Sample of combined results:"
+              head -20 benchmark-results.json
+            else
+              echo "has-results=false" >> $GITHUB_OUTPUT
+              echo "⚠️ No actual benchmark results found (only empty arrays)"
+            fi
           else
             echo "No benchmark result files found"
             echo "[]" > benchmark-results.json
+            echo "has-results=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Compare benchmark results
-        if: steps.check-benchmarks.outputs.found == 'true'
+        if: steps.check-benchmarks.outputs.found == 'true' && steps.combine-results.outputs.has-results == 'true'
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: JMH Benchmarks
@@ -109,7 +120,11 @@ jobs:
           fail-on-alert: false
 
       - name: Post benchmark page link
-        if: github.event.workflow_run.event == 'pull_request' && steps.get-pr.outputs.pr-number != '' && steps.check-benchmarks.outputs.found == 'true'
+        if: |
+          github.event.workflow_run.event == 'pull_request' && 
+          steps.get-pr.outputs.pr-number != '' && 
+          steps.check-benchmarks.outputs.found == 'true' &&
+          steps.combine-results.outputs.has-results == 'true'
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ steps.get-pr.outputs.pr-number }}
@@ -129,7 +144,10 @@ jobs:
             > Comprehensive benchmarks with full parameter matrix run automatically on master branch.
 
       - name: Post no benchmarks comment
-        if: github.event.workflow_run.event == 'pull_request' && steps.get-pr.outputs.pr-number != '' && steps.check-benchmarks.outputs.found == 'false'
+        if: |
+          github.event.workflow_run.event == 'pull_request' && 
+          steps.get-pr.outputs.pr-number != '' && 
+          (steps.check-benchmarks.outputs.found == 'false' || steps.combine-results.outputs.has-results == 'false')
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ steps.get-pr.outputs.pr-number }}
@@ -138,6 +156,7 @@ jobs:
 
             No benchmark results were generated for this PR. This can happen when:
             - Benchmarks were skipped due to compilation issues
+            - JMH failed to create output files (directory issues)
             - The workflow was triggered from a schedule event
             - Benchmark jobs were filtered out due to conditions
 

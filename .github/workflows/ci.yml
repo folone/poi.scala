@@ -142,6 +142,9 @@ jobs:
           fi
       - name: Run optimized JMH benchmarks
         run: |
+          # Ensure benchmarks directory exists
+          mkdir -p benchmarks
+          
           case "${{ matrix.benchmark-type }}" in
             "core")
               # Run core benchmarks with reduced parameters for faster execution
@@ -207,6 +210,9 @@ jobs:
       - uses: sbt/setup-sbt@v1
       - name: Run full benchmark suite
         run: |
+          # Ensure benchmarks directory exists
+          mkdir -p benchmarks
+          
           # Run all benchmarks with all parameter combinations (comprehensive)
           export SBT_OPTS="-Xmx4g -XX:+UseG1GC"
           if sbt "benchmarks/Jmh/run -rf json -rff benchmarks/comprehensive-results.json"; then
