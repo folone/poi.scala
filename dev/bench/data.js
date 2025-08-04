@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1754295784323,
+  "lastUpdate": 1754298019033,
   "repoUrl": "https://github.com/folone/poi.scala",
   "entries": {
     "JMH Benchmarks": [
@@ -3436,6 +3436,66 @@ window.BENCHMARK_DATA = {
           {
             "name": "info.folone.scala.poi.benchmarks.MemoryBenchmarks.memoryEfficiencyBenchmark ( {\"dataSize\":\"10000\"} )",
             "value": 34.769728,
+            "unit": "ms/op",
+            "extra": "iterations: 5\nforks: 1\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "george.leontiev@reddit.com",
+            "name": "George Leontiev",
+            "username": "folone"
+          },
+          "committer": {
+            "email": "george.leontiev@reddit.com",
+            "name": "George Leontiev",
+            "username": "folone"
+          },
+          "distinct": true,
+          "id": "51f323e9f6aadcc7dafcc18e2edb3c479bc8d295",
+          "message": "Don't forget to checkout the repo",
+          "timestamp": "2025-08-04T09:55:57+01:00",
+          "tree_id": "961d2b240d62eab6d36218415a1f25fd602be672",
+          "url": "https://github.com/folone/poi.scala/commit/51f323e9f6aadcc7dafcc18e2edb3c479bc8d295"
+        },
+        "date": 1754298018108,
+        "tool": "jmh",
+        "benches": [
+          {
+            "name": "info.folone.scala.poi.benchmarks.MemoryBenchmarks.memoryAllocationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 6.222439,
+            "unit": "ms/op",
+            "extra": "iterations: 5\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.MemoryBenchmarks.memoryAllocationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 17.2828464,
+            "unit": "ms/op",
+            "extra": "iterations: 5\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.MemoryBenchmarks.memoryAllocationBenchmark ( {\"dataSize\":\"10000\"} )",
+            "value": 35.5592176,
+            "unit": "ms/op",
+            "extra": "iterations: 5\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.MemoryBenchmarks.memoryEfficiencyBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 19.6878112,
+            "unit": "ms/op",
+            "extra": "iterations: 5\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.MemoryBenchmarks.memoryEfficiencyBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 24.124883599999997,
+            "unit": "ms/op",
+            "extra": "iterations: 5\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.MemoryBenchmarks.memoryEfficiencyBenchmark ( {\"dataSize\":\"10000\"} )",
+            "value": 31.072349000000003,
             "unit": "ms/op",
             "extra": "iterations: 5\nforks: 1\nthreads: 1"
           }
