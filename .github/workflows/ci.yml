@@ -175,11 +175,26 @@ jobs:
 
           # Verify the results file exists and has content
           result_file="benchmark-results-${{ matrix.benchmark-type }}.json"
+
+          # Check both project root and benchmarks directory
           if [ -f "$result_file" ] && [ -s "$result_file" ]; then
-            echo "✅ Results file created: $result_file"
+            echo "✅ Results file found in project root: $result_file"
+            ls -la "$result_file"
+          elif [ -f "benchmarks/$result_file" ] && [ -s "benchmarks/$result_file" ]; then
+            echo "✅ Results file found in benchmarks directory, moving to root"
+            mv "benchmarks/$result_file" "$result_file"
             ls -la "$result_file"
           else
-            echo "⚠️ Results file missing or empty, creating fallback"
+            echo "⚠️ Results file missing or empty in both locations, creating fallback"
+            echo "🔍 Debugging: Let's find where JMH actually wrote files..."
+            echo "Current working directory: $(pwd)"
+            echo "Files in project root:"
+            ls -la *.json 2>/dev/null || echo "No JSON files in root"
+            echo "Files in benchmarks directory:"
+            ls -la benchmarks/*.json 2>/dev/null || echo "No JSON files in benchmarks/"
+            echo "Searching for any JSON files containing 'benchmark':"
+            find . -name "*benchmark*.json" -type f 2>/dev/null | head -10
+            echo "Creating fallback file..."
             echo "[]" > "$result_file"
           fi
       - name: Store benchmark results
@@ -209,16 +224,32 @@ jobs:
         run: |
           # Run all benchmarks with all parameter combinations (comprehensive)
           export SBT_OPTS="-Xmx4g -XX:+UseG1GC"
+          echo "🔍 Starting comprehensive benchmarks from directory: $(pwd)"
           if sbt 'benchmarks/Jmh/run -rf json -rff comprehensive-results.json'; then
             echo "✅ Comprehensive benchmarks completed successfully"
-            ls -la comprehensive-results.json
+            if [ -f "comprehensive-results.json" ]; then
+              echo "✅ Found comprehensive-results.json in project root"
+              ls -la comprehensive-results.json
+            elif [ -f "benchmarks/comprehensive-results.json" ]; then
+              echo "✅ Found comprehensive-results.json in benchmarks directory, moving to root"
+              mv "benchmarks/comprehensive-results.json" "comprehensive-results.json"
+              ls -la comprehensive-results.json
+            else
+              echo "⚠️ comprehensive-results.json not found in either location"
+              echo "🔍 Searching for comprehensive results files..."
+              echo "Files in project root:"
+              ls -la *.json 2>/dev/null || echo "No JSON files in root"
+              echo "Files in benchmarks directory:"
+              ls -la benchmarks/*.json 2>/dev/null || echo "No JSON files in benchmarks/"
+              find . -name "*comprehensive*.json" -o -name "*results*.json" 2>/dev/null | head -10
+            fi
           else
             echo "❌ Comprehensive benchmarks failed, creating empty results file"
             echo "[]" > comprehensive-results.json
           fi
       - name: Validate comprehensive benchmark results
         id: validate-results
-        if: always()  # Run even if benchmarks failed
+        if: always() # Run even if benchmarks failed
         run: |
           if [ -f "comprehensive-results.json" ] && [ -s "comprehensive-results.json" ]; then
             RESULT_COUNT=$(jq length comprehensive-results.json 2>/dev/null || echo "0")
