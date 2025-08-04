@@ -3,8 +3,8 @@ package info.folone.scala.poi.benchmarks
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
-import info.folone.scala.poi._
-import info.folone.scala.poi.AsyncOperations._
+import info.folone.poi._
+import info.folone.poi.async.AsyncOperations._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 

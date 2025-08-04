@@ -1,8 +1,9 @@
 package info.folone.poi.cats
 
+import cats.effect.unsafe.implicits.global
+import info.folone.poi._
 import java.io.File
 import org.specs2.mutable._
-import cats.effect.unsafe.implicits.global
 
 class IOOperationsSpec extends Specification {
   sequential
@@ -11,7 +12,7 @@ class IOOperationsSpec extends Specification {
 
     "create workbook using Cats IO" in {
       val sheets = Set(
-        Sheet("IOTest")( 
+        Sheet("IOTest")(
           Set(
             Row(0)(Set(StringCell(0, "IO Test Data")))
           )
@@ -28,7 +29,7 @@ class IOOperationsSpec extends Specification {
     "save and load workbook using Cats IO" in {
       val originalWorkbook = Workbook(
         Set(
-          Sheet("IOSaveLoad")( 
+          Sheet("IOSaveLoad")(
             Set(
               Row(0)(Set(StringCell(0, "IO Save/Load Test")))
             )

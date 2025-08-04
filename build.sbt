@@ -80,7 +80,7 @@ lazy val root = Project(
   standardSettings,
   name := "poi-scala-aggregate",
   publishArtifact := false
-).aggregate(core, scalaz, async, benchmarks, fatjar)
+).aggregate(core, scalaz, cats, async, benchmarks, fatjar)
 
 lazy val fatjar = Project(
   id = "fatjar",
@@ -137,6 +137,8 @@ lazy val cats = Project(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % "2.12.0",
     "org.typelevel" %% "cats-effect" % "3.5.4",
+    "org.typelevel" %% "cats-laws" % "2.12.0" % "test",
+    "org.typelevel" %% "discipline-specs2" % "1.4.0" % "test",
     "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
     "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
   )

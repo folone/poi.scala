@@ -62,11 +62,10 @@ object WorkbookValidator {
     else errors.toList.head.invalidNel
   }
 
-  def validateAll(workbook: Workbook): ValidationResult[Workbook] = {
+  def validateAll(workbook: Workbook): ValidationResult[Workbook] =
     (validateFormulas(workbook), validateCellReferences(workbook), validateDataTypes(workbook)).mapN { (_, _, _) =>
       workbook
     }
-  }
 
   private def isValidFormula(formula: String): Boolean =
     // Basic formula validation - the formula should not be empty and should look like a valid Excel formula

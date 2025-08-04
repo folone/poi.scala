@@ -1,8 +1,11 @@
 package info.folone.poi.cats
 
-import org.specs2.mutable._
+import cats.{Monoid, Semigroup}
 import cats.implicits._
-import cats.kernel.laws.discipline._
+import cats.laws.discipline._
+import info.folone.poi._
+import info.folone.poi.cats
+import org.specs2.mutable._
 
 class MonoidLawsSpec extends Specification {
 
@@ -12,27 +15,27 @@ class MonoidLawsSpec extends Specification {
       val wb2 = Workbook(Set(Sheet("Sheet2")(Set(Row(0)(Set(StringCell(0, "B")))))))
       val wb3 = Workbook(Set(Sheet("Sheet3")(Set(Row(0)(Set(StringCell(0, "C")))))))
 
-      val wbInstance = implicitly[Monoid[Workbook]]
+      val wb = implicitly[Monoid[Workbook]]
 
       // (wb1 |+| wb2) |+| wb3 === wb1 |+| (wb2 |+| wb3)
-      val left = wbInstance.combine(wbInstance.combine(wb1, wb2), wb3)
-      val right = wbInstance.combine(wb1, wbInstance.combine(wb2, wb3))
+      val left = wb.combine(wb.combine(wb1, wb2), wb3)
+      val right = wb.combine(wb1, wb.combine(wb2, wb3))
 
       left must beEqualTo(right)
     }
 
     "satisfy left identity" in {
       val wb1 = Workbook(Set(Sheet("Sheet1")(Set(Row(0)(Set(StringCell(0, "A")))))))
-      val wbInstance = implicitly[Monoid[Workbook]]
+      val wb = implicitly[Monoid[Workbook]]
 
-      wbInstance.combine(wb1, wbInstance.empty) must beEqualTo(wb1)
+      wb.combine(wb1, wb.empty) must beEqualTo(wb1)
     }
 
     "satisfy right identity" in {
       val wb1 = Workbook(Set(Sheet("Sheet1")(Set(Row(0)(Set(StringCell(0, "A")))))))
-      val wbInstance = implicitly[Monoid[Workbook]]
+      val wb = implicitly[Monoid[Workbook]]
 
-      wbInstance.combine(wbInstance.empty, wb1) must beEqualTo(wb1)
+      wb.combine(wb.empty, wb1) must beEqualTo(wb1)
     }
 
     "merge sheets with different names" in {
@@ -41,9 +44,9 @@ class MonoidLawsSpec extends Specification {
 
       val wb1 = Workbook(Set(sheet1))
       val wb2 = Workbook(Set(sheet2))
-      val wbInstance = implicitly[Monoid[Workbook]]
+      val wb = implicitly[Monoid[Workbook]]
 
-      val combined = wbInstance.combine(wb1, wb2)
+      val combined = wb.combine(wb1, wb2)
 
       combined.sheets must contain(exactly(sheet1, sheet2))
     }
@@ -54,9 +57,9 @@ class MonoidLawsSpec extends Specification {
 
       val wb1 = Workbook(Set(sheet1))
       val wb2 = Workbook(Set(sheet2))
-      val wbInstance = implicitly[Monoid[Workbook]]
+      val wb = implicitly[Monoid[Workbook]]
 
-      val combined = wbInstance.combine(wb1, wb2)
+      val combined = wb.combine(wb1, wb2)
 
       // Should have one sheet with merged rows
       combined.sheets must haveSize(1)
@@ -70,9 +73,9 @@ class MonoidLawsSpec extends Specification {
     "merge rows with different indices" in {
       val row1 = Row(0)(Set(StringCell(0, "A")))
       val row2 = Row(1)(Set(StringCell(0, "B")))
-      val rowInstance = implicitly[Semigroup[Row]]
+      val row = implicitly[Semigroup[Row]]
 
-      val combined = rowInstance.combine(row1, row2)
+      val combined = row.combine(row1, row2)
 
       // Should prefer second row
       combined must beEqualTo(row2)
@@ -81,9 +84,9 @@ class MonoidLawsSpec extends Specification {
     "merge rows with same index, combining cells" in {
       val row1 = Row(0)(Set(StringCell(0, "A")))
       val row2 = Row(0)(Set(StringCell(1, "B")))
-      val rowInstance = implicitly[Semigroup[Row]]
+      val row = implicitly[Semigroup[Row]]
 
-      val combined = rowInstance.combine(row1, row2)
+      val combined = row.combine(row1, row2)
 
       combined.index must beEqualTo(0)
       combined.cells must contain(exactly(StringCell(0, "A"): Cell, StringCell(1, "B"): Cell))
@@ -92,9 +95,9 @@ class MonoidLawsSpec extends Specification {
     "handle overlapping cells by preferring second row's cells" in {
       val row1 = Row(0)(Set(StringCell(0, "A")))
       val row2 = Row(0)(Set(StringCell(0, "B")))
-      val rowInstance = implicitly[Semigroup[Row]]
+      val row = implicitly[Semigroup[Row]]
 
-      val combined = rowInstance.combine(row1, row2)
+      val combined = row.combine(row1, row2)
 
       combined.index must beEqualTo(0)
       combined.cells must contain(exactly(StringCell(0, "B"): Cell))
@@ -105,9 +108,9 @@ class MonoidLawsSpec extends Specification {
     "merge sheets with different row indices" in {
       val sheet1 = Sheet("TestSheet")(Set(Row(0)(Set(StringCell(0, "A")))))
       val sheet2 = Sheet("TestSheet")(Set(Row(1)(Set(StringCell(0, "B")))))
-      val sheetInstance = implicitly[Semigroup[Sheet]]
+      val sheet = implicitly[Semigroup[Sheet]]
 
-      val combined = sheetInstance.combine(sheet1, sheet2)
+      val combined = sheet.combine(sheet1, sheet2)
 
       combined.name must beEqualTo("TestSheet")
       combined.rows must haveSize(2)
@@ -116,9 +119,9 @@ class MonoidLawsSpec extends Specification {
     "merge sheets with overlapping rows" in {
       val sheet1 = Sheet("TestSheet")(Set(Row(0)(Set(StringCell(0, "A")))))
       val sheet2 = Sheet("TestSheet")(Set(Row(0)(Set(StringCell(1, "B")))))
-      val sheetInstance = implicitly[Semigroup[Sheet]]
+      val sheet = implicitly[Semigroup[Sheet]]
 
-      val combined = sheetInstance.combine(sheet1, sheet2)
+      val combined = sheet.combine(sheet1, sheet2)
 
       combined.name must beEqualTo("TestSheet")
       combined.rows must haveSize(1)
@@ -131,9 +134,9 @@ class MonoidLawsSpec extends Specification {
     "prefer second cell when combining" in {
       val cell1 = StringCell(0, "First")
       val cell2 = StringCell(0, "Second")
-      val cellInstance = implicitly[Semigroup[Cell]]
+      val cell = implicitly[Semigroup[Cell]]
 
-      val combined = cellInstance.combine(cell1, cell2)
+      val combined = cell.combine(cell1, cell2)
 
       combined must beEqualTo(cell2) // Second cell wins
     }
@@ -141,9 +144,9 @@ class MonoidLawsSpec extends Specification {
     "work with different cell types" in {
       val stringCell = StringCell(0, "Text")
       val numericCell = NumericCell(0, 42.0)
-      val cellInstance = implicitly[Semigroup[Cell]]
+      val cell = implicitly[Semigroup[Cell]]
 
-      val combined = cellInstance.combine(stringCell, numericCell)
+      val combined = cell.combine(stringCell, numericCell)
 
       combined must beEqualTo(numericCell) // Second cell wins
     }
