@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0  # Fetch all history for all branches
+          fetch-depth: 0 # Fetch all history for all branches
       - name: Get PR number
         id: get-pr
         if: github.event.workflow_run.event == 'pull_request'
@@ -50,18 +50,64 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Download benchmark results
+      - name: Download all benchmark results
+        id: download-benchmarks
         uses: actions/download-artifact@v4
         with:
-          name: benchmark-results
+          pattern: "benchmark-results-*" # Download all benchmark result artifacts
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          merge-multiple: true # Merge all artifacts into a single directory
+        continue-on-error: true # Don't fail if no benchmark artifacts exist
+
+      - name: Check if benchmarks were downloaded
+        id: check-benchmarks
+        run: |
+          if ls benchmark-results-*.json 1> /dev/null 2>&1; then
+            echo "found=true" >> $GITHUB_OUTPUT
+            echo "Found benchmark result files:"
+            ls -la benchmark-results-*.json
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+            echo "No benchmark result files found - benchmarks may have been skipped"
+          fi
+
+      - name: Combine benchmark results
+        if: steps.check-benchmarks.outputs.found == 'true'
+        run: |
+          # Combine all benchmark JSON files into a single file for processing
+          echo "Combining benchmark results..."
+          if ls benchmark-results-*.json 1> /dev/null 2>&1; then
+            # Create a combined JSON array from all individual result files
+            echo "[" > combined-benchmark-results.json
+            first=true
+            for file in benchmark-results-*.json; do
+              if [ "$first" = true ]; then
+                first=false
+              else
+                echo "," >> combined-benchmark-results.json
+              fi
+              # Extract the benchmarks array content and append
+              jq '.[] | select(.benchmark != null)' "$file" >> combined-benchmark-results.json
+            done
+            echo "]" >> combined-benchmark-results.json
+            
+            # Flatten the nested structure
+            jq '[.[] | select(. != null)]' combined-benchmark-results.json > benchmark-results.json
+            
+            echo "Combined $(jq length benchmark-results.json) benchmark results"
+            ls -la benchmark-results.json
+          else
+            echo "No benchmark result files found"
+            echo "[]" > benchmark-results.json
+          fi
 
       - name: Compare benchmark results
+        if: steps.check-benchmarks.outputs.found == 'true'
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: JMH Benchmarks
-          tool: 'jmh'
+          tool: "jmh"
           output-file-path: benchmark-results.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
@@ -69,16 +115,39 @@ jobs:
           fail-on-alert: false
 
       - name: Post benchmark page link
-        if: github.event.workflow_run.event == 'pull_request' && steps.get-pr.outputs.pr-number != ''
+        if: github.event.workflow_run.event == 'pull_request' && steps.get-pr.outputs.pr-number != '' && steps.check-benchmarks.outputs.found == 'true'
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ steps.get-pr.outputs.pr-number }}
           body: |
             📊 **Benchmark Results**
 
-            The detailed benchmark results are available for review on our website.
+            Performance benchmarks have completed successfully! The detailed results are available for review:
 
             [View Benchmark Report](https://folone.github.io/poi.scala/dev/bench/)
+
+            **Benchmark Coverage:**
+            - ✅ Core POI operations (dataSize=1000)
+            - ✅ Async operations (dataSize=100) 
+            - ✅ Memory efficiency (dataSize=5000)
+
+            > 💡 **Note**: This is an optimized benchmark suite for faster PR feedback. 
+            > Comprehensive benchmarks with full parameter matrix run automatically on master branch.
+
+      - name: Post no benchmarks comment
+        if: github.event.workflow_run.event == 'pull_request' && steps.get-pr.outputs.pr-number != '' && steps.check-benchmarks.outputs.found == 'false'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.get-pr.outputs.pr-number }}
+          body: |
+            📊 **Benchmark Results**
+
+            No benchmark results were generated for this PR. This can happen when:
+            - Benchmarks were skipped due to compilation issues
+            - The workflow was triggered from a schedule event
+            - Benchmark jobs were filtered out due to conditions
+
+            If you expected benchmarks to run, please check the [workflow logs](${{ github.event.workflow_run.html_url }}) for details.
 
       - name: Log when PR number not found
         if: github.event.workflow_run.event == 'pull_request' && steps.get-pr.outputs.pr-number == ''

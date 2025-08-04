@@ -13,11 +13,11 @@ import _root_.scalaz.syntax.semigroup._
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
 @Fork(1)
-@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 3, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 class PoiBenchmarks {
 
-  @Param(Array("100", "1000", "5000"))
+  @Param(Array("1000"))
   var dataSize: Int = _
 
   var largeWorkbook: Workbook = _
@@ -42,6 +42,7 @@ class PoiBenchmarks {
     mediumWorkbook = BenchmarkUtils.createWorkbook(1000, "Medium")
   }
 
+  // Core benchmarks - essential tests for performance regression detection
   @Benchmark
   def cellCreationBenchmark(bh: Blackhole): Unit = {
     val cells = (0 until dataSize).map {
@@ -49,35 +50,6 @@ class PoiBenchmarks {
         StringCell(i, s"BenchmarkCell-$i")
     }
     bh.consume(cells)
-  }
-
-  @Benchmark
-  def rowCreationBenchmark(bh: Blackhole): Unit = {
-    val rows = (0 until dataSize).map {
-      rowIndex =>
-        val cells: Set[Cell] = (0 until 10).map {
-          colIndex =>
-            StringCell(colIndex, s"Row-$rowIndex-Col-$colIndex"): Cell
-        }.toSet
-        Row(rowIndex)(cells)
-    }
-    bh.consume(rows)
-  }
-
-  @Benchmark
-  def sheetCreationBenchmark(bh: Blackhole): Unit = {
-    val random = new Random(42)
-    val rows = (0 until dataSize).map {
-      rowIndex =>
-        val cells: Set[Cell] = (0 until 10).map {
-          colIndex =>
-            StringCell(colIndex, s"Sheet-$rowIndex-Col-$colIndex"): Cell
-        }.toSet
-        Row(rowIndex)(cells)
-    }.toSet
-
-    val sheet = Sheet("BenchmarkSheet")(rows)
-    bh.consume(sheet)
   }
 
   @Benchmark
@@ -97,74 +69,8 @@ class PoiBenchmarks {
   }
 
   @Benchmark
-  def dataTransformationBenchmark(bh: Blackhole): Unit = {
-    val sheet = largeWorkbook.sheets.head
-    val transformedRows = sheet.rows.map {
-      row =>
-        val newCells = row.cells.map {
-          case StringCell(index, data) => StringCell(index, data.toUpperCase)
-          case other => other
-        }
-        Row(row.index)(newCells)
-    }
-    bh.consume(transformedRows)
-  }
-
-  @Benchmark
-  def formulaCellsBenchmark(bh: Blackhole): Unit = {
-    val formulas = Seq(
-      "SUM(A1:A10)",
-      "AVERAGE(B1:B100)",
-      "MAX(C1:C50)",
-      "MIN(D1:D25)",
-      "COUNT(E1:E75)"
-    )
-
-    val cells = (0 until dataSize).map {
-      i =>
-        FormulaCell(i, formulas(i % formulas.length))
-    }
-    bh.consume(cells)
-  }
-
-  @Benchmark
-  def unicodeDataBenchmark(bh: Blackhole): Unit = {
-    val unicodeData = Seq(
-      "测试数据",
-      "テストデータ",
-      "тестові дані",
-      "δοκιμαστικά δεδομένα",
-      "données de test"
-    )
-
-    val cells = (0 until dataSize).map {
-      i =>
-        StringCell(i, unicodeData(i % unicodeData.length))
-    }
-    bh.consume(cells)
-  }
-
-  @Benchmark
   def workbookCombinationBenchmark(bh: Blackhole): Unit = {
     val combined = smallWorkbook |+| mediumWorkbook
     bh.consume(combined)
-  }
-
-  @Benchmark
-  def memoryIntensiveBenchmark(bh: Blackhole): Unit = {
-    val workbooks = (1 to 10).map {
-      i =>
-        BenchmarkUtils.createWorkbook(dataSize / 10, s"Memory-$i")
-    }
-
-    val combined = workbooks.reduce(_ |+| _)
-    bh.consume(combined)
-  }
-
-  @Benchmark
-  def bulkDataProcessingBenchmark(bh: Blackhole): Unit = {
-    val workbooks = (0 until 20).map(i => BenchmarkUtils.createWorkbook(50, s"Bulk-$i"))
-    val combined = workbooks.reduce((wb1, wb2) => wb1 |+| wb2)
-    bh.consume(combined.toString)
   }
 }

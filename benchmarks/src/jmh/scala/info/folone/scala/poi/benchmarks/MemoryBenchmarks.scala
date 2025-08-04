@@ -16,11 +16,11 @@ import _root_.scalaz.syntax.semigroup._
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
 @Fork(1)
-@Warmup(iterations = 3)
-@Measurement(iterations = 5)
+@Warmup(iterations = 2)
+@Measurement(iterations = 3)
 class MemoryBenchmarks {
 
-  @Param(Array("1000", "5000", "10000"))
+  @Param(Array("5000"))
   var dataSize: Int = _
 
   @Benchmark
