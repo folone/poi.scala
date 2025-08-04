@@ -15,26 +15,93 @@ Programmatically create Excel sheets in Scala (via Apache POI library) with enha
 - ✅ **Asynchronous Operations**: Future-based async operations, reactive streams, and backpressure handling
 - ✅ **Error Handling**: Comprehensive error types with validation utilities
 
+## Table of Contents
+
+- [Architecture](#architecture) - Modular design and dependencies
+- [Setup](#setup) - Installation and configuration
+- [Basic Usage](#basic-usage) - Getting started examples
+- [Module Imports](#module-imports) - Import patterns for different modules
+- [Enhanced Features](#enhanced-features) - Advanced Excel operations
+  - [Styled Cells](#styled-cells-with-enhanced-formatting)
+  - [Enhanced Sheets](#enhanced-sheet-creation)
+  - [Data Validation](#data-validation)
+  - [Named Ranges](#named-ranges)
+- [Performance Optimizations](#performance-optimizations) - Streaming and bulk operations
+- [Error Handling](#error-handling-and-validation) - Safe operations and validation
+- [Asynchronous Operations](#asynchronous-and-reactive-operations) - Future-based and reactive patterns
+- [Functional Programming](#functional-io-operations) - Cats and Scalaz integration
+- [Quick Reference](#quick-reference) - Common operations cheat sheet
+- [Development](#development) - Building and testing
+
+## Architecture
+
+Poi Scala is organized into several modules for better modularity and dependency management:
+
+- **`poi-scala-core`** - Core Excel operations and data structures (required)
+- **`poi-scala-cats`** - [Cats](https://typelevel.org/cats/) functional programming integration
+- **`poi-scala-scalaz`** - [Scalaz](https://github.com/scalaz/scalaz) functional programming integration
+- **`poi-scala-async`** - Asynchronous operations with Future and reactive streams support
+- **`poi-scala-fatjar`** - Assembly plugin for creating fat JARs with all dependencies
+
+You only need to include the modules you actually use in your project.
+
 ## Setup
 
 [![poi-scala Scala version support](https://index.scala-lang.org/folone/poi.scala/poi-scala/latest.svg)](https://index.scala-lang.org/folone/poi.scala/poi-scala)
+[![Maven Central](https://img.shields.io/maven-central/v/info.folone/poi-scala-core_2.13.svg)](https://maven-badges.herokuapp.com/maven-central/info.folone/poi-scala-core_2.13)
+
+Replace `LATEST_VERSION` with the version shown in the badges above.
 
 ### SBT:
 
-`libraryDependencies += "info.folone" %% "poi-scala-core" % "LATEST_VERSION"`
+**Core library (required):**
+```scala
+libraryDependencies += "info.folone" %% "poi-scala-core" % "LATEST_VERSION"
+```
 
-For Scalaz integration:
-`libraryDependencies += "info.folone" %% "poi-scala-scalaz" % "LATEST_VERSION"`
+**Optional integrations:**
+```scala
+// For Cats functional programming integration
+libraryDependencies += "info.folone" %% "poi-scala-cats" % "LATEST_VERSION"
 
-For Async operations:
-`libraryDependencies += "info.folone" %% "poi-scala-async" % "LATEST_VERSION"`
+// For Scalaz functional programming integration
+libraryDependencies += "info.folone" %% "poi-scala-scalaz" % "LATEST_VERSION"
+
+// For asynchronous operations
+libraryDependencies += "info.folone" %% "poi-scala-async" % "LATEST_VERSION"
+```
 
 ### Maven:
 
+**Core library:**
 ```xml
 <dependency>
     <groupId>info.folone</groupId>
     <artifactId>poi-scala-core_${scala.version}</artifactId>
+    <version>LATEST_VERSION</version>
+</dependency>
+```
+
+**Optional integrations:**
+```xml
+<!-- For Cats integration -->
+<dependency>
+    <groupId>info.folone</groupId>
+    <artifactId>poi-scala-cats_${scala.version}</artifactId>
+    <version>LATEST_VERSION</version>
+</dependency>
+
+<!-- For Scalaz integration -->
+<dependency>
+    <groupId>info.folone</groupId>
+    <artifactId>poi-scala-scalaz_${scala.version}</artifactId>
+    <version>LATEST_VERSION</version>
+</dependency>
+
+<!-- For async operations -->
+<dependency>
+    <groupId>info.folone</groupId>
+    <artifactId>poi-scala-async_${scala.version}</artifactId>
     <version>LATEST_VERSION</version>
 </dependency>
 ```
@@ -77,7 +144,7 @@ The telemetry is designed to fail silently and never interfere with your applica
 ## Basic Usage
 
 ```scala
-import info.folone.scala.poi._
+import info.folone.poi._
 
 // Basic sheet creation
 val sheet = Sheet("DataSheet") {
@@ -91,12 +158,35 @@ val workbook = Workbook(Set(sheet))
 workbook.toFile("datasheet.xlsx")
 ```
 
+## Module Imports
+
+Depending on which modules you've included, you'll need different imports:
+
+### Core Functionality
+```scala
+import info.folone.poi._  // Core types: Workbook, Sheet, Cell, etc.
+```
+
+### Functional Programming Integration
+```scala
+// For Cats integration
+import info.folone.poi.cats._  // Cats typeclass instances and effect operations
+
+// For Scalaz integration
+import info.folone.poi.scalaz._ // Scalaz typeclass instances and effect operations
+```
+
+### Asynchronous Operations
+```scala
+import info.folone.poi.async._  // Async operations and reactive streams
+```
+
 ## Enhanced Features
 
 ### Styled Cells with Enhanced Formatting
 
 ```scala
-import info.folone.scala.poi._
+import info.folone.poi._
 
 // Create enhanced cell styles
 val headerStyle = CellStyle(
@@ -126,7 +216,7 @@ val styledCell = StyledCell(StringCell(0, "Header"), Some(headerStyle))
 ### Enhanced Sheet Creation
 
 ```scala
-import info.folone.scala.poi._
+import info.folone.poi._
 
 val enhancedSheet = Sheet.enhanced(
   "ProductReport",
@@ -171,7 +261,7 @@ val enhancedSheet = Sheet.enhanced(
 ### Data Validation
 
 ```scala
-import info.folone.scala.poi._
+import info.folone.poi._
 
 // Create dropdown validation
 val statusValidation = DataValidation.dropdownList(
@@ -200,7 +290,7 @@ val complexValidation = DataValidationBuilder(CellRange("Sheet1", "A1:A10"))
 ### Named Ranges
 
 ```scala
-import info.folone.scala.poi._
+import info.folone.poi._
 
 // Create and manage named ranges
 val workbookWithRanges = Workbook(Set.empty)
@@ -214,7 +304,7 @@ val formulaWithNamedRange = FormulaCell(0, "SUM(SalesData)")
 ### Extended Cell Types
 
 ```scala
-import info.folone.scala.poi._
+import info.folone.poi._
 import java.util.Date
 
 // All supported cell types
@@ -236,7 +326,7 @@ For large datasets and memory-intensive operations, poi-scala provides comprehen
 ### Streaming Workbooks (SXSSF)
 
 ```scala
-import info.folone.scala.poi._
+import info.folone.poi._
 
 // Configure streaming parameters
 val streamingConfig = SXSSF(
@@ -262,7 +352,7 @@ val largeDataWorkbook = Workbook.forLargeDataset(
 ### Bulk Operations
 
 ```scala
-import info.folone.scala.poi._
+import info.folone.poi._
 import java.util.Date
 
 // Bulk data creation
@@ -323,27 +413,84 @@ val styledWorkbook = workbook.styled(styleMap)
 ### Error Handling and Validation
 
 ```scala
-import info.folone.scala.poi._
-import info.folone.scala.poi.impure.WorkbookImpure // This import might not be needed if Workbook.fromFile is used directly
+import info.folone.poi._
+import info.folone.poi.impure.load // For file loading functionality
+import java.io.File
+import scala.util.{Try, Success, Failure}
 
-// Assuming `workbook` is an instance of Workbook
-val validation = WorkbookValidator.validateWorkbook(workbook)
-validation match {
-  case Right(_) => println("Workbook is valid")
-  case Left(errors) => errors.foreach(println)
+// Safe file loading with error handling
+val workbookResult: Try[Workbook] = Try {
+  Workbook.fromFile(new File("/path/to/workbook.xlsx"))
+}.flatten
+
+workbookResult match {
+  case Success(workbook) =>
+    println(s"Successfully loaded workbook with ${workbook.sheets.size} sheets")
+  case Failure(exception) =>
+    println(s"Failed to load workbook: ${exception.getMessage}")
 }
 
-// Specific validations
-val formulaCheck = WorkbookValidator.validateFormulas(workbook)
-val referenceCheck = WorkbookValidator.validateCellReferences(workbook)
+// Validate workbook structure
+def validateWorkbook(workbook: Workbook): Either[String, Workbook] = {
+  if (workbook.sheets.isEmpty) {
+    Left("Workbook must contain at least one sheet")
+  } else if (workbook.sheets.exists(_.name.trim.isEmpty)) {
+    Left("All sheets must have non-empty names")
+  } else {
+    Right(workbook)
+  }
+}
+
+// Validate cell data before creation
+def createSafeNumericCell(index: Int, value: String): Either[String, NumericCell] = {
+  Try(value.toDouble) match {
+    case Success(numValue) => Right(NumericCell(index, numValue))
+    case Failure(_) => Left(s"Invalid numeric value: '$value'")
+  }
+}
+
+// Example usage
+val cellResult = createSafeNumericCell(0, "123.45")
+cellResult match {
+  case Right(cell) => println(s"Created cell: $cell")
+  case Left(error) => println(s"Cell creation failed: $error")
+}
+
+// Comprehensive validation for sheet data
+case class ValidationError(message: String, row: Option[Int] = None, column: Option[Int] = None)
+
+def validateSheetData(data: Seq[Seq[Any]]): Either[List[ValidationError], Seq[Seq[Any]]] = {
+  val errors = data.zipWithIndex.flatMap { case (row, rowIndex) =>
+    row.zipWithIndex.flatMap { case (cell, colIndex) =>
+      cell match {
+        case s: String if s.length > 32767 =>
+          Some(ValidationError(s"String too long (${s.length} chars, max 32767)", Some(rowIndex), Some(colIndex)))
+        case d: Double if d.isNaN || d.isInfinite =>
+          Some(ValidationError("Invalid numeric value (NaN or Infinite)", Some(rowIndex), Some(colIndex)))
+        case _ => None
+      }
+    }
+  }.toList
+
+  if (errors.nonEmpty) Left(errors) else Right(data)
+}
+
+// Safe workbook operations with validation
+def createValidatedWorkbook(sheetName: String, data: Seq[Seq[Any]]): Either[String, Workbook] = {
+  for {
+    validatedData <- validateSheetData(data).left.map(errors =>
+      s"Validation errors: ${errors.map(_.message).mkString(", ")}")
+    workbook = Workbook.forLargeDataset(Set.empty).addSheetWithBulkData(sheetName, validatedData)
+    validatedWorkbook <- validateWorkbook(workbook)
+  } yield validatedWorkbook
+}
 ```
 
 ### Complete Example
 
 ```scala
-import info.folone.scala.poi._
+import info.folone.poi._
 import java.io.File
-import scalaz._, syntax.monoid._ // Keep if monoid syntax is used elsewhere, otherwise remove
 
 // Create a comprehensive workbook showcasing all features
 val headerStyle = CellStyle(font = Font(bold = true))
@@ -398,8 +545,8 @@ For applications requiring non-blocking Excel operations, poi-scala provides com
 ### Future-Based Async Operations
 
 ```scala
-import info.folone.scala.poi._
-import info.folone.scala.poi.async._ // Import the async package
+import info.folone.poi._
+import info.folone.poi.async._ // Import the async package
 import scala.concurrent.{Future, ExecutionContext}
 import scala.concurrent.duration._ // Needed for Await.result
 import scala.util.{Success, Failure} // Needed for onComplete
@@ -438,9 +585,9 @@ val loadFuture: Future[Workbook] = AsyncOperations.loadWorkbookAsync("/tmp/async
 ### Stream Processing with Async
 
 ```scala
-import info.folone.scala.poi._
-import info.folone.scala.poi.async.AsyncOperations._ // Import AsyncOperations for processDataStreamAsync
-import info.folone.scala.poi.async.AsyncOperations.ReactiveStreams._ // Import ReactiveStreams for MemoryDataSource, BackpressureProcessor
+import info.folone.poi._
+import info.folone.poi.async.AsyncOperations._ // Import AsyncOperations for processDataStreamAsync
+import info.folone.poi.async.AsyncOperations.ReactiveStreams._ // Import ReactiveStreams for MemoryDataSource, BackpressureProcessor
 import scala.concurrent.{Future, ExecutionContext}
 import scala.concurrent.duration._
 import scala.util.{Success, Failure}
@@ -475,8 +622,8 @@ streamFuture.foreach { workbook =>
 ### Progressive Workbook Building
 
 ```scala
-import info.folone.scala.poi._
-import info.folone.scala.poi.async._ // Import async package for ProgressiveWorkbookBuilder
+import info.folone.poi._
+import info.folone.poi.async._ // Import async package for ProgressiveWorkbookBuilder
 import scala.concurrent.{Future, ExecutionContext}
 import scala.concurrent.duration._
 import scala.util.{Success, Failure}
@@ -523,9 +670,9 @@ buildProcess.onComplete {
 ### Reactive Streams with Backpressure
 
 ```scala
-import info.folone.scala.poi._
-import info.folone.scala.poi.async.AsyncOperations._ // Import AsyncOperations for processDataStreamAsync
-import info.folone.scala.poi.async.AsyncOperations.ReactiveStreams._ // Import ReactiveStreams for MemoryDataSource, BackpressureProcessor
+import info.folone.poi._
+import info.folone.poi.async.AsyncOperations._ // Import AsyncOperations for processDataStreamAsync
+import info.folone.poi.async.AsyncOperations.ReactiveStreams._ // Import ReactiveStreams for MemoryDataSource, BackpressureProcessor
 import scala.concurrent.{Future, ExecutionContext}
 import scala.concurrent.duration._
 import scala.util.{Success, Failure}
@@ -577,8 +724,8 @@ while (!processingComplete) {
 ### Java Interoperability
 
 ```scala
-import info.folone.scala.poi._
-import info.folone.scala.poi.async.AsyncOperations.JavaInterop._ // Import JavaInterop
+import info.folone.poi._
+import info.folone.poi.async.AsyncOperations.JavaInterop._ // Import JavaInterop
 import java.util.concurrent.CompletableFuture
 import scala.collection.JavaConverters._ // For .asJava conversion
 
@@ -597,7 +744,7 @@ val saveFuture: CompletableFuture[Void] =
   saveWorkbookAsyncJava(workbook, "/tmp/java-async.xlsx")
 
 // Process data with Java callback
-case class SalesRecord(product: String, amount: Double, date: String) // Redefine if not in scope
+// Note: SalesRecord case class defined earlier in async examples
 val javaData = List(
   SalesRecord("Java Product 1", 100.0, "2024-01-01"),
   SalesRecord("Java Product 2", 200.0, "2024-01-02")
@@ -621,8 +768,8 @@ val processedFuture: CompletableFuture[Workbook] = processDataWithCallbackJava(
 ### Functional IO Operations
 
 ```scala
-import info.folone.scala.poi._
-import info.folone.scala.poi.scalaz.IOOperations
+import info.folone.poi._
+import info.folone.poi.scalaz.IOOperations
 import scalaz.effect.IO
 
 val sheets = Set(Sheet("Sheet 1")(Set(Row(0)(Set(StringCell(0, "data"))))))
@@ -651,6 +798,46 @@ val result: Workbook = saveAndLoadIO.unsafePerformIO()
 val multiSheetResult: Workbook = multiSheetIO.unsafePerformIO()
 ```
 
+### Cats Functional Programming Integration
+
+The `poi-scala-cats` module provides integration with the [Cats](https://typelevel.org/cats/) functional programming library, offering typeclass instances and effect-based operations.
+
+```scala
+import info.folone.poi._
+import info.folone.poi.cats.IOOperations
+import cats.effect.IO
+import cats.implicits._
+
+val sheets = Set(Sheet("Cats Sheet")(Set(Row(0)(Set(StringCell(0, "Cats data"))))))
+
+// Pure functional workbook creation with Cats IO
+val createWorkbookIO: IO[Workbook] = IOOperations.createWorkbookIO(sheets, XSSF)
+
+// Composable IO operations
+val saveAndLoadIO: IO[Workbook] = for {
+  workbook <- createWorkbookIO
+  _ <- IOOperations.saveWorkbookIO(workbook, "/tmp/cats-workbook.xlsx")
+  loadedWorkbook <- IOOperations.loadWorkbookIO("/tmp/cats-workbook.xlsx")
+} yield loadedWorkbook
+
+// Process multiple sheets with Cats effects
+val multiSheetData = Map(
+  "Sales" -> Seq(Seq("Product", "Amount"), Seq("Widget", 100.0)),
+  "Inventory" -> Seq(Seq("Item", "Quantity"), Seq("Widget", 50))
+)
+
+val multiSheetIO: IO[Workbook] = IOOperations.processMultipleSheetsIO(multiSheetData, XSSF)
+
+// Execute IO operations safely
+import cats.effect.unsafe.implicits.global
+val result: Workbook = saveAndLoadIO.unsafeRunSync()
+val multiSheetResult: Workbook = multiSheetIO.unsafeRunSync()
+
+// Using cats typeclass instances (automatically available when importing poi.cats.*)
+val equalCells = StringCell(0, "test") === StringCell(0, "test")  // true
+val orderedCells = List(NumericCell(1, 2.0), NumericCell(0, 1.0)).sorted
+```
+
 ### Async Best Practices
 
 1. **Use appropriate batch sizes** for stream processing (1000-5000 rows typically optimal)
@@ -663,8 +850,8 @@ val multiSheetResult: Workbook = multiSheetIO.unsafePerformIO()
 ### Complete Async Example
 
 ```scala
-import info.folone.scala.poi._
-import info.folone.scala.poi.async.AsyncOperations._
+import info.folone.poi._
+import info.folone.poi.async.AsyncOperations._
 import scala.concurrent.{Future, ExecutionContext, Await}
 import scala.concurrent.duration._
 import scala.util.{Success, Failure}
@@ -733,12 +920,12 @@ val result = Await.result(futureResult, 30.seconds)
 println(result)
 ```
 
-### Performance Optimization
+## Performance Optimization for Large Datasets
 
-For applications processing large datasets, consider using performance-optimized APIs:
+For applications processing large datasets, choose the right approach based on your data size:
 
 ```scala
-// Creating large datasets row by row (slow)
+// ❌ AVOID: Creating large datasets row by row (slow and memory intensive)
 val largeSheet = Sheet("Data") {
   (1 to 10000).map { i =>
     Row(i) {
@@ -750,7 +937,7 @@ val largeSheet = Sheet("Data") {
   }.toSet
 }
 
-// Using bulk operations (much faster)
+// ✅ RECOMMENDED: Using bulk operations (much faster)
 val largeData = (1 to 10000).map { i =>
   Seq(s"Item $i", i.toDouble)
 }
@@ -758,14 +945,55 @@ val largeData = (1 to 10000).map { i =>
 val optimizedWorkbook = Workbook.forLargeDataset(Set.empty)
   .addSheetWithBulkData("Data", largeData)
 
-// Creating workbooks for large data (memory issues)
+// ❌ AVOID: Creating workbooks for large data (memory issues)
 val regularWorkbook = Workbook(Set(largeSheet))
 
-// Using streaming workbooks (memory efficient)
+// ✅ RECOMMENDED: Using streaming workbooks (memory efficient)
 val streamingWorkbook = Workbook.streaming(
   Set.empty,
   SXSSF(rowAccessWindowSize = 100)
 )
+```
+
+## Quick Reference
+
+### Common Operations
+```scala
+// Create basic workbook
+val workbook = Workbook(Set(
+  Sheet("MySheet")(Set(
+    Row(0)(Set(StringCell(0, "Hello"), NumericCell(1, 42.0)))
+  ))
+))
+
+// Save to file
+workbook.toFile("output.xlsx")
+
+// Load from file
+val loaded = Workbook.fromFile(new File("input.xlsx"))
+
+// Add styling
+val styled = StyledCell(StringCell(0, "Header"), Some(CellStyle(font = Font(bold = true))))
+
+// Bulk data operations
+val workbook = Workbook.forLargeDataset(Set.empty)
+  .addSheetWithBulkData("Data", Seq(Seq("Name", "Age"), Seq("John", 30)))
+
+// Async operations (requires poi-scala-async)
+val future = AsyncOperations.createWorkbookAsync(sheets, XSSF)
+```
+
+### Module Dependencies
+```scala
+// Core (always required)
+"info.folone" %% "poi-scala-core" % "VERSION"
+
+// Choose functional programming style (optional)
+"info.folone" %% "poi-scala-cats" % "VERSION"     // For Cats
+"info.folone" %% "poi-scala-scalaz" % "VERSION"   // For Scalaz
+
+// Async operations (optional)
+"info.folone" %% "poi-scala-async" % "VERSION"
 ```
 
 ## Development
@@ -776,10 +1004,12 @@ This project includes a Makefile with common development tasks for easy workflow
 
 The project is organized into the following modules:
 
-- **core**: The core module containing the main poi-scala library.
-- **scalaz**: The Scalaz integration module.
-- **async**: The module for asynchronous operations.
-- **benchmarks**: The module for performance benchmarks.
+- **core**: The core module containing the main poi-scala library
+- **cats**: The Cats functional programming integration module
+- **scalaz**: The Scalaz functional programming integration module
+- **async**: The module for asynchronous operations
+- **fatjar**: Assembly module for creating fat JARs with all dependencies
+- **benchmarks**: The module for performance benchmarks
 
 ### Quick Start
 
@@ -811,7 +1041,7 @@ make test-features        # Enhanced feature tests
 
 # Run a specific test class
 make test-only TEST='*MonoidLaws*'
-make test-only TEST='info.folone.scala.poi.IntegrationSpec'
+make test-only TEST='info.folone.poi.IntegrationSpec'
 ```
 
 ### Development Workflow
