@@ -1,13 +1,13 @@
 package info.folone.scala.poi.benchmarks
 
-import java.util.concurrent.TimeUnit
-import org.openjdk.jmh.annotations._
-import org.openjdk.jmh.infra.Blackhole
+import _root_.scalaz.syntax.semigroup._
 import info.folone.poi._
 import info.folone.poi.scalaz._
+import java.util.concurrent.TimeUnit
 import java.util.Date
+import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.infra.Blackhole
 import scala.util.Random
-import _root_.scalaz.syntax.semigroup._
 
 /**
  * Memory-specific benchmarks to monitor heap usage
@@ -29,7 +29,7 @@ class MemoryBenchmarks {
     val beforeMemory = runtime.totalMemory() - runtime.freeMemory()
 
     val workbook = BenchmarkUtils.createWorkbook(dataSize, "Large")
-    
+
     val afterMemory = runtime.totalMemory() - runtime.freeMemory()
     val memoryUsed = afterMemory - beforeMemory
 
@@ -47,20 +47,19 @@ class MemoryBenchmarks {
         )
         Row(rowIndex)(cells)
       }.toSet
-      
+
       val sheet = Sheet(s"Efficient-$i")(rows)
       Workbook(Set(sheet))
     }
 
     // Force garbage collection
     System.gc()
-    
+
     val combined = workbooks.take(10).reduce { (wb1: Workbook, wb2: Workbook) =>
       wb1 |+| wb2
     }
-    
+
     bh.consume(combined.toString)
   }
 
-  
 }

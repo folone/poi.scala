@@ -1,12 +1,12 @@
 package info.folone.scala.poi.benchmarks
 
+import info.folone.poi._
+import info.folone.poi.async.AsyncOperations._
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
-import info.folone.poi._
-import info.folone.poi.async.AsyncOperations._
-import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.concurrent.Await
 
 @BenchmarkMode(Array(Mode.Throughput, Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -29,9 +29,11 @@ class AsyncPoiBenchmarks {
         s"Data-$row-$col"
       }
     }
-    val sheets = Set(Sheet("Sheet1") { (0 until dataSize).map { i =>
-      Row(i) { Set(StringCell(0, s"data-$i")) }
-    }.toSet })
+    val sheets = Set(Sheet("Sheet1") {
+      (0 until dataSize).map { i =>
+        Row(i)(Set(StringCell(0, s"data-$i")))
+      }.toSet
+    })
     workbook = Workbook(sheets)
   }
 
@@ -66,4 +68,5 @@ class AsyncPoiBenchmarks {
     val result = Await.result(future, 10.seconds)
     bh.consume(result)
   }
+
 }

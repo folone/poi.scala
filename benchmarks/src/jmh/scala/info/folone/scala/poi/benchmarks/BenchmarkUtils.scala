@@ -24,4 +24,5 @@ object BenchmarkUtils {
     val sheet = Sheet(s"${prefix}Sheet")(rows)
     Workbook(Set(sheet))
   }
+
 }

@@ -1,13 +1,13 @@
 package info.folone.scala.poi.benchmarks
 
-import java.util.concurrent.TimeUnit
-import org.openjdk.jmh.annotations._
-import org.openjdk.jmh.infra.Blackhole
+import _root_.scalaz.syntax.semigroup._
 import info.folone.poi._
 import info.folone.poi.scalaz._
+import java.util.concurrent.TimeUnit
 import java.util.Date
+import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.infra.Blackhole
 import scala.util.Random
-import _root_.scalaz.syntax.semigroup._
 
 @BenchmarkMode(Array(Mode.Throughput, Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -29,12 +29,10 @@ class PoiBenchmarks {
   def setupData(): Unit = {
     val random = new Random(42)
 
-    testData = (1 to dataSize).map {
-      row =>
-        (1 to 10).map {
-          col =>
-            s"Data-${row}-${col}-${random.nextInt(1000)}"
-        }
+    testData = (1 to dataSize).map { row =>
+      (1 to 10).map { col =>
+        s"Data-${row}-${col}-${random.nextInt(1000)}"
+      }
     }
 
     largeWorkbook = BenchmarkUtils.createWorkbook(5000, "Large")
@@ -44,22 +42,19 @@ class PoiBenchmarks {
 
   @Benchmark
   def cellCreationBenchmark(bh: Blackhole): Unit = {
-    val cells = (0 until dataSize).map {
-      i =>
-        StringCell(i, s"BenchmarkCell-$i")
+    val cells = (0 until dataSize).map { i =>
+      StringCell(i, s"BenchmarkCell-$i")
     }
     bh.consume(cells)
   }
 
   @Benchmark
   def rowCreationBenchmark(bh: Blackhole): Unit = {
-    val rows = (0 until dataSize).map {
-      rowIndex =>
-        val cells: Set[Cell] = (0 until 10).map {
-          colIndex =>
-            StringCell(colIndex, s"Row-$rowIndex-Col-$colIndex"): Cell
-        }.toSet
-        Row(rowIndex)(cells)
+    val rows = (0 until dataSize).map { rowIndex =>
+      val cells: Set[Cell] = (0 until 10).map { colIndex =>
+        StringCell(colIndex, s"Row-$rowIndex-Col-$colIndex"): Cell
+      }.toSet
+      Row(rowIndex)(cells)
     }
     bh.consume(rows)
   }
@@ -67,13 +62,11 @@ class PoiBenchmarks {
   @Benchmark
   def sheetCreationBenchmark(bh: Blackhole): Unit = {
     val random = new Random(42)
-    val rows = (0 until dataSize).map {
-      rowIndex =>
-        val cells: Set[Cell] = (0 until 10).map {
-          colIndex =>
-            StringCell(colIndex, s"Sheet-$rowIndex-Col-$colIndex"): Cell
-        }.toSet
-        Row(rowIndex)(cells)
+    val rows = (0 until dataSize).map { rowIndex =>
+      val cells: Set[Cell] = (0 until 10).map { colIndex =>
+        StringCell(colIndex, s"Sheet-$rowIndex-Col-$colIndex"): Cell
+      }.toSet
+      Row(rowIndex)(cells)
     }.toSet
 
     val sheet = Sheet("BenchmarkSheet")(rows)
@@ -89,9 +82,8 @@ class PoiBenchmarks {
   @Benchmark
   def cellLookupBenchmark(bh: Blackhole): Unit = {
     val sheet = largeWorkbook.sheets.head
-    val results = (0 until 100).map {
-      i =>
-        sheet.rows.find(_.index == i % dataSize)
+    val results = (0 until 100).map { i =>
+      sheet.rows.find(_.index == i % dataSize)
     }
     bh.consume(results)
   }
@@ -99,13 +91,12 @@ class PoiBenchmarks {
   @Benchmark
   def dataTransformationBenchmark(bh: Blackhole): Unit = {
     val sheet = largeWorkbook.sheets.head
-    val transformedRows = sheet.rows.map {
-      row =>
-        val newCells = row.cells.map {
-          case StringCell(index, data) => StringCell(index, data.toUpperCase)
-          case other => other
-        }
-        Row(row.index)(newCells)
+    val transformedRows = sheet.rows.map { row =>
+      val newCells = row.cells.map {
+        case StringCell(index, data) => StringCell(index, data.toUpperCase)
+        case other => other
+      }
+      Row(row.index)(newCells)
     }
     bh.consume(transformedRows)
   }
@@ -120,9 +111,8 @@ class PoiBenchmarks {
       "COUNT(E1:E75)"
     )
 
-    val cells = (0 until dataSize).map {
-      i =>
-        FormulaCell(i, formulas(i % formulas.length))
+    val cells = (0 until dataSize).map { i =>
+      FormulaCell(i, formulas(i % formulas.length))
     }
     bh.consume(cells)
   }
@@ -137,9 +127,8 @@ class PoiBenchmarks {
       "données de test"
     )
 
-    val cells = (0 until dataSize).map {
-      i =>
-        StringCell(i, unicodeData(i % unicodeData.length))
+    val cells = (0 until dataSize).map { i =>
+      StringCell(i, unicodeData(i % unicodeData.length))
     }
     bh.consume(cells)
   }
@@ -152,9 +141,8 @@ class PoiBenchmarks {
 
   @Benchmark
   def memoryIntensiveBenchmark(bh: Blackhole): Unit = {
-    val workbooks = (1 to 10).map {
-      i =>
-        BenchmarkUtils.createWorkbook(dataSize / 10, s"Memory-$i")
+    val workbooks = (1 to 10).map { i =>
+      BenchmarkUtils.createWorkbook(dataSize / 10, s"Memory-$i")
     }
 
     val combined = workbooks.reduce(_ |+| _)
@@ -167,4 +155,5 @@ class PoiBenchmarks {
     val combined = workbooks.reduce((wb1, wb2) => wb1 |+| wb2)
     bh.consume(combined.toString)
   }
+
 }
