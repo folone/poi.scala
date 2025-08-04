@@ -38,9 +38,7 @@ jobs:
           echo "Looking for merged PR with commit: $HEAD_SHA"
           
           # Search for recently merged PRs that contain this commit
-          PR_DATA=$(gh pr list --state merged --limit 10 --json number,mergeCommit,headRefOid --jq --arg sha "$HEAD_SHA" '
-            map(select(.mergeCommit.oid == $sha or .headRefOid == $sha)) | .[0]
-          ')
+          PR_DATA=$(gh pr list --state merged --limit 10 --json number,mergeCommit,headRefOid --jq "map(select(.mergeCommit.oid == \"$HEAD_SHA\" or .headRefOid == \"$HEAD_SHA\")) | .[0]")
           
           if [ -n "$PR_DATA" ] && [ "$PR_DATA" != "null" ]; then
             PR_NUM=$(echo "$PR_DATA" | jq -r '.number')
