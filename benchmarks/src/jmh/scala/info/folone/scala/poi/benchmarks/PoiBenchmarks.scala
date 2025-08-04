@@ -3,10 +3,11 @@ package info.folone.scala.poi.benchmarks
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
-import info.folone.scala.poi._
+import info.folone.poi._
+import info.folone.poi.scalaz._
 import java.util.Date
 import scala.util.Random
-import scalaz.syntax.semigroup._
+import _root_.scalaz.syntax.semigroup._
 
 @BenchmarkMode(Array(Mode.Throughput, Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
@@ -145,7 +146,6 @@ class PoiBenchmarks {
 
   @Benchmark
   def workbookCombinationBenchmark(bh: Blackhole): Unit = {
-    import scalaz.syntax.monoid._
     val combined = smallWorkbook |+| mediumWorkbook
     bh.consume(combined)
   }
@@ -157,7 +157,6 @@ class PoiBenchmarks {
         BenchmarkUtils.createWorkbook(dataSize / 10, s"Memory-$i")
     }
 
-    import scalaz.syntax.monoid._
     val combined = workbooks.reduce(_ |+| _)
     bh.consume(combined)
   }

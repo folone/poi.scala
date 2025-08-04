@@ -1,12 +1,10 @@
-package info.folone.scala
+package info.folone.poi
 
-import cats._
-import cats.implicits._
-import poi._
+import _root_.cats._
+import _root_.cats.implicits._
+import _root_.scala.annotation.tailrec
 
-import scala.annotation.tailrec
-
-package object poi extends Instances
+package object cats extends Instances
 
 trait Instances {
 
@@ -109,17 +107,21 @@ trait Instances {
         Row(f2.index)(mergeSets(f1.cells, f2.cells, (_: Cell).index))
       override def eqv(a1: Row, a2: Row): Boolean =
         a1.index == a2.index && a1.cells === a2.cells
-      override def show(as: Row): String = s"Row(${as.index})(${as.cells.toIndexedSeq.sortBy(_.index).map(Show[Cell].show).mkString(", ")})"
+      override def show(as: Row): String =
+        s"Row(${as.index})(${as.cells.toIndexedSeq.sortBy(_.index).map(Show[Cell].show).mkString(", ")})"
     }
 
   implicit val sheetInstance: Semigroup[Sheet] with Eq[Sheet] with Show[Sheet] =
     new Semigroup[Sheet] with Eq[Sheet] with Show[Sheet] {
       override def combine(f1: Sheet, f2: Sheet): Sheet =
         Sheet(f2.name)(mergeSets(f1.rows, f2.rows, (_: Row).index))
-      override def eqv(a1: Sheet, a2: Sheet): Boolean =
+      override def eqv(a1: Sheet, a2: Sheet): Boolean = {
+        val rows1 = a1.rows.toIndexedSeq.sortBy((x: Row) => x.index)
+        val rows2 = a2.rows.toIndexedSeq.sortBy((x: Row) => x.index)
         a1.name == a2.name &&
-          (a1.rows.toIndexedSeq.sortBy((x: Row) => x.index) zip
-            a2.rows.toIndexedSeq.sortBy((x: Row) => x.index)).forall { case (r1, r2) => r1 === r2 }
+        rows1.length == rows2.length &&
+        (rows1 zip rows2).forall { case (r1, r2) => r1 === r2 }
+      }
       override def show(as: Sheet): String =
         s"""Sheet("${as.name}")(${as.rows.toIndexedSeq.sortBy(_.index).map(Show[Row].show).mkString(", ")})"""
     }
@@ -129,10 +131,14 @@ trait Instances {
       override def empty: Workbook = Workbook(Set[Sheet]())
       override def combine(f1: Workbook, f2: Workbook): Workbook =
         Workbook(mergeSets(f1.sheets, f2.sheets, (_: Sheet).name))
-      override def eqv(a1: Workbook, a2: Workbook): Boolean =
-        (a1.sheets.toIndexedSeq.sortBy((x: Sheet) => x.name) zip
-          a2.sheets.toIndexedSeq.sortBy((x: Sheet) => x.name)).forall { case (s1, s2) => s1 === s2 }
-      override def show(as: Workbook): String = s"Workbook(${as.sheets.toIndexedSeq.sortBy(_.name).map(Show[Sheet].show).mkString(", ")})"
+      override def eqv(a1: Workbook, a2: Workbook): Boolean = {
+        val sheets1 = a1.sheets.toIndexedSeq.sortBy((x: Sheet) => x.name)
+        val sheets2 = a2.sheets.toIndexedSeq.sortBy((x: Sheet) => x.name)
+        sheets1.length == sheets2.length &&
+        (sheets1 zip sheets2).forall { case (s1, s2) => s1 === s2 }
+      }
+      override def show(as: Workbook): String =
+        s"Workbook(${as.sheets.toIndexedSeq.sortBy(_.name).map(Show[Sheet].show).mkString(", ")})"
     }
 
   // Utility functions
@@ -144,7 +150,10 @@ trait Instances {
     val k2 = m2.keys.toSet
     val intersection = k1 & k2
     val r1 = intersection.map(key => key -> m1(key).combine(m2(key))).toMap
-    val r2 = m1.filter { case (key, _) => !intersection.contains(key) } ++ m2.filter { case (key, _) => !intersection.contains(key) }
+    val r2 = m1.filter { case (key, _) => !intersection.contains(key) } ++ m2.filter { case (key, _) =>
+      !intersection.contains(key)
+    }
     r2 ++ r1
   }
+
 }

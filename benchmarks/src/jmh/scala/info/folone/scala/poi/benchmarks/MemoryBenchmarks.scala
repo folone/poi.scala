@@ -3,10 +3,11 @@ package info.folone.scala.poi.benchmarks
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
-import info.folone.scala.poi._
+import info.folone.poi._
+import info.folone.poi.scalaz._
 import java.util.Date
 import scala.util.Random
-import scalaz.syntax.semigroup._
+import _root_.scalaz.syntax.semigroup._
 
 /**
  * Memory-specific benchmarks to monitor heap usage
