@@ -1,4 +1,4 @@
-package info.folone.scala.poi.benchmarks
+package info.folone.poi.benchmarks
 
 import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._

@@ -1,4 +1,4 @@
-package info.folone.scala.poi.benchmarks
+package info.folone.poi.benchmarks
 
 import info.folone.poi._
 import java.util.Date
