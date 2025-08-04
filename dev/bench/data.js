@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1754307965136,
+  "lastUpdate": 1754308407792,
   "repoUrl": "https://github.com/folone/poi.scala",
   "entries": {
     "JMH Benchmarks": [
@@ -8728,6 +8728,520 @@ window.BENCHMARK_DATA = {
           {
             "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCreationBenchmark ( {\"dataSize\":\"5000\"} )",
             "value": 9.77453833148717,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "scala-steward-bot",
+            "username": "scala-steward-bot",
+            "email": "2517319+scala-steward-bot@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "0f7e53458db83b76f52b5ab2f1826ea24a517243",
+          "message": "Update sbt-assembly to 2.3.1 (#333)\n\nCo-authored-by: George Leontiev <folone@users.noreply.github.com>",
+          "timestamp": "2025-08-04T11:18:55Z",
+          "url": "https://github.com/folone/poi.scala/commit/0f7e53458db83b76f52b5ab2f1826ea24a517243"
+        },
+        "date": 1754308407337,
+        "tool": "jmh",
+        "benches": [
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.createWorkbookAsyncBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 43.913032375777334,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.createWorkbookAsyncBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 43.96463579749629,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.loadWorkbookAsyncBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 1.325035553070684,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.loadWorkbookAsyncBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.23662043987712025,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.processDataStreamAsyncBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 13.769434085082105,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.processDataStreamAsyncBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 1.8886052382635647,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.saveWorkbookAsyncBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 4.461301545885496,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.saveWorkbookAsyncBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 1.1754541018368516,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.bulkDataProcessingBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.09234534090060062,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.bulkDataProcessingBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.09070643713295848,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.bulkDataProcessingBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.09043430042287667,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellCreationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 496.6676059666067,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellCreationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 44.52771561549549,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellCreationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 8.651528791499008,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellLookupBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.43245370991007287,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellLookupBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.37920705179551184,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellLookupBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.37728264262867284,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.dataTransformationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.14797489345206935,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.dataTransformationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.14373868051110725,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.dataTransformationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.1374399773951526,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.formulaCellsBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 558.4075860816379,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.formulaCellsBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 56.07792134173934,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.formulaCellsBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 11.194238565942083,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.memoryIntensiveBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 1.5409564492596752,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.memoryIntensiveBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.17303003994087318,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.memoryIntensiveBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.03176650473747895,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.rowCreationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 7.068268080024319,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.rowCreationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.6086181051709033,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.rowCreationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.11553349371941968,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.sheetCreationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 5.9395275720955585,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.sheetCreationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.5035088370429195,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.sheetCreationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.09294263060307172,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.unicodeDataBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 617.323959834516,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.unicodeDataBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 60.92510538454887,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.unicodeDataBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 12.120096281614988,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCombinationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 624.2658400979346,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCombinationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 654.1129766996717,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCombinationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 616.5690452578559,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCreationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 5.884272292524381,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCreationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.5157924632051265,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCreationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.10141519236180523,
+            "unit": "ops/ms",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.createWorkbookAsyncBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.022600010382860268,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.createWorkbookAsyncBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.02246321219079709,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.loadWorkbookAsyncBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.7641852495570371,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.loadWorkbookAsyncBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 4.217628783974096,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.processDataStreamAsyncBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.07490799208660619,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.processDataStreamAsyncBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.5259344100058081,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.saveWorkbookAsyncBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.23008926047791345,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.AsyncPoiBenchmarks.saveWorkbookAsyncBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.8830732323723047,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.bulkDataProcessingBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 10.890690486898082,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.bulkDataProcessingBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 10.947591894565218,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.bulkDataProcessingBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 11.066503731953604,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellCreationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.0020151902379645197,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellCreationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.021370054348570998,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellCreationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.11557237453065874,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellLookupBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 2.662771119950033,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellLookupBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 2.189282021272773,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.cellLookupBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 2.517237473939205,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.dataTransformationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 6.7314521100671145,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.dataTransformationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 6.868224263449849,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.dataTransformationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 6.725130465530202,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.formulaCellsBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.0017779588345300835,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.formulaCellsBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.017757785268045796,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.formulaCellsBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.09032525166386962,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.memoryIntensiveBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.497255279316847,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.memoryIntensiveBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 5.873286819866615,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.memoryIntensiveBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 31.29393131524621,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.rowCreationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.14423031828300806,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.rowCreationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 1.6548231634210626,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.rowCreationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 8.842455241325377,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.sheetCreationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.1611120277041436,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.sheetCreationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 2.011951762365411,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.sheetCreationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 10.91810845978261,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.unicodeDataBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.0016839217133609529,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.unicodeDataBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.015890794890047823,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.unicodeDataBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.08182056131465508,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCombinationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.0014694381649341761,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCombinationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 0.0014305368182605939,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCombinationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 0.0015764266166593092,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCreationBenchmark ( {\"dataSize\":\"100\"} )",
+            "value": 0.1757210856267885,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCreationBenchmark ( {\"dataSize\":\"1000\"} )",
+            "value": 1.8878712565055171,
+            "unit": "ms/op",
+            "extra": "iterations: 10\nforks: 1\nthreads: 1"
+          },
+          {
+            "name": "info.folone.scala.poi.benchmarks.PoiBenchmarks.workbookCreationBenchmark ( {\"dataSize\":\"5000\"} )",
+            "value": 9.582422492210338,
             "unit": "ms/op",
             "extra": "iterations: 10\nforks: 1\nthreads: 1"
           }
