@@ -136,7 +136,7 @@ lazy val cats = Project(
   name := "poi-scala-cats",
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % "2.13.0",
-    "org.typelevel" %% "cats-effect" % "3.5.7",
+    "org.typelevel" %% "cats-effect" % "3.6.3",
     "org.typelevel" %% "cats-laws" % "2.13.0" % "test",
     "org.typelevel" %% "discipline-specs2" % "1.5.0" % "test",
     "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
