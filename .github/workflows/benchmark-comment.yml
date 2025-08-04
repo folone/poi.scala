@@ -1,0 +1,87 @@
+name: Benchmark Comment
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+jobs:
+  benchmark-comment:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Debug workflow info
+        run: |
+          echo "Triggering workflow: ${{ github.event.workflow_run.name }}"
+          echo "Run ID: ${{ github.event.workflow_run.id }}"
+          echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "Event: ${{ github.event.workflow_run.event }}"
+          echo "Pull requests: ${{ toJson(github.event.workflow_run.pull_requests) }}"
+      - name: Get PR number
+        id: get-pr
+        if: github.event.workflow_run.event == 'pull_request'
+        run: |
+          # Try to get PR number from workflow_run data using jq to safely parse
+          PR_DATA='${{ toJson(github.event.workflow_run.pull_requests) }}'
+          PR_NUM=$(echo "$PR_DATA" | jq -r '.[0].number // empty' 2>/dev/null || echo "")
+
+          # If that's empty, try to find it from the head commit
+          if [ -z "$PR_NUM" ] || [ "$PR_NUM" = "null" ]; then
+            echo "PR number not found in workflow_run data, searching by commit..."
+            # Get the head SHA from the workflow run
+            HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+
+            # Search for PRs with this commit
+            PR_NUM=$(gh pr list --state all --search "$HEAD_SHA" --json number --jq '.[0].number // empty')
+          fi
+
+          if [ -n "$PR_NUM" ] && [ "$PR_NUM" != "null" ]; then
+            echo "Found PR number: $PR_NUM"
+            echo "pr-number=$PR_NUM" >> $GITHUB_OUTPUT
+          else
+            echo "Could not determine PR number"
+            echo "pr-number=" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Fetch all history for all branches
+      - name: Download benchmark results
+        uses: actions/download-artifact@v4
+        with:
+          name: benchmark-results
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compare benchmark results
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: JMH Benchmarks
+          tool: 'jmh'
+          output-file-path: benchmark-results.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          # Do not fail the build, just comment on the PR.
+          fail-on-alert: false
+
+      - name: Post benchmark page link
+        if: github.event.workflow_run.event == 'pull_request' && steps.get-pr.outputs.pr-number != ''
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.get-pr.outputs.pr-number }}
+          body: |
+            📊 **Benchmark Results**
+
+            The detailed benchmark results are available for review on our website.
+
+            [View Benchmark Report](https://folone.github.io/poi.scala/dev/bench/)
+
+      - name: Log when PR number not found
+        if: github.event.workflow_run.event == 'pull_request' && steps.get-pr.outputs.pr-number == ''
+        run: |
+          echo "⚠️ Could not determine PR number for commenting"
+          echo "This might happen with external PRs or due to GitHub API limitations"

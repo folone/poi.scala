@@ -3,7 +3,8 @@
 
 .PHONY: help compile test test-only test-quick clean package run console scalastyle docs publish-local \
         deps update watch-compile watch-test format format-check test-integration test-unit \
-        test-laws test-primitives test-features dev-setup dev pre-release info check-sbt \
+        test-laws test-primitives test-features test-core test-cats test-scalaz test-async \
+        benchmarks dev-setup dev pre-release info check-sbt \
         cross-compile cross-test cross-test-only cross-package cross-publish-local cross-clean
 
 # Default target
@@ -25,6 +26,10 @@ help:
 	@echo "  test-laws    - Run typeclass and monoid law tests"
 	@echo "  test-primitives - Run primitive class tests (Cell, Row, etc.)"
 	@echo "  test-features - Run enhanced feature tests"
+	@echo "  test-core    - Run core module tests only"
+	@echo "  test-cats    - Run cats module tests only"
+	@echo "  test-scalaz  - Run scalaz module tests only"
+	@echo "  test-async   - Run async module tests only"
 	@echo "  cross-test   - Run all tests across all Scala versions"
 	@echo "  cross-test-only - Run specific test across all Scala versions"
 	@echo ""
@@ -41,6 +46,9 @@ help:
 	@echo "  format       - Format code"
 	@echo "  format-check - Check code formatting"
 	@echo ""
+	@echo "Benchmarks:"
+	@echo "  benchmarks   - Run performance benchmarks"
+	@echo ""
 	@echo "Documentation & Publishing:"
 	@echo "  docs         - Generate documentation"
 	@echo "  publish-local - Publish to local repository"
@@ -56,7 +64,7 @@ help:
 	@echo "Examples:"
 	@echo "  make test-only TEST='*PoiSpec'"
 	@echo "  make test-only TEST='*Integration*'"
-	@echo "  make test-only TEST='info.folone.scala.poi.MonoidLawsSpec'"
+	@echo "  make test-only TEST='info.folone.poi.MonoidLawsSpec'"
 	@echo "  make cross-test-only TEST='*PoiSpec'"
 	@echo "  make cross-compile"
 
@@ -150,6 +158,23 @@ test-primitives:
 test-features:
 	./sbt "testOnly *EnhancedSheetSpec *ExtendedCellTypesSpec *EnhancedStylingSpec *DataValidationSpec *ErrorHandlingSpec"
 
+# Module-specific test targets
+test-core:
+	./sbt "core/test"
+
+test-cats:
+	./sbt "cats/test"
+
+test-scalaz:
+	./sbt "scalaz/test"
+
+test-async:
+	./sbt "async/test"
+
+# Benchmark targets
+benchmarks:
+	./sbt "benchmarks/Jmh/run"
+
 # Cross-compilation targets
 # Compile for all supported Scala versions
 cross-compile:
@@ -196,11 +221,21 @@ pre-release: clean compile test scalastyle docs
 # Show project information
 info:
 	@echo "Project: poi.scala"
+	@echo "Description: Scala library for Excel file operations"
 	@echo "Build tool: sbt"
 	@echo "Scala version: 2.12.20 (default)"
 	@echo "Cross Scala versions: 2.12.20, 2.13.16, 3.3.6"
 	@echo "SBT version: $(shell ./sbt sbtVersion 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -1)"
-	@echo "Test count: $(shell find src/test -name '*.scala' | wc -l | tr -d ' ')"
+	@echo ""
+	@echo "Modules:"
+	@echo "  - core: Core Excel operations (required)"
+	@echo "  - cats: Cats functional programming integration"
+	@echo "  - scalaz: Scalaz functional programming integration"
+	@echo "  - async: Asynchronous operations"
+	@echo "  - fatjar: Fat JAR assembly"
+	@echo "  - benchmarks: Performance benchmarks"
+	@echo ""
+	@echo "Test count: $(shell find poi-scala-*/src/test -name '*.scala' 2>/dev/null | wc -l | tr -d ' ')"
 
 # Check if sbt is available
 check-sbt:

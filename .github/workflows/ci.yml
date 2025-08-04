@@ -145,25 +145,11 @@ jobs:
     - name: Run JMH benchmarks
       run: |
         sbt "benchmarks/Jmh/run -rf json -rff benchmark-results.json .*PoiBenchmarks.*" || echo "Benchmarks failed but continuing"
-    - name: Compare benchmark results
-      uses: benchmark-action/github-action-benchmark@v1
+    - name: Store benchmark results
+      uses: actions/upload-artifact@v4
       with:
-        name: JMH Benchmarks
-        tool: 'jmh'
-        output-file-path: benchmarks/benchmark-results.json
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        auto-push: true
-        # Do not fail the build, just comment on the PR.
-        fail-on-alert: false
-    - name: Post benchmark page link
-      if: github.event_name == 'pull_request'
-      uses: peter-evans/create-or-update-comment@v4
-      with:
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          📊 **Benchmark Results**
-
-          [View Benchmark Report](https://folone.github.io/poi.scala/dev/bench/)
+        name: benchmark-results
+        path: benchmarks/benchmark-results.json
 
   memory-testing:
     name: Memory & Stress Testing

@@ -1,6 +1,6 @@
 package info.folone.scala.poi.benchmarks
 
-import info.folone.scala.poi._
+import info.folone.poi._
 import java.util.Date
 import scala.util.Random
 
