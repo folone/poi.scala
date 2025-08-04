@@ -226,6 +226,16 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           fail-on-alert: false
+      - name: Log comprehensive benchmark completion
+        if: always()
+        run: |
+          if [ -f "benchmarks/comprehensive-results.json" ] && [ -s "benchmarks/comprehensive-results.json" ]; then
+            BENCHMARK_COUNT=$(jq length benchmarks/comprehensive-results.json 2>/dev/null || echo "0")
+            echo "🎯 Comprehensive benchmarks completed with $BENCHMARK_COUNT results"
+            echo "📊 Performance data has been published to: https://folone.github.io/poi.scala/dev/bench/"
+          else
+            echo "⚠️ Comprehensive benchmarks completed but no valid results generated"
+          fi
 
   # REQUIRED STATUS CHECK - All critical jobs must pass
   required-checks:

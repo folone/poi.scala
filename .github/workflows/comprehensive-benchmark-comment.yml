@@ -1,0 +1,144 @@
+name: Comprehensive Benchmark Comment
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+    branches:
+      - master
+
+jobs:
+  comprehensive-benchmark-comment:
+    runs-on: ubuntu-latest
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'master'
+    steps:
+      - name: Debug workflow info
+        run: |
+          echo "Triggering workflow: ${{ github.event.workflow_run.name }}"
+          echo "Run ID: ${{ github.event.workflow_run.id }}"
+          echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
+          echo "Event: ${{ github.event.workflow_run.event }}"
+          echo "Head branch: ${{ github.event.workflow_run.head_branch }}"
+          echo "Head SHA: ${{ github.event.workflow_run.head_sha }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Find merged PR
+        id: find-pr
+        run: |
+          HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+          echo "Looking for merged PR with commit: $HEAD_SHA"
+          
+          # Search for recently merged PRs that contain this commit
+          PR_DATA=$(gh pr list --state merged --limit 10 --json number,mergeCommit,headRefOid --jq --arg sha "$HEAD_SHA" '
+            map(select(.mergeCommit.oid == $sha or .headRefOid == $sha)) | .[0]
+          ')
+          
+          if [ -n "$PR_DATA" ] && [ "$PR_DATA" != "null" ]; then
+            PR_NUM=$(echo "$PR_DATA" | jq -r '.number')
+            echo "Found merged PR: #$PR_NUM"
+            echo "pr-number=$PR_NUM" >> $GITHUB_OUTPUT
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "No merged PR found for this commit - might be a direct push"
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if comprehensive benchmarks ran
+        id: check-benchmarks
+        run: |
+          # Check if the comprehensive benchmark job ran and succeeded
+          # We can infer this by checking if comprehensive results would be published
+          RUN_ID="${{ github.event.workflow_run.id }}"
+          
+          # Get job details to see if comprehensive-benchmarks job ran
+          JOBS_DATA=$(gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID/jobs" --jq '.jobs[] | select(.name == "Comprehensive Performance Suite")')
+          
+          if [ -n "$JOBS_DATA" ]; then
+            JOB_STATUS=$(echo "$JOBS_DATA" | jq -r '.conclusion')
+            echo "Comprehensive benchmark job status: $JOB_STATUS"
+            
+            if [ "$JOB_STATUS" = "success" ]; then
+              echo "benchmarks-ran=true" >> $GITHUB_OUTPUT
+              echo "✅ Comprehensive benchmarks completed successfully"
+            else
+              echo "benchmarks-ran=false" >> $GITHUB_OUTPUT
+              echo "⚠️ Comprehensive benchmarks did not complete successfully"
+            fi
+          else
+            echo "benchmarks-ran=false" >> $GITHUB_OUTPUT
+            echo "❌ No comprehensive benchmark job found"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post comprehensive benchmark comment
+        if: |
+          steps.find-pr.outputs.found == 'true' && 
+          steps.check-benchmarks.outputs.benchmarks-ran == 'true'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.find-pr.outputs.pr-number }}
+          body: |
+            🚀 **Comprehensive Benchmark Results**
+
+            Your merged PR has triggered comprehensive performance benchmarks on the `master` branch! 
+
+            📈 **Full Performance Analysis Available:**
+            [View Detailed Benchmark Report](https://folone.github.io/poi.scala/dev/bench/)
+
+            **What's Different from PR Benchmarks:**
+            - ✅ **Complete parameter matrix** (all data sizes and configurations)
+            - ✅ **Extended warmup and measurement iterations** for accuracy
+            - ✅ **Memory profiling** with full heap analysis
+            - ✅ **Cross-version compatibility** testing
+            - ✅ **Historical trend analysis** vs previous releases
+
+            > 💡 **Performance Impact**: These comprehensive results show the true performance characteristics of your changes in production-like conditions.
+            > 
+            > 📊 The benchmark data is automatically stored and will be used for performance regression detection in future PRs.
+
+            ---
+            *This comment was posted after your PR was merged and comprehensive benchmarks completed on master.*
+
+      - name: Post benchmark failure comment  
+        if: |
+          steps.find-pr.outputs.found == 'true' && 
+          steps.check-benchmarks.outputs.benchmarks-ran == 'false'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.find-pr.outputs.pr-number }}
+          body: |
+            ⚠️ **Comprehensive Benchmark Update**
+
+            Your merged PR triggered comprehensive benchmarks, but they did not complete successfully.
+
+            **Possible reasons:**
+            - Build or compilation issues on master branch
+            - Resource constraints during benchmark execution  
+            - JMH configuration problems
+
+            🔍 **Next Steps:**
+            - Check the [workflow logs](${{ github.event.workflow_run.html_url }}) for details
+            - The issue may resolve itself on the next master push
+            - Performance baseline will be updated when benchmarks succeed
+
+            ---
+            *This is a follow-up to your merged PR - no action required on your part.*
+
+      - name: Log when no PR found
+        if: steps.find-pr.outputs.found == 'false'
+        run: |
+          echo "ℹ️ No merged PR found for this master push"
+          echo "This might be a direct commit to master or a squash-merged PR"
+          echo "Comprehensive benchmarks will still update the performance baseline"
