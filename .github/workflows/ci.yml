@@ -142,42 +142,39 @@ jobs:
           fi
       - name: Run optimized JMH benchmarks
         run: |
-          # Ensure benchmarks directory exists
-          mkdir -p benchmarks
-          
           case "${{ matrix.benchmark-type }}" in
             "core")
               # Run core benchmarks with reduced parameters for faster execution
-              if sbt "benchmarks/Jmh/run -p dataSize=1000 -rf json -rff benchmarks/benchmark-results-core.json .*PoiBenchmarks.*"; then
+              if sbt 'benchmarks/Jmh/run -p dataSize=1000 -rf json -rff benchmark-results-core.json .*PoiBenchmarks.*'; then
                 echo "✅ Core benchmarks completed successfully"
               else
                 echo "❌ Core benchmarks failed, creating empty results file"
-                echo "[]" > benchmarks/benchmark-results-core.json
+                echo "[]" > benchmark-results-core.json
               fi
               ;;
             "async")
               # Run async benchmarks with smaller dataset
-              if sbt "benchmarks/Jmh/run -p dataSize=100 -rf json -rff benchmarks/benchmark-results-async.json .*AsyncPoiBenchmarks.*"; then
+              if sbt 'benchmarks/Jmh/run -p dataSize=100 -rf json -rff benchmark-results-async.json .*AsyncPoiBenchmarks.*'; then
                 echo "✅ Async benchmarks completed successfully"
               else
                 echo "❌ Async benchmarks failed, creating empty results file"
-                echo "[]" > benchmarks/benchmark-results-async.json
+                echo "[]" > benchmark-results-async.json
               fi
               ;;
             "memory")
               # Run memory benchmarks with single data size for efficiency
               export SBT_OPTS="-Xmx2g -XX:+UseG1GC"
-              if sbt "benchmarks/Jmh/run -p dataSize=5000 -rf json -rff benchmarks/benchmark-results-memory.json .*MemoryBenchmarks.*"; then
+              if sbt 'benchmarks/Jmh/run -p dataSize=5000 -rf json -rff benchmark-results-memory.json .*MemoryBenchmarks.*'; then
                 echo "✅ Memory benchmarks completed successfully"
               else
                 echo "❌ Memory benchmarks failed, creating empty results file"
-                echo "[]" > benchmarks/benchmark-results-memory.json
+                echo "[]" > benchmark-results-memory.json
               fi
               ;;
           esac
 
           # Verify the results file exists and has content
-          result_file="benchmarks/benchmark-results-${{ matrix.benchmark-type }}.json"
+          result_file="benchmark-results-${{ matrix.benchmark-type }}.json"
           if [ -f "$result_file" ] && [ -s "$result_file" ]; then
             echo "✅ Results file created: $result_file"
             ls -la "$result_file"
@@ -189,7 +186,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results-${{ matrix.benchmark-type }}
-          path: benchmarks/benchmark-results-*.json
+          path: benchmark-results-*.json
 
   # Full comprehensive benchmarks - only run on master branch push
   comprehensive-benchmarks:
@@ -210,24 +207,21 @@ jobs:
       - uses: sbt/setup-sbt@v1
       - name: Run full benchmark suite
         run: |
-          # Ensure benchmarks directory exists
-          mkdir -p benchmarks
-          
           # Run all benchmarks with all parameter combinations (comprehensive)
           export SBT_OPTS="-Xmx4g -XX:+UseG1GC"
-          if sbt "benchmarks/Jmh/run -rf json -rff benchmarks/comprehensive-results.json"; then
+          if sbt 'benchmarks/Jmh/run -rf json -rff comprehensive-results.json'; then
             echo "✅ Comprehensive benchmarks completed successfully"
-            ls -la benchmarks/comprehensive-results.json
+            ls -la comprehensive-results.json
           else
             echo "❌ Comprehensive benchmarks failed, creating empty results file"
-            echo "[]" > benchmarks/comprehensive-results.json
+            echo "[]" > comprehensive-results.json
           fi
       - name: Validate comprehensive benchmark results
         id: validate-results
         if: always()  # Run even if benchmarks failed
         run: |
-          if [ -f "benchmarks/comprehensive-results.json" ] && [ -s "benchmarks/comprehensive-results.json" ]; then
-            RESULT_COUNT=$(jq length benchmarks/comprehensive-results.json 2>/dev/null || echo "0")
+          if [ -f "comprehensive-results.json" ] && [ -s "comprehensive-results.json" ]; then
+            RESULT_COUNT=$(jq length comprehensive-results.json 2>/dev/null || echo "0")
             if [ "$RESULT_COUNT" -gt 0 ]; then
               echo "✅ Found $RESULT_COUNT comprehensive benchmark results"
               echo "has-results=true" >> $GITHUB_OUTPUT
@@ -245,15 +239,15 @@ jobs:
         with:
           name: JMH Comprehensive Benchmarks
           tool: "jmh"
-          output-file-path: benchmarks/comprehensive-results.json
+          output-file-path: comprehensive-results.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           fail-on-alert: false
       - name: Log comprehensive benchmark completion
         if: always()
         run: |
-          if [ -f "benchmarks/comprehensive-results.json" ] && [ -s "benchmarks/comprehensive-results.json" ]; then
-            BENCHMARK_COUNT=$(jq length benchmarks/comprehensive-results.json 2>/dev/null || echo "0")
+          if [ -f "comprehensive-results.json" ] && [ -s "comprehensive-results.json" ]; then
+            BENCHMARK_COUNT=$(jq length comprehensive-results.json 2>/dev/null || echo "0")
             echo "🎯 Comprehensive benchmarks completed with $BENCHMARK_COUNT results"
             echo "📊 Performance data has been published to: https://folone.github.io/poi.scala/dev/bench/"
           else
