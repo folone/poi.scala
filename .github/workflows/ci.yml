@@ -145,18 +145,43 @@ jobs:
           case "${{ matrix.benchmark-type }}" in
             "core")
               # Run core benchmarks with reduced parameters for faster execution
-              sbt "benchmarks/Jmh/run -p dataSize=1000 -rf json -rff benchmark-results-core.json .*PoiBenchmarks.*" || echo "Core benchmarks failed but continuing"
+              if sbt "benchmarks/Jmh/run -p dataSize=1000 -rf json -rff benchmarks/benchmark-results-core.json .*PoiBenchmarks.*"; then
+                echo "✅ Core benchmarks completed successfully"
+              else
+                echo "❌ Core benchmarks failed, creating empty results file"
+                echo "[]" > benchmarks/benchmark-results-core.json
+              fi
               ;;
             "async")
               # Run async benchmarks with smaller dataset
-              sbt "benchmarks/Jmh/run -p dataSize=100 -rf json -rff benchmark-results-async.json .*AsyncPoiBenchmarks.*" || echo "Async benchmarks failed but continuing"
+              if sbt "benchmarks/Jmh/run -p dataSize=100 -rf json -rff benchmarks/benchmark-results-async.json .*AsyncPoiBenchmarks.*"; then
+                echo "✅ Async benchmarks completed successfully"
+              else
+                echo "❌ Async benchmarks failed, creating empty results file"
+                echo "[]" > benchmarks/benchmark-results-async.json
+              fi
               ;;
             "memory")
               # Run memory benchmarks with single data size for efficiency
               export SBT_OPTS="-Xmx2g -XX:+UseG1GC"
-              sbt "benchmarks/Jmh/run -p dataSize=5000 -rf json -rff benchmark-results-memory.json .*MemoryBenchmarks.*" || echo "Memory benchmarks failed but continuing"
+              if sbt "benchmarks/Jmh/run -p dataSize=5000 -rf json -rff benchmarks/benchmark-results-memory.json .*MemoryBenchmarks.*"; then
+                echo "✅ Memory benchmarks completed successfully"
+              else
+                echo "❌ Memory benchmarks failed, creating empty results file"
+                echo "[]" > benchmarks/benchmark-results-memory.json
+              fi
               ;;
           esac
+
+          # Verify the results file exists and has content
+          result_file="benchmarks/benchmark-results-${{ matrix.benchmark-type }}.json"
+          if [ -f "$result_file" ] && [ -s "$result_file" ]; then
+            echo "✅ Results file created: $result_file"
+            ls -la "$result_file"
+          else
+            echo "⚠️ Results file missing or empty, creating fallback"
+            echo "[]" > "$result_file"
+          fi
       - name: Store benchmark results
         uses: actions/upload-artifact@v4
         with:
@@ -184,8 +209,15 @@ jobs:
         run: |
           # Run all benchmarks with all parameter combinations (comprehensive)
           export SBT_OPTS="-Xmx4g -XX:+UseG1GC"
-          sbt "benchmarks/Jmh/run -rf json -rff comprehensive-results.json" || echo "Comprehensive benchmarks failed but continuing"
+          if sbt "benchmarks/Jmh/run -rf json -rff benchmarks/comprehensive-results.json"; then
+            echo "✅ Comprehensive benchmarks completed successfully"
+            ls -la benchmarks/comprehensive-results.json
+          else
+            echo "❌ Comprehensive benchmarks failed, creating empty results file"
+            echo "[]" > benchmarks/comprehensive-results.json
+          fi
       - name: Compare comprehensive benchmark results
+        if: always()  # Run even if benchmarks failed
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: JMH Comprehensive Benchmarks
