@@ -222,8 +222,25 @@ jobs:
             echo "❌ Comprehensive benchmarks failed, creating empty results file"
             echo "[]" > benchmarks/comprehensive-results.json
           fi
-      - name: Compare comprehensive benchmark results
+      - name: Validate comprehensive benchmark results
+        id: validate-results
         if: always()  # Run even if benchmarks failed
+        run: |
+          if [ -f "benchmarks/comprehensive-results.json" ] && [ -s "benchmarks/comprehensive-results.json" ]; then
+            RESULT_COUNT=$(jq length benchmarks/comprehensive-results.json 2>/dev/null || echo "0")
+            if [ "$RESULT_COUNT" -gt 0 ]; then
+              echo "✅ Found $RESULT_COUNT comprehensive benchmark results"
+              echo "has-results=true" >> $GITHUB_OUTPUT
+            else
+              echo "⚠️ No actual benchmark results found (empty or invalid JSON)"
+              echo "has-results=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "⚠️ Comprehensive results file missing or empty"
+            echo "has-results=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Compare comprehensive benchmark results
+        if: steps.validate-results.outputs.has-results == 'true'
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: JMH Comprehensive Benchmarks
