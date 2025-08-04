@@ -124,6 +124,10 @@ jobs:
     if: github.event_name != 'schedule'
     needs: [test]
     continue-on-error: true  # Don't fail the entire workflow if benchmarks fail
+    strategy:
+      matrix:
+        benchmark-type: ["core", "async", "memory"]
+      fail-fast: false
     steps:
     - uses: actions/checkout@v4
       with:
@@ -142,51 +146,59 @@ jobs:
           echo "❌ JMH compilation failed, skipping benchmarks"
           exit 0
         fi
-    - name: Run JMH benchmarks
+    - name: Run optimized JMH benchmarks
       run: |
-        sbt "benchmarks/Jmh/run -rf json -rff benchmark-results.json .*PoiBenchmarks.*" || echo "Benchmarks failed but continuing"
+        case "${{ matrix.benchmark-type }}" in
+          "core")
+            # Run core benchmarks with reduced parameters for faster execution
+            sbt "benchmarks/Jmh/run -p dataSize=1000 -rf json -rff benchmark-results-core.json .*PoiBenchmarks.*" || echo "Core benchmarks failed but continuing"
+            ;;
+          "async")
+            # Run async benchmarks with smaller dataset
+            sbt "benchmarks/Jmh/run -p dataSize=100 -rf json -rff benchmark-results-async.json .*AsyncPoiBenchmarks.*" || echo "Async benchmarks failed but continuing"
+            ;;
+          "memory")
+            # Run memory benchmarks with single data size for efficiency
+            export SBT_OPTS="-Xmx2g -XX:+UseG1GC"
+            sbt "benchmarks/Jmh/run -p dataSize=5000 -rf json -rff benchmark-results-memory.json .*MemoryBenchmarks.*" || echo "Memory benchmarks failed but continuing"
+            ;;
+        esac
     - name: Store benchmark results
       uses: actions/upload-artifact@v4
       with:
-        name: benchmark-results
-        path: benchmarks/benchmark-results.json
+        name: benchmark-results-${{ matrix.benchmark-type }}
+        path: benchmarks/benchmark-results-*.json
 
-  memory-testing:
-    name: Memory & Stress Testing
+  # Full comprehensive benchmarks - only run on master branch push
+  comprehensive-benchmarks:
+    name: Comprehensive Performance Suite
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: [test]
-    continue-on-error: true  # Don't fail workflow if memory tests fail
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - uses: actions/setup-java@v4
       with:
         java-version: 11
         distribution: temurin
     - uses: coursier/cache-action@v6
     - uses: sbt/setup-sbt@v1
-    - name: Check if memory benchmarks compile
+    - name: Run full benchmark suite
       run: |
-        if sbt "benchmarks/Jmh/compile"; then
-          echo "✅ JMH compilation successful for memory tests"
-        else
-          echo "❌ JMH compilation failed, skipping memory tests"
-          exit 0
-        fi
-    - name: Run memory benchmarks
-      run: |
-        # Run with larger heap for memory testing
-        export SBT_OPTS="-Xmx2g -XX:+UseG1GC"
-        sbt "benchmarks/Jmh/run -rf json -rff memory-results.json .*MemoryBenchmarks.*" || echo "Memory benchmarks failed but continuing"
-    - name: Compare memory benchmark results
+        # Run all benchmarks with all parameter combinations (comprehensive)
+        export SBT_OPTS="-Xmx4g -XX:+UseG1GC"
+        sbt "benchmarks/Jmh/run -rf json -rff comprehensive-results.json" || echo "Comprehensive benchmarks failed but continuing"
+    - name: Compare comprehensive benchmark results
       uses: benchmark-action/github-action-benchmark@v1
       with:
-        name: JMH Memory Benchmarks
+        name: JMH Comprehensive Benchmarks
         tool: 'jmh'
-        output-file-path: benchmarks/memory-results.json
+        output-file-path: benchmarks/comprehensive-results.json
         github-token: ${{ secrets.GITHUB_TOKEN }}
         auto-push: true
-        # Do not fail the build, just comment on the PR.
         fail-on-alert: false
 
   # REQUIRED STATUS CHECK - All critical jobs must pass
