@@ -64,7 +64,7 @@ help:
 	@echo "Examples:"
 	@echo "  make test-only TEST='*PoiSpec'"
 	@echo "  make test-only TEST='*Integration*'"
-	@echo "  make test-only TEST='info.folone.poi.MonoidLawsSpec'"
+	@echo "  make test-only TEST='*MonoidLawsSpec'"
 	@echo "  make cross-test-only TEST='*PoiSpec'"
 	@echo "  make cross-compile"
 

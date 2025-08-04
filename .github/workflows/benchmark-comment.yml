@@ -78,25 +78,19 @@ jobs:
           # Combine all benchmark JSON files into a single file for processing
           echo "Combining benchmark results..."
           if ls benchmark-results-*.json 1> /dev/null 2>&1; then
-            # Create a combined JSON array from all individual result files
-            echo "[" > combined-benchmark-results.json
-            first=true
-            for file in benchmark-results-*.json; do
-              if [ "$first" = true ]; then
-                first=false
-              else
-                echo "," >> combined-benchmark-results.json
-              fi
-              # Extract the benchmarks array content and append
-              jq '.[] | select(.benchmark != null)' "$file" >> combined-benchmark-results.json
-            done
-            echo "]" >> combined-benchmark-results.json
+            # Each file contains a JMH results array, so we need to merge the arrays
+            echo "Processing individual benchmark files:"
+            ls -la benchmark-results-*.json
             
-            # Flatten the nested structure
-            jq '[.[] | select(. != null)]' combined-benchmark-results.json > benchmark-results.json
+            # Use jq to properly merge all JSON arrays into one
+            jq -s 'map(.[]) | flatten' benchmark-results-*.json > benchmark-results.json
             
-            echo "Combined $(jq length benchmark-results.json) benchmark results"
+            echo "Combined $(jq length benchmark-results.json 2>/dev/null || echo "0") benchmark results"
             ls -la benchmark-results.json
+            
+            # Debug: show first few lines of the combined file
+            echo "Sample of combined results:"
+            head -20 benchmark-results.json || echo "File is empty or invalid"
           else
             echo "No benchmark result files found"
             echo "[]" > benchmark-results.json
