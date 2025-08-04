@@ -88,8 +88,8 @@ jobs:
       - name: Run extended property-based tests
         run: |
           sbt "++${{ matrix.scala-version }}" \
-            "testOnly info.folone.scala.poi.PropertyBasedTestingSpec" \
-            "testOnly info.folone.scala.poi.TypeclassLawsSpec"
+            "testOnly *PropertyBasedTestingSpec" \
+            "testOnly *TypeclassLawsSpec"
 
   integration-testing:
     name: Integration Tests
@@ -105,7 +105,7 @@ jobs:
       - uses: sbt/setup-sbt@v1
       - name: Run integration tests
         run: |
-          sbt "testOnly info.folone.scala.poi.IntegrationSpec"
+          sbt "testOnly *IntegrationSpec"
       - name: Validate generated files
         run: |
           find . -name "*.xlsx" -type f | head -5
