@@ -110,7 +110,7 @@ lazy val core = Project(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
       "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
+      "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
     )
 )
 
@@ -124,7 +124,7 @@ lazy val scalaz = Project(
     "org.scalaz" %% "scalaz-effect" % scalazVersion,
     "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test",
     "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
-    "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
+    "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
   )
 ).dependsOn(core % "test->test;compile->compile")
 
@@ -140,7 +140,7 @@ lazy val cats = Project(
     "org.typelevel" %% "cats-laws" % "2.13.0" % "test",
     "org.typelevel" %% "discipline-specs2" % "1.5.0" % "test",
     "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
-    "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
+    "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
   )
 ).dependsOn(core % "test->test;compile->compile")
 
@@ -152,7 +152,7 @@ lazy val async = Project(
   name := "poi-scala-async",
   libraryDependencies ++= Seq(
     "org.specs2" %% "specs2-scalacheck" % "4.21.0" % "test",
-    "org.scalacheck" %% "scalacheck" % "1.18.1" % "test"
+    "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
   )
 ).dependsOn(core)
 
