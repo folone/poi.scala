@@ -125,7 +125,7 @@ jobs:
           steps.get-pr.outputs.pr-number != '' && 
           steps.check-benchmarks.outputs.found == 'true' &&
           steps.combine-results.outputs.has-results == 'true'
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ steps.get-pr.outputs.pr-number }}
           body: |
@@ -148,7 +148,7 @@ jobs:
           github.event.workflow_run.event == 'pull_request' && 
           steps.get-pr.outputs.pr-number != '' && 
           (steps.check-benchmarks.outputs.found == 'false' || steps.combine-results.outputs.has-results == 'false')
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ steps.get-pr.outputs.pr-number }}
           body: |
