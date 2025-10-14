@@ -223,8 +223,6 @@ info:
 	@echo "Project: poi.scala"
 	@echo "Description: Scala library for Excel file operations"
 	@echo "Build tool: sbt"
-	@echo "Scala version: 2.12.20 (default)"
-	@echo "Cross Scala versions: 2.12.20, 2.13.16, 3.3.6"
 	@echo "SBT version: $(shell ./sbt sbtVersion 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -1)"
 	@echo ""
 	@echo "Modules:"
