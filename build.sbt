@@ -7,7 +7,7 @@ val isScala3 = Def.setting(
 lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
-  crossScalaVersions := Seq(Scala212, "2.13.16", "3.3.6"),
+  crossScalaVersions := Seq(Scala212, "2.13.17", "3.3.7"),
   (Compile / doc / scalacOptions) ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
     if (isScala3.value) {
@@ -109,7 +109,7 @@ lazy val core = Project(
     Seq(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
-      "org.specs2" %% "specs2-scalacheck" % "4.22.0" % "test",
+      "org.specs2" %% "specs2-scalacheck" % "4.23.0" % "test",
       "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
     )
 )
@@ -123,7 +123,7 @@ lazy val scalaz = Project(
   libraryDependencies ++= Seq(
     "org.scalaz" %% "scalaz-effect" % scalazVersion,
     "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test",
-    "org.specs2" %% "specs2-scalacheck" % "4.22.0" % "test",
+    "org.specs2" %% "specs2-scalacheck" % "4.23.0" % "test",
     "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
   )
 ).dependsOn(core % "test->test;compile->compile")
@@ -139,7 +139,7 @@ lazy val cats = Project(
     "org.typelevel" %% "cats-effect" % "3.6.3",
     "org.typelevel" %% "cats-laws" % "2.13.0" % "test",
     "org.typelevel" %% "discipline-specs2" % "1.5.0" % "test",
-    "org.specs2" %% "specs2-scalacheck" % "4.22.0" % "test",
+    "org.specs2" %% "specs2-scalacheck" % "4.23.0" % "test",
     "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
   )
 ).dependsOn(core % "test->test;compile->compile")
@@ -151,7 +151,7 @@ lazy val async = Project(
   standardSettings,
   name := "poi-scala-async",
   libraryDependencies ++= Seq(
-    "org.specs2" %% "specs2-scalacheck" % "4.22.0" % "test",
+    "org.specs2" %% "specs2-scalacheck" % "4.23.0" % "test",
     "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
   )
 ).dependsOn(core)

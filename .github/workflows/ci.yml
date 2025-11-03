@@ -17,7 +17,7 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Check code formatting
         run: sbt scalafmtSbtCheck "+scalafmtCheckAll"
@@ -55,7 +55,7 @@ jobs:
         with:
           java-version: "${{ matrix.java }}"
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Run comprehensive test suite
         shell: bash
@@ -76,14 +76,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        scala-version: ["2.12.20", "2.13.16", "3.3.6"]
+        scala-version: ["2.12.20", "2.13.17", "3.3.7"]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
         with:
           java-version: 11
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Run extended property-based tests
         run: |
@@ -101,7 +101,7 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Run integration tests
         run: |
@@ -130,7 +130,7 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Check if JMH compiles
         run: |
@@ -198,7 +198,7 @@ jobs:
             echo "[]" > "$result_file"
           fi
       - name: Store benchmark results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: benchmark-results-${{ matrix.benchmark-type }}
           path: benchmark-results-*.json
@@ -218,7 +218,7 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Run full benchmark suite
         run: |
