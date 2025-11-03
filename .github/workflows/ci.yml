@@ -17,7 +17,7 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Check code formatting
         run: sbt scalafmtSbtCheck "+scalafmtCheckAll"
@@ -55,7 +55,7 @@ jobs:
         with:
           java-version: "${{ matrix.java }}"
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Run comprehensive test suite
         shell: bash
@@ -83,7 +83,7 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Run extended property-based tests
         run: |
@@ -101,7 +101,7 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Run integration tests
         run: |
@@ -130,7 +130,7 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Check if JMH compiles
         run: |
@@ -218,7 +218,7 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
-      - uses: coursier/cache-action@v6
+      - uses: coursier/cache-action@v7
       - uses: sbt/setup-sbt@v1
       - name: Run full benchmark suite
         run: |
