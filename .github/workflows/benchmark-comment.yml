@@ -19,7 +19,7 @@ jobs:
           echo "Event: ${{ github.event.workflow_run.event }}"
           echo "Pull requests: ${{ toJson(github.event.workflow_run.pull_requests) }}"
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0 # Fetch all history for all branches
