@@ -5,8 +5,8 @@ import cats.laws.discipline._
 import info.folone.poi._
 import info.folone.poi.cats
 import org.scalacheck._
-import org.specs2.mutable._
 import org.specs2.ScalaCheck
+import org.specs2.mutable._
 import org.typelevel.discipline.specs2.mutable.Discipline
 
 class TypeclassLawsSpec extends Specification with ScalaCheck with Discipline {

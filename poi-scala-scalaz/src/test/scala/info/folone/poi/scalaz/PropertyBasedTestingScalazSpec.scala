@@ -7,8 +7,8 @@ import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen._
 import org.scalacheck.Prop._
-import org.specs2.mutable.Specification
 import org.specs2.ScalaCheck
+import org.specs2.mutable.Specification
 
 class PropertyBasedTestingScalazSpec extends Specification with ScalaCheck {
 
