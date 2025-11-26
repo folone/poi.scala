@@ -3,8 +3,8 @@ package info.folone.poi.benchmarks
 import _root_.scalaz.syntax.semigroup._
 import info.folone.poi._
 import info.folone.poi.scalaz._
-import java.util.concurrent.TimeUnit
 import java.util.Date
+import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 import scala.util.Random

@@ -3,9 +3,9 @@ package info.folone.poi.scalaz
 import _root_.scalaz.scalacheck.ScalazProperties._
 import info.folone.poi._
 import org.scalacheck._
+import org.specs2.ScalaCheck
 import org.specs2.mutable._
 import org.specs2.specification.Scope
-import org.specs2.ScalaCheck
 import Arbitrary._
 
 class TypeclassLawsSpec extends Specification with ScalaCheck {
