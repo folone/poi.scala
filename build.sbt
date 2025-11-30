@@ -42,7 +42,7 @@ lazy val buildSettings = Def.settings(
 )
 
 val scalazVersion = "7.3.8"
-val poiVersion = "5.5.0"
+val poiVersion = "5.5.1"
 val jmhVersion = "1.37"
 
 lazy val standardSettings = Def.settings(
