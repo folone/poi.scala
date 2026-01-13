@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        scala-version: ["2.12.21", "2.13.18", "3.3.7"]
+        scala-version: ["2.12.21", "3.8.0", "3.3.7"]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
