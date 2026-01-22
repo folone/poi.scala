@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 8
+          java-version: 17
           cache: sbt
       - name: Setup SBT
         uses: sbt/setup-sbt@v1
