@@ -7,7 +7,7 @@ val isScala3 = Def.setting(
 lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
-  crossScalaVersions := Seq(Scala212, "2.13.18", "3.8.1"),
+  crossScalaVersions := Seq(Scala212, "2.13.18", "3.8.2"),
   (Compile / doc / scalacOptions) ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
     if (isScala3.value) {
