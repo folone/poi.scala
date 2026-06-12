@@ -41,7 +41,7 @@ lazy val buildSettings = Def.settings(
   Compile / parallelExecution := true
 )
 
-val scalazVersion = "7.3.8"
+val scalazVersion = "7.3.9"
 val poiVersion = "5.5.1"
 val jmhVersion = "1.37"
 
