@@ -12,7 +12,7 @@ jobs:
     name: Code Quality & Formatting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           java-version: 17
@@ -48,7 +48,7 @@ jobs:
     steps:
       - run: "git config --global core.autocrlf false"
         shell: bash
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           java-version: "${{ matrix.java }}"
@@ -76,7 +76,7 @@ jobs:
       matrix:
         scala-version: ["2.12.21", "2.13.18", "3.8.4"]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           java-version: 17
@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           java-version: 17
@@ -121,7 +121,7 @@ jobs:
         benchmark-type: ["core", "async", "memory"]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Need full history for performance comparison
       - uses: actions/setup-java@v5
@@ -209,7 +209,7 @@ jobs:
     needs: [test]
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: actions/setup-java@v5
