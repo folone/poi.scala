@@ -7,7 +7,7 @@ val isScala3 = Def.setting(
 lazy val buildSettings = Def.settings(
   organization := "info.folone",
   scalaVersion := Scala212,
-  crossScalaVersions := Seq(Scala212, "2.13.18", "3.8.4"),
+  crossScalaVersions := Seq(Scala212, "2.13.18", "3.9.0"),
   (Compile / doc / scalacOptions) ++= {
     val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
     if (isScala3.value) {
@@ -110,7 +110,7 @@ lazy val core = Project(
       "org.apache.poi" % "poi" % poiVersion,
       "org.apache.poi" % "poi-ooxml" % poiVersion,
       "org.specs2" %% "specs2-scalacheck" % "4.23.0" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
+      "org.scalacheck" %% "scalacheck" % "1.20.0" % "test"
     )
 )
 
@@ -124,7 +124,7 @@ lazy val scalaz = Project(
     "org.scalaz" %% "scalaz-effect" % scalazVersion,
     "org.scalaz" %% "scalaz-scalacheck-binding" % scalazVersion % "test",
     "org.specs2" %% "specs2-scalacheck" % "4.23.0" % "test",
-    "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
+    "org.scalacheck" %% "scalacheck" % "1.20.0" % "test"
   )
 ).dependsOn(core % "test->test;compile->compile")
 
@@ -136,11 +136,11 @@ lazy val cats = Project(
   name := "poi-scala-cats",
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % "2.13.0",
-    "org.typelevel" %% "cats-effect" % "3.7.0",
+    "org.typelevel" %% "cats-effect" % "3.7.1",
     "org.typelevel" %% "cats-laws" % "2.13.0" % "test",
     "org.typelevel" %% "discipline-specs2" % "1.5.0" % "test",
     "org.specs2" %% "specs2-scalacheck" % "4.23.0" % "test",
-    "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
+    "org.scalacheck" %% "scalacheck" % "1.20.0" % "test"
   )
 ).dependsOn(core % "test->test;compile->compile")
 
@@ -152,7 +152,7 @@ lazy val async = Project(
   name := "poi-scala-async",
   libraryDependencies ++= Seq(
     "org.specs2" %% "specs2-scalacheck" % "4.23.0" % "test",
-    "org.scalacheck" %% "scalacheck" % "1.19.0" % "test"
+    "org.scalacheck" %% "scalacheck" % "1.20.0" % "test"
   )
 ).dependsOn(core)
 
