@@ -52,7 +52,7 @@ trait Instances {
           case DateCell(index, data) => "DateCell(" + index + ", " + data + ")"
           case BooleanCell(index, data) => "BooleanCell(" + index + ", " + data + ")"
           case FormulaCell(index, data) => "FormulaCell(" + index + ", \"=" + data + ")"
-          case StyledCell(cell, style) => "StyledCell(" + shows(cell) + ", <style>)"
+          case StyledCell(cell, _) => "StyledCell(" + shows(cell) + ", <style>)"
           case BlankCell(index) => "BlankCell(" + index + ")"
           case ErrorCell(index, errorCode) => "ErrorCell(" + index + ", " + errorCode + ")"
         }
