@@ -1060,20 +1060,20 @@ make dev                  # clean + compile + test-quick
 make dev-setup           # clean + compile + test
 
 # Pre-release checks
-make pre-release         # clean + compile + test + scalastyle + docs
+make pre-release         # clean + compile + test + scalafix-check + docs
 ```
 
 ### Code Quality
 
 ```bash
-# Run scalastyle checks
-make scalastyle
-
 # Format code
 make format
 
 # Check code formatting
 make format-check
+
+# Check scalafix rules
+make scalafix-check
 ```
 
 ### Benchmarks

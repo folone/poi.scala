@@ -29,16 +29,28 @@ lazy val buildSettings = Def.settings(
     "-deprecation",
     "-unchecked"
   ),
+  // scalafix RemoveUnused is a semantic rule: it needs the compiler to emit
+  // unused-code warnings (-Ywarn-unused on 2.12, -Wunused on 2.13, -Wunused:all on 3).
   scalacOptions ++= {
     if (isScala3.value) {
-      Seq()
+      Seq(
+        "-Wunused:all"
+      )
+    } else if (scalaVersion.value.startsWith("2.12.")) {
+      Seq(
+        "-explaintypes",
+        "-Ywarn-unused"
+      )
     } else {
       Seq(
-        "-explaintypes"
+        "-explaintypes",
+        "-Wunused"
       )
     }
   },
-  Compile / parallelExecution := true
+  Compile / parallelExecution := true,
+  semanticdbEnabled := true,
+  semanticdbVersion := scalafixSemanticdb.revision
 )
 
 val scalazVersion = "7.3.9"

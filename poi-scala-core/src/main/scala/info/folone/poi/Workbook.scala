@@ -31,17 +31,17 @@ class Workbook(
   @annotation.tailrec
   private def setPoiCell(defaultRowHeight: Short, row: POIRow, cell: Cell, poiCell: POICell): Unit =
     cell match {
-      case StringCell(index, data) =>
+      case StringCell(_, data) =>
         poiCell.setCellValue(data)
         val cellHeight = data.split("\n").length * defaultRowHeight
         if (cellHeight > row.getHeight)
           row setHeight cellHeight.asInstanceOf[Short]
-      case BooleanCell(index, data) => poiCell.setCellValue(data)
-      case DateCell(index, data) => poiCell.setCellValue(data)
-      case NumericCell(index, data) => poiCell.setCellValue(data)
-      case FormulaCell(index, data) => poiCell.setCellFormula(data)
-      case BlankCell(index) => poiCell.setBlank()
-      case ErrorCell(index, errorCode) => poiCell.setCellErrorValue(errorCode)
+      case BooleanCell(_, data) => poiCell.setCellValue(data)
+      case DateCell(_, data) => poiCell.setCellValue(data)
+      case NumericCell(_, data) => poiCell.setCellValue(data)
+      case FormulaCell(_, data) => poiCell.setCellFormula(data)
+      case BlankCell(_) => poiCell.setBlank()
+      case ErrorCell(_, errorCode) => poiCell.setCellErrorValue(errorCode)
       case styledCell @ StyledCell(_, _) =>
         setPoiCell(defaultRowHeight, row, styledCell.nestedCell, poiCell)
     }
@@ -249,9 +249,9 @@ object Workbook {
     } yield (sheet, row, cell)
     val result = data.groupBy(_._1).map { case (sheet, lst) =>
       sheet -> lst
-        .map { case (s, r, c) => (r, c) }
+        .map { case (_, r, c) => (r, c) }
         .groupBy(_._1)
-        .map { case (row, cellList) => row -> cellList.map { case (r, c) => c }.toList }
+        .map { case (row, cellList) => row -> cellList.map { case (_, c) => c }.toList }
     }
     val sheets = result.map { case (sheet, rowLst) =>
       Sheet(sheet.getSheetName) {

@@ -93,7 +93,7 @@ class WorkbookSpec extends Specification {
     }
 
     "work with enhanced sheet features" in {
-      val validation = DataValidation(
+      DataValidation(
         cellRange = CellRange("Sheet1", 0, 0, 0, 0),
         validationType = ListValidation,
         constraint = ListConstraint(List("Option1", "Option2", "Option3"))

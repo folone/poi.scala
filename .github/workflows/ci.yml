@@ -21,6 +21,8 @@ jobs:
       - uses: sbt/setup-sbt@v1
       - name: Check code formatting
         run: sbt scalafmtSbtCheck "+scalafmtCheckAll"
+      - name: Check scalafix rules
+        run: sbt "scalafix --check" "Test / scalafix --check"
       - name: Compile and check for warnings
         run: |
           if sbt "+compile"; then
@@ -29,8 +31,6 @@ jobs:
             echo "❌ Compilation failed - please check source code"
             exit 1
           fi
-      - name: Run scalastyle
-        run: sbt scalastyle
 
   test:
     name: Test Suite (${{ matrix.java }}, ${{ matrix.os }})
