@@ -11,7 +11,7 @@ class IntegrationScalazSpec extends Specification {
   "Poi integration with Scalaz" should {
     "create workbook with backward compatibility and enhanced features" in {
       // Create enhanced cell styles for demonstration
-      val headerStyle = CellStyle(
+      CellStyle(
         font = Font(
           name = "Arial",
           bold = true,
@@ -22,7 +22,7 @@ class IntegrationScalazSpec extends Specification {
         alignment = Some(CenterAlignment)
       )
 
-      val dataStyle = CellStyle(
+      CellStyle(
         font = Font(heightInPoints = 10),
         dataFormat = DataFormat("0.00")
       )

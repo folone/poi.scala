@@ -9,7 +9,7 @@ class IntegrationSpec extends Specification {
   "Poi integration" should {
     "create workbook with backward compatibility and enhanced features" in {
       // Create enhanced cell styles for demonstration
-      val headerStyle = CellStyle(
+      CellStyle(
         font = Font(
           name = "Arial",
           bold = true,
@@ -20,7 +20,7 @@ class IntegrationSpec extends Specification {
         alignment = Some(CenterAlignment)
       )
 
-      val dataStyle = CellStyle(
+      CellStyle(
         font = Font(heightInPoints = 10),
         dataFormat = DataFormat("0.00")
       )
