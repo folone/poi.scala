@@ -38,7 +38,9 @@ lazy val buildSettings = Def.settings(
       )
     }
   },
-  Compile / parallelExecution := true
+  Compile / parallelExecution := true,
+  semanticdbEnabled := true,
+  semanticdbVersion := scalafixSemanticdb.revision
 )
 
 val scalazVersion = "7.3.9"

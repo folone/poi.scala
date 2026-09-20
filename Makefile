@@ -1,8 +1,8 @@
 # Makefile for poi.scala project
 # Common targets for Scala development workflow
 
-.PHONY: help compile test test-only test-quick clean package run console scalastyle docs publish-local \
-        deps update watch-compile watch-test format format-check test-integration test-unit \
+.PHONY: help compile test test-only test-quick clean package run console docs publish-local \
+        deps update watch-compile watch-test format format-check scalafix-check test-integration test-unit \
         test-laws test-primitives test-features test-core test-cats test-scalaz test-async \
         benchmarks dev-setup dev pre-release info check-sbt \
         cross-compile cross-test cross-test-only cross-package cross-publish-local cross-clean
@@ -42,9 +42,9 @@ help:
 	@echo "  dev-setup    - Full development setup (clean, compile, test)"
 	@echo ""
 	@echo "Quality:"
-	@echo "  scalastyle   - Run scalastyle checks"
 	@echo "  format       - Format code"
 	@echo "  format-check - Check code formatting"
+	@echo "  scalafix-check - Check scalafix rules"
 	@echo ""
 	@echo "Benchmarks:"
 	@echo "  benchmarks   - Run performance benchmarks"
@@ -106,10 +106,6 @@ run:
 console:
 	./sbt console
 
-# Run scalastyle checks
-scalastyle:
-	./sbt scalastyle
-
 # Generate documentation
 docs:
 	./sbt doc
@@ -141,6 +137,10 @@ format:
 # Check code formatting
 format-check:
 	./sbt scalafmtCheckAll scalafmtSbtCheck
+
+# Check scalafix rules (Compile and Test sources)
+scalafix-check:
+	./sbt "scalafix --check" "Test / scalafix --check"
 
 # Integration test specific targets
 test-integration:
@@ -215,7 +215,7 @@ dev: clean compile test-quick
 	@echo "Quick development cycle complete!"
 
 # Release preparation
-pre-release: clean compile test scalastyle docs
+pre-release: clean compile test scalafix-check docs
 	@echo "Pre-release checks complete!"
 
 # Show project information
@@ -244,4 +244,4 @@ check-sbt:
 	fi
 
 # All targets depend on sbt being available
-compile test test-only test-quick clean package run console scalastyle docs publish-local deps update cross-compile cross-test cross-test-only cross-package cross-publish-local cross-clean: check-sbt
+compile test test-only test-quick clean package run console docs publish-local deps update scalafix-check cross-compile cross-test cross-test-only cross-package cross-publish-local cross-clean: check-sbt
