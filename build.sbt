@@ -180,6 +180,20 @@ lazy val benchmarks = Project(
       "org.openjdk.jmh" % "jmh-core" % jmhVersion,
       "org.openjdk.jmh" % "jmh-generator-annprocess" % jmhVersion
     ),
-    Jmh / dependencyClasspath := (Compile / dependencyClasspath).value ++ (Test / dependencyClasspath).value ++ (scalaz / Compile / dependencyClasspath).value ++ (cats / Compile / dependencyClasspath).value ++ (async / Compile / dependencyClasspath).value
+    // sbt-jmh writes META-INF/BenchmarkList by scanning (Compile / classDirectory)
+    // after Compile/compile. These sources live in src/jmh, so that directory is
+    // empty on a clean compile and the generator emits nothing. sbt 1 ran the
+    // generator again on the next process and then saw the classes; sbt 2's
+    // disk cache keeps the empty result, and Jmh/run fails with
+    // "Unable to find the resource: /META-INF/BenchmarkList". Compiling the
+    // benchmark sources on Compile makes them visible to the generator in the
+    // same task graph. Append to dependencyClasspath instead of replacing it,
+    // so the generated classes and BenchmarkList stay on the Jmh run classpath.
+    Compile / unmanagedSourceDirectories += baseDirectory.value / "src" / "jmh" / "scala",
+    Jmh / dependencyClasspath ++=
+      (Test / dependencyClasspath).value ++
+        (scalaz / Compile / dependencyClasspath).value ++
+        (cats / Compile / dependencyClasspath).value ++
+        (async / Compile / dependencyClasspath).value
   )
   .dependsOn(core, scalaz, cats, async)

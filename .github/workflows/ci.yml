@@ -139,58 +139,38 @@ jobs:
           case "${{ matrix.benchmark-type }}" in
             "core")
               # Run core benchmarks with reduced parameters for faster execution
-              if sbt 'benchmarks/Jmh/run -p dataSize=1000 -rf json -rff benchmark-results-core.json .*PoiBenchmarks.*'; then
-                echo "✅ Core benchmarks completed successfully"
-              else
-                echo "❌ Core benchmarks failed, creating empty results file"
-                echo "[]" > benchmark-results-core.json
-              fi
+              sbt 'benchmarks/Jmh/run -p dataSize=1000 -rf json -rff benchmark-results-core.json .*PoiBenchmarks.*'
               ;;
             "async")
               # Run async benchmarks with smaller dataset
-              if sbt 'benchmarks/Jmh/run -p dataSize=100 -rf json -rff benchmark-results-async.json .*AsyncPoiBenchmarks.*'; then
-                echo "✅ Async benchmarks completed successfully"
-              else
-                echo "❌ Async benchmarks failed, creating empty results file"
-                echo "[]" > benchmark-results-async.json
-              fi
+              sbt 'benchmarks/Jmh/run -p dataSize=100 -rf json -rff benchmark-results-async.json .*AsyncPoiBenchmarks.*'
               ;;
             "memory")
               # Run memory benchmarks with single data size for efficiency
               export SBT_OPTS="-Xmx2g -XX:+UseG1GC"
-              if sbt 'benchmarks/Jmh/run -p dataSize=5000 -rf json -rff benchmark-results-memory.json .*MemoryBenchmarks.*'; then
-                echo "✅ Memory benchmarks completed successfully"
-              else
-                echo "❌ Memory benchmarks failed, creating empty results file"
-                echo "[]" > benchmark-results-memory.json
-              fi
+              sbt 'benchmarks/Jmh/run -p dataSize=5000 -rf json -rff benchmark-results-memory.json .*MemoryBenchmarks.*'
               ;;
           esac
 
-          # Verify the results file exists and has content
+          # JMH's -rff path is relative to the forked project, which may be
+          # the benchmarks module. Fail the job if the run produced no scores
+          # instead of uploading an empty array.
           result_file="benchmark-results-${{ matrix.benchmark-type }}.json"
-
-          # Check both project root and benchmarks directory
-          if [ -f "$result_file" ] && [ -s "$result_file" ]; then
-            echo "✅ Results file found in project root: $result_file"
-            ls -la "$result_file"
-          elif [ -f "benchmarks/$result_file" ] && [ -s "benchmarks/$result_file" ]; then
-            echo "✅ Results file found in benchmarks directory, moving to root"
+          if [ -f "benchmarks/$result_file" ]; then
             mv "benchmarks/$result_file" "$result_file"
-            ls -la "$result_file"
-          else
-            echo "⚠️ Results file missing or empty in both locations, creating fallback"
-            echo "🔍 Debugging: Let's find where JMH actually wrote files..."
-            echo "Current working directory: $(pwd)"
-            echo "Files in project root:"
-            ls -la *.json 2>/dev/null || echo "No JSON files in root"
-            echo "Files in benchmarks directory:"
-            ls -la benchmarks/*.json 2>/dev/null || echo "No JSON files in benchmarks/"
-            echo "Searching for any JSON files containing 'benchmark':"
-            find . -name "*benchmark*.json" -type f 2>/dev/null | head -10
-            echo "Creating fallback file..."
-            echo "[]" > "$result_file"
           fi
+          if [ ! -s "$result_file" ]; then
+            echo "❌ JMH produced no results file ($result_file)"
+            exit 1
+          fi
+          result_count=$(jq 'length' "$result_file")
+          if [ "$result_count" -eq 0 ]; then
+            echo "❌ JMH results file is empty: $result_file"
+            cat "$result_file"
+            exit 1
+          fi
+          echo "✅ Recorded $result_count benchmark results in $result_file"
+          ls -la "$result_file"
       - name: Store benchmark results
         uses: actions/upload-artifact@v7
         with:
