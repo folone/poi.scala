@@ -1,5 +1,6 @@
 package info.folone.poi
 
+import info.folone.poi.TypeCompat.Intersection3
 import _root_.cats._
 import _root_.cats.implicits._
 import _root_.scala.annotation.tailrec
@@ -38,7 +39,7 @@ trait Instances {
 
   }
 
-  implicit val cellInstance: Semigroup[Cell] with Order[Cell] with Show[Cell] =
+  implicit val cellInstance: Intersection3[Semigroup[Cell], Order[Cell], Show[Cell]] =
     new Semigroup[Cell] with Order[Cell] with Show[Cell] {
       override def combine(f1: Cell, f2: Cell): Cell = f2
       override def compare(x: Cell, y: Cell): Int = {
@@ -101,7 +102,7 @@ trait Instances {
         }
     }
 
-  implicit val rowInstance: Semigroup[Row] with Eq[Row] with Show[Row] =
+  implicit val rowInstance: Intersection3[Semigroup[Row], Eq[Row], Show[Row]] =
     new Semigroup[Row] with Eq[Row] with Show[Row] {
       override def combine(f1: Row, f2: Row): Row =
         Row(f2.index)(mergeSets(f1.cells, f2.cells, (_: Cell).index))
@@ -111,7 +112,7 @@ trait Instances {
         s"Row(${as.index})(${as.cells.toIndexedSeq.sortBy(_.index).map(Show[Cell].show).mkString(", ")})"
     }
 
-  implicit val sheetInstance: Semigroup[Sheet] with Eq[Sheet] with Show[Sheet] =
+  implicit val sheetInstance: Intersection3[Semigroup[Sheet], Eq[Sheet], Show[Sheet]] =
     new Semigroup[Sheet] with Eq[Sheet] with Show[Sheet] {
       override def combine(f1: Sheet, f2: Sheet): Sheet =
         Sheet(f2.name)(mergeSets(f1.rows, f2.rows, (_: Row).index))
@@ -126,7 +127,7 @@ trait Instances {
         s"""Sheet("${as.name}")(${as.rows.toIndexedSeq.sortBy(_.index).map(Show[Row].show).mkString(", ")})"""
     }
 
-  implicit val wbInstance: Monoid[Workbook] with Eq[Workbook] with Show[Workbook] =
+  implicit val wbInstance: Intersection3[Monoid[Workbook], Eq[Workbook], Show[Workbook]] =
     new Monoid[Workbook] with Eq[Workbook] with Show[Workbook] {
       override def empty: Workbook = Workbook(Set[Sheet]())
       override def combine(f1: Workbook, f2: Workbook): Workbook =

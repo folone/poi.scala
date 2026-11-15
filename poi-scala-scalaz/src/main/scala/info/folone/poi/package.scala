@@ -1,5 +1,6 @@
 package info.folone.poi
 
+import info.folone.poi.TypeCompat.Intersection3
 import _root_.scala.annotation.tailrec
 import _root_.scalaz._
 import _root_.scalaz.effect.IO
@@ -40,7 +41,7 @@ trait Instances {
 
   }
 
-  implicit val cellInstance: Semigroup[Cell] with Order[Cell] with Show[Cell] =
+  implicit val cellInstance: Intersection3[Semigroup[Cell], Order[Cell], Show[Cell]] =
     new Semigroup[Cell] with Order[Cell] with Show[Cell] {
       override def append(f1: Cell, f2: => Cell): Cell = f2
       override def equal(a1: Cell, a2: Cell): Boolean = a1.index == a2.index
@@ -103,7 +104,7 @@ trait Instances {
       }
     }
 
-  implicit val rowInstance: Semigroup[Row] with Equal[Row] with Show[Row] =
+  implicit val rowInstance: Intersection3[Semigroup[Row], Equal[Row], Show[Row]] =
     new Semigroup[Row] with Equal[Row] with Show[Row] {
       override def append(f1: Row, f2: => Row): Row =
         Row(f2.index)(mergeSets(f1.cells, f2.cells, (_: Cell).index))
@@ -115,7 +116,7 @@ trait Instances {
       override def shows(as: Row): String = "Row (" + as.index + ")(" + as.cells.toIndexedSeq.sortBy(_.index) + ")"
     }
 
-  implicit val sheetInstance: Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] =
+  implicit val sheetInstance: Intersection3[Semigroup[Sheet], Equal[Sheet], Show[Sheet]] =
     new Semigroup[Sheet] with Equal[Sheet] with Show[Sheet] {
       override def append(f1: Sheet, f2: => Sheet): Sheet =
         Sheet(f2.name)(mergeSets(f1.rows, f2.rows, (_: Row).index))
@@ -128,7 +129,7 @@ trait Instances {
         "Sheet (\"" + as.name + "\")(" + as.rows.toIndexedSeq.sortBy(_.index) + ")"
     }
 
-  implicit val wbInstance: Monoid[Workbook] with Equal[Workbook] with Show[Workbook] =
+  implicit val wbInstance: Intersection3[Monoid[Workbook], Equal[Workbook], Show[Workbook]] =
     new Monoid[Workbook] with Equal[Workbook] with Show[Workbook] {
       override def zero: Workbook = Workbook(Set[Sheet]())
       override def append(f1: Workbook, f2: => Workbook): Workbook =
