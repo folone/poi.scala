@@ -65,7 +65,6 @@ class ComprehensivePoiBenchmarks {
 
   @Benchmark
   def sheetCreationBenchmark(bh: Blackhole): Unit = {
-    val random = new Random(42)
     val rows = (0 until dataSize).map { rowIndex =>
       val cells: Set[Cell] = (0 until 10).map { colIndex =>
         StringCell(colIndex, s"Sheet-$rowIndex-Col-$colIndex"): Cell
