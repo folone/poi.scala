@@ -107,6 +107,12 @@ lazy val fatjar = Project(
       case "reference.conf" => MergeStrategy.concat
       case _ => MergeStrategy.first
     },
+    // `assembly / artifact` has no classifier, and `assemblyJarName` matches the
+    // `packageBin` jar, so both would publish as
+    // `info.folone:poi-scala_<scalaBinary>`. sbt 1 overwrote the thin jar with the
+    // fat jar; sbt 2's ivyless publisher rejects the duplicate Maven path.
+    // Keep the fat jar on the existing coordinates and do not publish the thin one.
+    Compile / packageBin / publishArtifact := false,
     addArtifact(assembly / artifact, assembly)
   )
   .dependsOn(core, scalaz, async)
