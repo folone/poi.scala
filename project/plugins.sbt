@@ -4,6 +4,6 @@ addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.14.10")
 
 addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.12.1")
 
-addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.8")
+addSbtPlugin("com.github.sbt" % "sbt-jmh" % "0.4.9")
 
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "2.5.0")
